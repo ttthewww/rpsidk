@@ -111,12 +111,12 @@ public class GamePanel extends JPanel implements Runnable{
                     System.out.println("MU LAG AGI RECURSION");
                     enemies.add(new Enemy(this, enemies));
                     enemies.add(new Enemy(this, enemies));
-                    enemies.add(new Enemy(this, enemies));
-                    enemies.add(new Enemy(this, enemies));
-                    enemies.add(new Enemy(this, enemies));
-                    enemies.add(new Enemy(this, enemies));
-                    enemies.add(new Enemy(this, enemies));
-                    enemies.add(new Enemy(this, enemies));
+//                    enemies.add(new Enemy(this, enemies));
+//                    enemies.add(new Enemy(this, enemies));
+//                    enemies.add(new Enemy(this, enemies));
+//                    enemies.add(new Enemy(this, enemies));
+//                    enemies.add(new Enemy(this, enemies));
+//                    enemies.add(new Enemy(this, enemies));
 //                    frameEnemies.add(new FrameEnemy());
                 }
 //                System.out.println("FPS" + drawCount);

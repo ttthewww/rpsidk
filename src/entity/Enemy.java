@@ -146,5 +146,6 @@ public class Enemy extends Entity{
         at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
 
         g2.drawImage(image, at, null);
+        g2.draw(this.colRect);
     }
 }
