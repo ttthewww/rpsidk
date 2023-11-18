@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,14 +30,15 @@ public class Player extends Entity {
     private int width = 30;
     private int height = 30;
     public double speed_x_right = 0;
-    public double speed_x_left  = 0;
+    public double speed_x_left = 0;
     public double speed_y_up = 0;
     public double speed_y_down = 0;
     public double top_speed = 4;
     double deceleration = 0.1;
     public int bulletType = 1;
+    MaskCreationThread maskThread;
 
-    public Player(GamePanel gp, KeyHandler keyH){
+    public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
         this.keyH = keyH;
         getPlayerImage();
@@ -44,9 +47,9 @@ public class Player extends Entity {
         setDefaultValues();
     }
 
-    public void setDefaultValues(){
-        this.x = 500;
-        this.y = 500;
+    public void setDefaultValues() {
+        this.x = 250;
+        this.y = 250;
     }
 
     public void getPlayerImage() {
@@ -62,22 +65,26 @@ public class Player extends Entity {
                     // Handle the error or provide a default image
                 }
             }
-        } catch(IOException e){
+            this.image = playerFrames[0];
+            this.maskThread = new MaskCreationThread(this.image, x, y);
+            maskThread.start();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void toggleBulletType(){
-        if(changeBulletTypeCooldown >= changeBulletTypeTime){
+    public void toggleBulletType() {
+        if (changeBulletTypeCooldown >= changeBulletTypeTime) {
             bulletType++;
-            if(bulletType > 3){
+            if (bulletType > 3) {
                 bulletType = 1;
             }
             changeBulletTypeCooldown = 0;
         }
     }
-    public void shoot(int targetX, int targetY, WindowContainer window){
-        if(fireCooldown >= reloadTime){
+
+    public void shoot(int targetX, int targetY, WindowContainer window) {
+        if (fireCooldown >= reloadTime) {
             double directionX = this.gp.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
             double directionY = this.gp.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));
             double rotationAngleInRadians = Math.atan2(directionY, directionX);
@@ -88,54 +95,54 @@ public class Player extends Entity {
         }
     }
 
-    public void move(){
-        if(keyH.rightPressed){
+    public void move() {
+        if (keyH.rightPressed) {
             this.speed_x_right += this.acceleration;
-            if (this.speed_x_right > this.top_speed){
+            if (this.speed_x_right > this.top_speed) {
                 this.speed_x_right = this.top_speed;
             }
-        }else{
+        } else {
             this.speed_x_right -= this.deceleration;
         }
 
-        if(keyH.leftPressed){
+        if (keyH.leftPressed) {
             this.speed_x_left -= this.acceleration;
-            if (this.speed_x_left < -this.top_speed){
+            if (this.speed_x_left < -this.top_speed) {
                 this.speed_x_left = -this.top_speed;
             }
-        }else{
+        } else {
             this.speed_x_left += this.deceleration;
         }
 
-        if(keyH.downPressed){
+        if (keyH.downPressed) {
             this.speed_y_down += this.acceleration;
-            if (this.speed_y_down > this.top_speed){
+            if (this.speed_y_down > this.top_speed) {
                 this.speed_y_down = this.top_speed;
             }
-        }else{
+        } else {
             this.speed_y_down -= this.deceleration;
         }
 
-        if(keyH.upPressed){
+        if (keyH.upPressed) {
             this.speed_y_up -= this.acceleration;
-            if (this.speed_y_up < -this.top_speed){
+            if (this.speed_y_up < -this.top_speed) {
                 this.speed_y_up = -this.top_speed;
             }
-        }else{
+        } else {
             this.speed_y_up += this.deceleration;
         }
 
 
-        if (this.speed_x_right < 0){
+        if (this.speed_x_right < 0) {
             this.speed_x_right = 0;
         }
-        if (this.speed_x_left > 0){
+        if (this.speed_x_left > 0) {
             this.speed_x_left = 0;
         }
-        if (this.speed_y_down < 0){
+        if (this.speed_y_down < 0) {
             this.speed_y_down = 0;
         }
-        if (this.speed_y_up > 0){
+        if (this.speed_y_up > 0) {
             this.speed_y_up = 0;
         }
 
@@ -144,24 +151,24 @@ public class Player extends Entity {
         this.y += this.speed_y_up;
         this.y += this.speed_y_down;
 
-        if(this.x - 15 <= 0){
+        if (this.x - 15 <= 0) {
             this.x = 15;
         }
 
-        if(this.x + 15 >= gp.getWidth()){
+        if (this.x + 15 >= gp.getWidth()) {
             this.x = gp.getWidth() - 15;
         }
 
-        if(this.y - 15 <= 0){
+        if (this.y - 15 <= 0) {
             this.y = 15;
         }
-        
-        if(this.y + 15 >= gp.getHeight()){
+
+        if (this.y + 15 >= gp.getHeight()) {
             this.y = gp.getHeight() - 15;
         }
     }
 
-    public void updatePlayerBullets(){
+    public void updatePlayerBullets() {
         Iterator<Bullet> iterator = bullets.iterator();
         while (iterator.hasNext()) {
             Bullet bullet = iterator.next();
@@ -173,28 +180,35 @@ public class Player extends Entity {
         }
     }
 
-    public void update(GamePanel gp, WindowContainer window){
+    public void update(GamePanel gp, WindowContainer window) {
         move();
 
         //Shooting
         fireCooldown++;
-        if(fireCooldown >= reloadTime)fireCooldown = reloadTime;
-        if(keyH.spacePressed){
-            shoot(gp.absoluteMouseX , gp.absoluteMouseY, window);
+        if (fireCooldown >= reloadTime) fireCooldown = reloadTime;
+        if (keyH.spacePressed) {
+            shoot(gp.absoluteMouseX, gp.absoluteMouseY, window);
         }
         updatePlayerBullets();
 
         //Toggling bullet type
         changeBulletTypeCooldown++;
-        if(changeBulletTypeCooldown >= changeBulletTypeTime)changeBulletTypeCooldown = changeBulletTypeTime;
-        if(keyH.tabPressed){
+        if (changeBulletTypeCooldown >= changeBulletTypeTime) changeBulletTypeCooldown = changeBulletTypeTime;
+        if (keyH.tabPressed) {
             toggleBulletType();
         }
         //Updating collision box
         this.colRect.x = this.x - 15;
         this.colRect.y = this.y - 15;
     }
-    public void rotate(BufferedImage image, GamePanel gamePanel, AffineTransform at){
+
+
+    public void rotateMask(Area mask, double rotationAngleInRadians, double centerX, double centerY) {
+        AffineTransform maskRotation = AffineTransform.getRotateInstance(rotationAngleInRadians, centerX, centerY);
+        mask.transform(maskRotation);
+    }
+
+    public void rotate(BufferedImage image, GamePanel gamePanel, AffineTransform at) {
         double directionX = gamePanel.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
         double directionY = gamePanel.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
@@ -209,18 +223,56 @@ public class Player extends Entity {
         }
 
         AffineTransform at = AffineTransform.getTranslateInstance(this.x - image.getWidth() / 2.0, this.y - image.getHeight() / 2.0);
+
+        // Rotate the image
         rotate(image, gamePanel, at);
         g2.drawImage(image, at, null);
+
+
+        if (maskThread.isAlive()) {
+            try {
+                maskThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Area mask = maskThread.getMask();
+
+        if (mask != null) {
+            double directionX = gamePanel.absoluteMouseX - (gp.getLocationOnScreen().x + this.x);
+            double directionY = gamePanel.absoluteMouseY - (gp.getLocationOnScreen().y + this.y);
+            double rotationAngleInRadians = Math.atan2(directionY, directionX);
+
+            Area transformedMask = new Area(mask);
+
+
+            double maskInitialX = this.x/* initial X position of the mask */;
+            double maskInitialY = this.y/* initial Y position of the mask */;
+            double offsetX = this.x - maskInitialX;
+            double offsetY = this.y - maskInitialY;
+
+            transformedMask.transform(AffineTransform.getTranslateInstance(this.x, this.y));
+
+            Rectangle bounds = transformedMask.getBounds();
+
+            System.out.println("Mask X: " + bounds.getX() + ", Mask Y: " + bounds.getY());
+            System.out.println("Player X: " + this.x + ", Player Y: " + this.y);
+            bounds.x = this.x;
+            bounds.y = this.y;
+            g2.setColor(Color.BLUE);
+            g2.drawOval((int) bounds.getX(), (int) bounds.getY(), 2, 2);
+            g2.fill(bounds);
+            g2.draw(transformedMask);
+
+            g2.setClip(null);
+        }
 
         for (Bullet bullet : bullets) {
             bullet.draw(g2, gamePanel);
         }
 
-        g2.drawOval(this.x, this.y, 1, 1);
-        g2.draw(this.colRect);
-//        g2.fill(this.colRect);
-
+        g2.drawOval(this.x, this.y, 3, 3);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
-
 }

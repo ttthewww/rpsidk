@@ -132,11 +132,8 @@ public class GamePanel extends JPanel implements Runnable{
             }
             if(fps.timer>= 1000000000){
                 if (Math.random() < spawnChance) {
-                    enemies.add(new ScissorEnemy(this, enemies));
 //                    enemies.add(new ScissorEnemy(this, enemies));
-                    enemies.add(new RockEnemy(this, enemies));
 //                    enemies.add(new RockEnemy(this, enemies));
-                    enemies.add(new PaperEnemy(this, enemies));
 //                    enemies.add(new PaperEnemy(this, enemies));
                 }
                 fps.currentFPS = fps.drawCount;
@@ -151,10 +148,6 @@ public class GamePanel extends JPanel implements Runnable{
         cChecker.checkPlayerBulletCollision(player.bullets, enemies);
         enemies.removeIf(enemy -> !enemy.isActive);
         player.bullets.removeIf(bullet -> !bullet.isActive);
-
-//        for (FrameEnemy e : frameEnemies){
-//            e.update(player);
-//        }
 
         player.update(this, this.window);
         for(Enemy e : enemies){
