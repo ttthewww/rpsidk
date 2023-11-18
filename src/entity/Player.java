@@ -22,8 +22,8 @@ public class Player extends Entity {
     public ArrayList<Bullet> bullets = new ArrayList<>();
     private int fireCooldown = 0;
     public int reloadTime = 30;
-    private int changeBulletTypeCooldown = 60;
-    private int changeBulletTypeTime = 60;
+    private int changeBulletTypeCooldown = 40;
+    private int changeBulletTypeTime = 40;
     private double acceleration = 1;
     private int width = 30;
     private int height = 30;
@@ -73,7 +73,6 @@ public class Player extends Entity {
             if(bulletType > 3){
                 bulletType = 1;
             }
-            System.out.println(bulletType);
             changeBulletTypeCooldown = 0;
         }
     }

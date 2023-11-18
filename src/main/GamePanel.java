@@ -40,6 +40,7 @@ public class GamePanel extends JPanel implements Runnable{
     private Background background1;
     private Background background2;
 
+    public FPS fps;
     public GamePanel(){
         setWindowDefaults();
         this.setBackground(Color.black);
@@ -49,12 +50,13 @@ public class GamePanel extends JPanel implements Runnable{
         this.setFocusable(true);
         this.setSize((int) window.windowHeight, (int)window.windowWidth);
         this.setFocusTraversalKeysEnabled(false);
-//        try {
-//            this.background1 = new Background(0);
-//            this.background2 = new Background(-this.getHeight());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            this.background1 = new Background(0);
+            this.background2 = new Background(-this.getHeight());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.fps = new FPS();
     }
 
 
@@ -88,8 +90,6 @@ public class GamePanel extends JPanel implements Runnable{
 //        enemies.add(new ScissorEnemy(this, enemies));
 //        enemies.add(new RockEnemy(this, enemies));
 //        enemies.add(new RockEnemy(this, enemies));
-
-
         while(gameThread != null){
             if(gameOver){
                 while(true){
@@ -105,43 +105,44 @@ public class GamePanel extends JPanel implements Runnable{
                 this.mouseY = mouseMotionH.getMouseY();
             }
 
+            fps.update();
+
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
             timer += (currentTime - lastTime);
             lastTime = currentTime;
-            if(delta >= 1){
+
+            if(fps.delta >= 1){
                 try {
                     update(window, enemies);
-//                    background1.update(delta, this);
-//                    background2.update(delta, this);
+                    background1.update(fps.delta, this);
+                    background2.update(fps.delta, this);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
-
                 repaint();
                 delta--;
                 drawCount++;
 
+                fps.delta--;
+                fps.drawCount++;
 //                if(Math.random() < .05){
 //                    this.window.shrink();
 //                }
             }
-
-            if(timer >= 1000000000){
+            if(fps.timer>= 1000000000){
                 if (Math.random() < spawnChance) {
+                    enemies.add(new ScissorEnemy(this, enemies));
 //                    enemies.add(new ScissorEnemy(this, enemies));
-//                    enemies.add(new ScissorEnemy(this, enemies));
+                    enemies.add(new RockEnemy(this, enemies));
 //                    enemies.add(new RockEnemy(this, enemies));
-//                    enemies.add(new RockEnemy(this, enemies));
-//                    enemies.add(new PaperEnemy(this, enemies));
+                    enemies.add(new PaperEnemy(this, enemies));
 //                    enemies.add(new PaperEnemy(this, enemies));
                 }
-
-//                System.out.println("FPS" + drawCount);
-
+                fps.currentFPS = fps.drawCount;
+                fps.drawCount= 0;
                 drawCount = 0;
-                timer = 0;
+                fps.timer = 0;
             }
         }
     }
@@ -166,13 +167,15 @@ public class GamePanel extends JPanel implements Runnable{
          super.paintComponent(g);
          Graphics2D g2 = (Graphics2D)g;
 
-
-//         background1.draw(g2);
-//         background2.draw(g2);
+         background1.draw(g2);
+         background2.draw(g2);
          player.draw(g2, this);
          for(Enemy e : enemies) {
              e.draw(g2, this);
          }
-         g2.dispose();
+
+        g2.setColor(Color.GREEN);
+        g2.drawString("FPS: " + fps.currentFPS, 5, 10);
+        g2.dispose();
     }
 }
