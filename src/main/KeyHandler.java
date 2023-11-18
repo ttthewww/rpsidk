@@ -1,21 +1,20 @@
 package main;
 
+import entity.Player;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener {
-
-    public boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed, shiftPressed;
-
+    public boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed, shiftPressed, tabPressed;
+    Player player;
     @Override
     public void keyTyped(KeyEvent e) {
-
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
-
         if(code == KeyEvent.VK_W){
             upPressed = true;
         }
@@ -38,6 +37,9 @@ public class KeyHandler implements KeyListener {
 
         if(code == KeyEvent.VK_SHIFT){
             shiftPressed = true;
+        }
+        if(code == KeyEvent.VK_TAB){
+            tabPressed = true;
         }
     }
 
@@ -68,6 +70,8 @@ public class KeyHandler implements KeyListener {
         if(code == KeyEvent.VK_SHIFT){
             shiftPressed = false;
         }
-
+        if(code == KeyEvent.VK_TAB){
+            tabPressed = false;
+        }
     }
 }

@@ -1,22 +1,22 @@
 package main;
 
-import entity.Enemy;
-import entity.Player;
-import entity.FrameEnemy;
-import jdk.jfr.Event;
+import entity.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class GamePanel extends JPanel implements Runnable{
 
-    int screenWidth = 576;
-    int screenHeight = 576;
+    public static WindowContainer window;
 
-    public int windowX = 500;
-    public int windowY = 250;
+    public int windowPosX = 500;
+    public int windowPosY = 250;
 
     public double windowSpeed = 1;
     public int mouseX;
@@ -29,7 +29,6 @@ public class GamePanel extends JPanel implements Runnable{
     MouseMotionHandler mouseMotionH = new MouseMotionHandler();
     Thread gameThread;
 
-    public Player player = new Player(this, this.keyH);
     ArrayList<Enemy> enemies = new ArrayList<>();
     ArrayList<FrameEnemy> frameEnemies = new ArrayList<>();
 
@@ -37,14 +36,38 @@ public class GamePanel extends JPanel implements Runnable{
     boolean gameOver = false;
 
     double spawnChance = 0.2;
+    public Player player = new Player(this, this.keyH);
+    private Background background1;
+    private Background background2;
 
     public GamePanel(){
-        this.setPreferredSize(new Dimension(screenWidth, screenHeight));
+        setWindowDefaults();
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.addMouseMotionListener(mouseMotionH);
         this.setFocusable(true);
+        this.setSize((int) window.windowHeight, (int)window.windowWidth);
+        this.setFocusTraversalKeysEnabled(false);
+//        try {
+//            this.background1 = new Background(0);
+//            this.background2 = new Background(-this.getHeight());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+
+    public void setWindowDefaults(){
+        this.window =  new WindowContainer(576, 576, 300, 0, 0);
+        window.setFocusTraversalKeysEnabled(false);
+        window.setResizable(false);
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setTitle("Game");
+        window.setAlwaysOnTop(true);
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        window.setLocation(dim.width / 2 - windowPosX / 2, dim.height / 2 - windowPosY);
+        window.add(this);
     }
 
     public void startGameThread(){
@@ -54,21 +77,6 @@ public class GamePanel extends JPanel implements Runnable{
 
     @Override
     public void run(){
-        JFrame window = new JFrame();
-
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setTitle("Game");
-        window.setLocation(windowX, windowY);
-        window.setAlwaysOnTop(true);
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-//        new FrameEnemies();
-        window.setLocation(dim.width / 2 - windowX / 2, dim.height / 2 - windowY);
-
-        window.setSize(this.getPreferredSize());
-
-        window.add(this);
-        window.setVisible(true);
-
         double drawInterval = 1000000000/FPS;
         double delta = 0;
         long lastTime = System.nanoTime();
@@ -76,14 +84,18 @@ public class GamePanel extends JPanel implements Runnable{
         long timer = 0;
         int drawCount = 0;
 
+//        enemies.add(new ScissorEnemy(this, enemies));
+//        enemies.add(new ScissorEnemy(this, enemies));
+//        enemies.add(new RockEnemy(this, enemies));
+//        enemies.add(new RockEnemy(this, enemies));
+
+
         while(gameThread != null){
             if(gameOver){
                 while(true){
                     System.out.println("GAME OVER");
                 }
-//                System.out.println("Pildi na");
             }
-
 
             this.absoluteMouseX =  MouseInfo.getPointerInfo().getLocation().x;
             this.absoluteMouseY = MouseInfo.getPointerInfo().getLocation().y;
@@ -92,33 +104,40 @@ public class GamePanel extends JPanel implements Runnable{
                 this.mouseX = mouseMotionH.getMouseX();
                 this.mouseY = mouseMotionH.getMouseY();
             }
-//            System.out.println(mouseX + " " + mouseY);
 
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
             timer += (currentTime - lastTime);
             lastTime = currentTime;
             if(delta >= 1){
-                update(window, enemies);
+                try {
+                    update(window, enemies);
+//                    background1.update(delta, this);
+//                    background2.update(delta, this);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+
                 repaint();
                 delta--;
                 drawCount++;
+
+//                if(Math.random() < .05){
+//                    this.window.shrink();
+//                }
             }
 
             if(timer >= 1000000000){
                 if (Math.random() < spawnChance) {
-                    System.out.println("ADDING ENEMIES");
-                    System.out.println("MU LAG AGI RECURSION");
-                    enemies.add(new Enemy(this, enemies));
-                    enemies.add(new Enemy(this, enemies));
-//                    enemies.add(new Enemy(this, enemies));
-//                    enemies.add(new Enemy(this, enemies));
-//                    enemies.add(new Enemy(this, enemies));
-//                    enemies.add(new Enemy(this, enemies));
-//                    enemies.add(new Enemy(this, enemies));
-//                    enemies.add(new Enemy(this, enemies));
-//                    frameEnemies.add(new FrameEnemy());
+//                    enemies.add(new ScissorEnemy(this, enemies));
+//                    enemies.add(new ScissorEnemy(this, enemies));
+//                    enemies.add(new RockEnemy(this, enemies));
+//                    enemies.add(new RockEnemy(this, enemies));
+//                    enemies.add(new PaperEnemy(this, enemies));
+//                    enemies.add(new PaperEnemy(this, enemies));
                 }
+
 //                System.out.println("FPS" + drawCount);
 
                 drawCount = 0;
@@ -127,15 +146,16 @@ public class GamePanel extends JPanel implements Runnable{
         }
     }
 
-    public void update(JFrame window, ArrayList<Enemy> enemies){
+    public void update(JFrame window, ArrayList<Enemy> enemies) throws IOException {
         cChecker.checkPlayerBulletCollision(player.bullets, enemies);
         enemies.removeIf(enemy -> !enemy.isActive);
+        player.bullets.removeIf(bullet -> !bullet.isActive);
 
-        for (FrameEnemy e : frameEnemies){
-            e.update(player);
-        }
+//        for (FrameEnemy e : frameEnemies){
+//            e.update(player);
+//        }
 
-        player.update(window, this);
+        player.update(this, this.window);
         for(Enemy e : enemies){
             e.update(this);
         }
@@ -143,12 +163,16 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     public void paintComponent(Graphics g){
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D)g;
-        player.draw(g2, this);
-        for(Enemy e : enemies) {
-            e.draw(g2, this);
-        }
-        g2.dispose();
+         super.paintComponent(g);
+         Graphics2D g2 = (Graphics2D)g;
+
+
+//         background1.draw(g2);
+//         background2.draw(g2);
+         player.draw(g2, this);
+         for(Enemy e : enemies) {
+             e.draw(g2, this);
+         }
+         g2.dispose();
     }
 }

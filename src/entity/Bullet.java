@@ -7,38 +7,44 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Objects;
 
-public class Bullet extends Entity{
+public abstract class Bullet extends Entity{
     double angle;
     double dx;
     double dy;
     int targetX;
     int targetY;
-    public boolean isActive;
+    public int bulletType;
     GamePanel gp;
-    public Bullet(Player player, int targetX, int targetY, GamePanel gp){
-        //FIX BULLET PROJECTILE;
+    double directionX;
+    double directionY;
+    public Bullet(Player player, GamePanel gp, double angle, int bulletType){
+        this.bulletType = bulletType;
         getBulletImage();
         this.gp = gp;
-        this.speed = 5;
-        this.targetX = targetX;
-        this.targetY = targetY;
-        this.angle = Math.atan2(targetY - this.y, targetX - this.x);
+        this.speed = 8;
+        this.x = player.x ;
+        this.y = player.y ;
 
-        this.dx = Math.cos(angle) * 8.0;
-        this.dy = Math.sin(angle) * 8.0;
+        directionX = this.gp.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
+        directionY = this.gp.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));
+        this.angle = Math.atan2(directionY, directionX);
 
-        this.x = player.x; //change this to attacker
-        this.y = player.y;
+        this.dx = Math.cos(angle) * this.speed;
+        this.dy = Math.sin(angle) * this.speed;
+
         this.isActive = true;
 
-        colRect = new Rectangle(this.x, this.y, bulletImage.getWidth(), bulletImage.getHeight());
+        colRect = new Rectangle((int) this.x, (int) this.y, this.image.getWidth(), this.image.getHeight());
     }
     public void getBulletImage(){
-        try {
-            bulletImage = ImageIO.read(getClass().getResourceAsStream("/bullets/scissor.png"));
-        }catch(IOException e){
-            e.printStackTrace();
+        if(this.bulletType == 1){
+            this.image = rockBulletImage;
+        }else if(this.bulletType == 2){
+            this.image = paperBulletImage;
+        }else{
+            this.image = scissorBulletImage;
         }
     }
 
@@ -46,50 +52,43 @@ public class Bullet extends Entity{
         return isActive;
     }
     public void update(){
-        this.angle = Math.atan2(targetY - this.y, targetX - this.x);
-        this.dx = Math.cos(angle) * 8.0;
-        this.dy = Math.sin(angle) * 8.0;
-
-        this.x += (int) this.dx;
-        this.y += (int) this.dy;
-
         if(this.x >= this.targetX - 30 && this.y >= this.targetY - 30) {
-            this.targetX += (int) this.dx * 10;
-            this.targetY += (int) this.dy * 10;
+            this.dx = Math.cos(angle) * this.speed;
+            this.dy = Math.sin(angle) * this.speed;
         }
-//        if(getAbsolutePosition(this.gp).x > 0)this.x--;
-//        if(getAbsolutePosition(this.gp).x< 0)this.x++;
-//        if(getAbsolutePosition(this.gp).y > 0)this.y--;
-//        if(getAbsolutePosition(this.gp).y < 0)this.y++;
 
-        this.colRect.x = this.x;
-        this.colRect.y = this.y;
+        this.x +=  this.dx;
+        this.y +=  this.dy;
 
+        this.colRect.x = (int) this.x;
+        this.colRect.y = (int) this.y;
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        if(this.x > screenSize.getWidth() || this.x < 0 || this.y > screenSize.getHeight() || this.y < 0){
+//        System.out.println(this.x + " " + this.y);
+        if(this.x > gp.getWidth() || this.x < 0 || this.y > gp.getHeight() || this.y < 0){
             this.isActive = false;
         }
     }
+    public void rotate(BufferedImage image , AffineTransform at){
+//        double directionX = this.gp.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
+//        double directionY = this.gp.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));
+        double rotationAngleInRadians = Math.atan2(this.directionY, this.directionX);
+        at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
+    }
 
-    public void draw(Graphics2D g2, GamePanel gameWindow){
-        BufferedImage image = bulletImage;
+    public void draw(Graphics2D g2, GamePanel gamePanel){
+        AffineTransform at =  AffineTransform.getTranslateInstance(this.x - this.image.getWidth() / 2.0, this.y - this.image.getHeight() / 2.0);
+        rotate(this.image, at);
+        g2.drawImage(image, at, null);
 
-//        double directionX = this.targetX - (gameWindow.windowX + this.x + (double) bulletImage.getWidth() / 2);
-//        double directionY = this.targetY - (gameWindow.windowY + this.y + (double) bulletImage.getHeight() / 2);
-//
-//        double rotationAngleInRadians = Math.atan2(directionY, directionX);
-//
-//        AffineTransform at = AffineTransform.getTranslateInstance(this.x - bulletImage.getWidth() / 2.0, this.y - bulletImage.getHeight() / 2.0);
-//
-//        at.rotate(rotationAngleInRadians, bulletImage.getWidth() / 2.0, bulletImage.getHeight() / 2.0);
-//
-//        g2.drawImage(image, this.x, this.y, null);
         g2.setColor(Color.RED);
-        g2.drawOval(this.x - 8, this.y - 8, 16, 16);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
 
-//        g2.drawLine(this.x,this.y,targetX, targetY);
+        g2.drawOval((int) this.x, (int) this.y, 1, 1);
+
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//        g2.drawLine(this.x,this.y, this.targetX, this.targetY);
+    }
+    public void checkWallCollision(){
+
     }
 }

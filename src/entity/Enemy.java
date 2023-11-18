@@ -9,40 +9,26 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
-public class Enemy extends Entity{
+public abstract class Enemy extends Entity{
 
     GamePanel gp;
-    int x;
-    int y;
-    int range = 500;
-    int min = 0;
-    public boolean isActive = true;
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    public int x;
+    public int y;
 
-    int xRange = 700;
-    int yRange = 700;
     ArrayList<Enemy> enemies;
-    FrameEnemy frame;
+    public int enemyType;
+
     public Enemy(GamePanel gp, ArrayList<Enemy> enemies){
         this.gp = gp;
         Point spawn = validSpawnPoint();
         this.x = spawn.x;
         this.y = spawn.y;
-        this.frame = new FrameEnemy(this.x, this.y, gp.player);
         this.enemies = enemies;
-        getEnemyImage();
-        colRect = new Rectangle(this.x, this.y, enemyImage.getWidth(), enemyImage.getHeight());
     }
 
-    public void getEnemyImage(){
-        try {
-            enemyImage = ImageIO.read(getClass().getResourceAsStream("/enemies/rock.png"));
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-    }
-
+    public abstract void getEnemyImage();
     public Point validSpawnPoint() {
         int maxAttempts = 100;
         int x;
@@ -70,9 +56,8 @@ public class Enemy extends Entity{
         return null;
     }
 
-
     private boolean checkCollisionWithEnemies(int x, int y) {
-        if (this.enemies != null && this.enemies.size() > 0) {
+        if (this.enemies != null && !this.enemies.isEmpty()) {
             for (Enemy otherEnemy : this.enemies) {
                 if (otherEnemy != this && this.colRect.intersects(otherEnemy.colRect)) {
                     return true;
@@ -81,7 +66,6 @@ public class Enemy extends Entity{
         }
         return false;
     }
-
 
     public void update(GamePanel gameWindow) {
         int speed = 1;
@@ -128,24 +112,25 @@ public class Enemy extends Entity{
             }
 //        }
 
-        frame.update(gp.player);
         this.colRect.x = this.x;
         this.colRect.y = this.y;
     }
 
-
     public void draw(Graphics2D g2, GamePanel gameWindow) {
-        BufferedImage image = enemyImage;
+        BufferedImage image = this.image;
 
-        double directionX = gameWindow.player.x - (this.x + (double) enemyImage.getWidth() / 2);
-        double directionY = gameWindow.player.y - (this.y + (double) enemyImage.getHeight() / 2);
+        double directionX = gameWindow.player.x - (this.x + (double) this.image.getWidth() / 2);
+        double directionY = gameWindow.player.y - (this.y + (double) this.image.getHeight() / 2);
 
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
 
         AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
         at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
 
-        g2.drawImage(image, at, null);
+        g2.drawOval(this.x + this.image.getWidth() / 2, this.y + this.image.getHeight() / 2, 1, 1);
         g2.draw(this.colRect);
+        g2.drawImage(image, at, null);
+
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 }
