@@ -3,12 +3,9 @@ package entity;
 import main.*;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,8 +21,8 @@ public class Player extends Entity {
     public ArrayList<Bullet> bullets = new ArrayList<>();
     private int fireCooldown = 0;
     public int reloadTime = 30;
-    private int changeBulletTypeCooldown = 40;
-    private int changeBulletTypeTime = 40;
+    private int changeBulletTypeCooldown = 20;
+    private int changeBulletTypeTime = 20;
     private double acceleration = 1;
     private int width = 30;
     private int height = 30;
@@ -36,6 +33,7 @@ public class Player extends Entity {
     public double top_speed = 4;
     double deceleration = 0.1;
     public int bulletType = 1;
+    private BufferedImage bulletTypeImage = rockBulletImage;
     MaskCreationThread maskThread;
 
     public Player(GamePanel gp, KeyHandler keyH) {
@@ -73,6 +71,10 @@ public class Player extends Entity {
     }
 
     public void toggleBulletType() {
+        if(this.bulletType == 1) this.bulletTypeImage = rockBulletImage;
+        if(this.bulletType == 2) this.bulletTypeImage = paperBulletImage;
+        if(this.bulletType == 3) this.bulletTypeImage = scissorBulletImage;
+
         if (changeBulletTypeCooldown >= changeBulletTypeTime) {
             bulletType++;
             if (bulletType > 3) {
@@ -220,14 +222,7 @@ public class Player extends Entity {
 
         rotate(image, gamePanel, at);
         g2.drawImage(image, at, null);
-
-//        if (maskThread.isAlive()) {
-//            try {
-//                maskThread.join();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        g2.drawImage(this.bulletTypeImage, AffineTransform.getTranslateInstance(250, 10), null);
 
         Area mask = maskThread.getMask();
 

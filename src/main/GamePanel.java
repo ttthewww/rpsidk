@@ -50,7 +50,7 @@ public class GamePanel extends JPanel implements Runnable{
         this.setFocusTraversalKeysEnabled(false);
         this.background1 = new Background(0);
         this.background2 = new Background(-this.getHeight());
-//        new MaskHandler();
+        new MaskHandler();
     }
 
     public void setWindowDefaults(){
@@ -79,11 +79,9 @@ public class GamePanel extends JPanel implements Runnable{
         long timer = 0;
         int drawCount = 0;
 
+//        enemies.add(new RockEnemy(this, enemies));
+//        enemies.add(new PaperEnemy(this, enemies));
 //        enemies.add(new ScissorEnemy(this, enemies));
-//        enemies.add(new ScissorEnemy(this, enemies));
-        enemies.add(new RockEnemy(this, enemies));
-        enemies.add(new RockEnemy(this, enemies));
-
 
         try {
             SoundHandler.playSound("../resource/sounds/bgm.wav");
@@ -119,13 +117,10 @@ public class GamePanel extends JPanel implements Runnable{
             lastTime = currentTime;
 
             if(fps.delta >= 1){
-                try {
-                    update(window, enemies);
-                    background1.update(fps.delta, this);
-                    background2.update(fps.delta, this);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                update(enemies);
+                background1.update(fps.delta, this);
+                background2.update(fps.delta, this);
+
                 repaint();
                 delta--;
                 drawCount++;
@@ -138,9 +133,9 @@ public class GamePanel extends JPanel implements Runnable{
             }
             if(fps.timer>= 1000000000){
                 if (Math.random() < spawnChance) {
-//                    enemies.add(new ScissorEnemy(this, enemies));
-//                    enemies.add(new RockEnemy(this, enemies));
-//                    enemies.add(new PaperEnemy(this, enemies));
+                    enemies.add(new RockEnemy(this, enemies));
+                    enemies.add(new PaperEnemy(this, enemies));
+                    enemies.add(new ScissorEnemy(this, enemies));
                 }
                 fps.currentFPS = fps.drawCount;
                 fps.drawCount= 0;
@@ -150,7 +145,7 @@ public class GamePanel extends JPanel implements Runnable{
         }
     }
 
-    public void update(JFrame window, ArrayList<Enemy> enemies) throws IOException {
+    public void update(ArrayList<Enemy> enemies){
         cChecker.checkPlayerBulletCollision(player.bullets, enemies);
         enemies.removeIf(enemy -> !enemy.isActive);
         player.bullets.removeIf(bullet -> !bullet.isActive);
@@ -168,7 +163,6 @@ public class GamePanel extends JPanel implements Runnable{
 
          background1.draw(g2);
          background2.draw(g2);
-         player.draw(g2, this);
          for(Enemy e : enemies) {
              e.draw(g2);
          }
@@ -176,6 +170,7 @@ public class GamePanel extends JPanel implements Runnable{
         for (Bullet bullet : player.bullets) {
             bullet.draw(g2, this);
         }
+        player.draw(g2, this);
 
         g2.setColor(Color.GREEN);
         g2.drawString("FPS: " + fps.currentFPS, 5, 10);

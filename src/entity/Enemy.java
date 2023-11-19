@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
+import static entity.MaskHandler.*;
+
 public abstract class Enemy extends Entity{
 
     GamePanel gp;
@@ -23,23 +25,29 @@ public abstract class Enemy extends Entity{
     public int enemyType;
 
     MaskCreationThread maskThread;
-    public Enemy(GamePanel gp, ArrayList<Enemy> enemies){
+    public Enemy(GamePanel gp, ArrayList<Enemy> enemies, int enemyType){
+        this.enemyType = enemyType;
+        getEnemyImage();
         this.gp = gp;
-//        Point spawn = validSpawnPoint();
-//        this.x = spawn.x;
-//        this.y = spawn.y;
-        this.x = 100;
-        this.y = 100;
+        Point spawn = validSpawnPoint();
+        this.x = spawn.x;
+        this.y = spawn.y;
         this.enemies = enemies;
+//        this.x = -50;
+//        this.y = -50;
+        this.colRect = this.mask.getBounds();
     }
 
     public void getEnemyImage(){
         if(this.enemyType == 1){
-            this.image = rockBulletImage;
+            this.image = enemyRockImage;
+            this.mask = new Area(MaskHandler.rockEnemyMask);
         }else if(this.enemyType == 2){
-            this.image = paperBulletImage;
+            this.image = enemyPaperImage;
+            this.mask = new Area(MaskHandler.paperEnemyMask);
         }else{
-            this.image = scissorBulletImage;
+            this.image = enemyScissorImage;
+            this.mask = new Area(MaskHandler.scissorsEnemyMask);
         }
         this.maskThread = new MaskCreationThread(this.image, 0, 0);
         maskThread.start();
@@ -86,6 +94,11 @@ public abstract class Enemy extends Entity{
     public void update() {
         int speed = 1;
 
+        if(this.x > Player.x)this.x--;
+        if(this.x < Player.x)this.x++;
+        if(this.y > Player.y)this.y--;
+        if(this.y < Player.y)this.y++;
+
         for (Enemy otherEnemy : enemies) {
             if (otherEnemy != this) {
                 if (this.colRect.intersects(otherEnemy.colRect)) {
@@ -98,20 +111,24 @@ public abstract class Enemy extends Entity{
             }
         }
 
-//        if (this.x < Player.x) {
-//            this.x += speed;
-//        } else if (this.x > Player.x) {
-//            this.x -= speed;
-//        }
-//
-//        if (this.y < Player.y) {
-//            this.y += speed;
-//        } else if (this.y > Player.y) {
-//            this.y -= speed;
-//        }
 
-        this.colRect.x = this.x;
-        this.colRect.y = this.y;
+
+        if (this.maskThread.getMask() != null) {
+            Area newMask = this.maskThread.getMask();
+            if (this.mask != null) {
+                AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
+                double directionX = Player.x - (this.x + (double) this.image.getWidth() / 2);
+                double directionY = Player.y - (this.y + (double) this.image.getHeight() / 2);
+                double rotationAngleInRadians = Math.atan2(directionY, directionX);
+
+                at.rotate(rotationAngleInRadians);
+                this.mask.reset();
+                this.mask.add(newMask);
+                this.mask.transform(at);
+            }
+        }
+//        System.out.println(this.mask);
+        this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2.0), (int) (this.y - this.image.getHeight() / 2.0));
     }
     public void rotate(AffineTransform at, double rotationAngleInRadians){
         at.rotate(rotationAngleInRadians, this.image.getWidth() / 2.0, this.image.getHeight() / 2.0);
@@ -124,29 +141,11 @@ public abstract class Enemy extends Entity{
         AffineTransform at = AffineTransform.getTranslateInstance(this.x - this.image.getWidth() / 2.0, this.y - this.image.getHeight() / 2.0);
         rotate(at, rotationAngleInRadians);
 
+        g2.draw(this.mask);
+        g2.draw(this.colRect);
+
         g2.drawImage(this.image, at, null);
 
-//        if (maskThread.isAlive()) {
-//            try {
-//                maskThread.join();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
-
-        Area mask = this.maskThread.getMask();
-        if (mask != null) {
-            this.mask = new Area(mask);
-            this.mask.transform(AffineTransform.getRotateInstance(rotationAngleInRadians));
-            this.mask.transform(AffineTransform.getTranslateInstance(this.x, this.y));
-
-            g2.setColor(Color.BLUE);
-            g2.draw(this.mask);
-
-            g2.setClip(null);
-        }
-
-        g2.drawOval(this.x, this.y, 3, 3);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 

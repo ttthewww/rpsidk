@@ -1,6 +1,7 @@
 package entity;
 
 import main.GamePanel;
+import main.MaskCreationThread;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -29,11 +30,13 @@ public abstract class Entity {
     public BufferedImage scissorBulletImage;
     public BufferedImage paperBulletImage;
     public Area mask;
+
     public Entity(){
         try{
             this.paperBulletImage =  ImageIO.read(getClass().getResourceAsStream("../resource/bullets/paper.png"));
             this.scissorBulletImage =  ImageIO.read(getClass().getResourceAsStream("../resource/bullets/scissors.png"));
             this.rockBulletImage =  ImageIO.read(getClass().getResourceAsStream("../resource/bullets/rock.png"));
+
             this.enemyRockImage =  ImageIO.read(getClass().getResourceAsStream("../resource/enemies/rock.png"));
             this.enemyPaperImage =  ImageIO.read(getClass().getResourceAsStream("../resource/enemies/paper.png"));
             this.enemyScissorImage =  ImageIO.read(getClass().getResourceAsStream("../resource/enemies/scissors.png"));

@@ -9,7 +9,6 @@ public class MaskCreationThread extends Thread{
     private double x;
     private double y;
     private volatile Area mask;
-
     public MaskCreationThread(BufferedImage image, double x, double y) {
         this.image = image;
         this.x = x;
@@ -19,16 +18,15 @@ public class MaskCreationThread extends Thread{
     @Override
     public void run() {
         try {
-            mask = createMaskFromTransparency(image, x - image.getWidth() / 2.0, y - image.getHeight() / 2.0);
+            this.mask = createMaskFromTransparency(image, x - image.getWidth() / 2.0, y - image.getHeight() / 2.0);
         } catch (Exception e) {
             e.printStackTrace(); // Or log the exception
         }
-
     }
 
     public Area getMask() {
         try {
-            return mask;
+            return this.mask;
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -50,4 +48,3 @@ public class MaskCreationThread extends Thread{
         return mask;
     }
 }
-

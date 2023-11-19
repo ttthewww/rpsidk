@@ -24,9 +24,6 @@ public abstract class Bullet extends Entity{
     MaskCreationThread maskThread;
 
     double rotationAngleInRadians;
-    public EntityMask entityMask;
-
-    private static ExecutorService threadPool = Executors.newSingleThreadExecutor(); // Using a single thread executor for this example
 
     public Bullet(GamePanel gp, double angle, int bulletType){
         this.bulletType = bulletType;
@@ -44,8 +41,9 @@ public abstract class Bullet extends Entity{
         this.dy = Math.sin(angle) * this.speed;
 
         this.isActive = true;
-//        this.colRect = mask.getBounds();
-        colRect = new Rectangle((int) this.x, (int) this.y, this.image.getWidth(), this.image.getHeight());
+        this.colRect = mask.getBounds();
+        this.colRect.x = (int) (this.x - this.image.getWidth() / 2.0);
+        this.colRect.y = (int) (this.y - this.image.getHeight() / 2.0);
     }
 
     public void getBulletImage(){
@@ -62,7 +60,6 @@ public abstract class Bullet extends Entity{
             }
             this.maskThread = new MaskCreationThread(this.image, this.x, this.y);
             this.maskThread.start();
-
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -101,10 +98,7 @@ public abstract class Bullet extends Entity{
                 this.mask.transform(at);
             }
         }
-
-        System.out.println(this.mask);
-
-        this.colRect.setLocation((int) this.x, (int) this.y);
+        this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2.0), (int) (this.y - this.image.getHeight() / 2.0));
     }
 
 
@@ -113,10 +107,9 @@ public abstract class Bullet extends Entity{
         rotate(this.image, at);
         g2.drawImage(image, at, null);
         g2.setColor(Color.RED);
-//        g2.draw(this.colRect);
-        if(this.mask != null){
-            g2.draw(this.mask);
-        }
+
+        g2.draw(this.mask);
+
         g2.drawOval((int) this.x, (int) this.y, 2, 2);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
