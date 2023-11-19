@@ -4,7 +4,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-public class MaskCreationThread extends Thread {
+public class MaskCreationThread extends Thread{
     private BufferedImage image;
     private double x;
     private double y;
@@ -18,14 +18,24 @@ public class MaskCreationThread extends Thread {
 
     @Override
     public void run() {
-        mask = createMaskFromTransparency(image, x - image.getWidth() / 2.0, y - image.getHeight() / 2.0);
+        try {
+            mask = createMaskFromTransparency(image, x - image.getWidth() / 2.0, y - image.getHeight() / 2.0);
+        } catch (Exception e) {
+            e.printStackTrace(); // Or log the exception
+        }
+
     }
 
     public Area getMask() {
-        return mask;
+        try {
+            return mask;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    private Area createMaskFromTransparency(BufferedImage image, double x, double y) {
+    public Area createMaskFromTransparency(BufferedImage image, double x, double y) {
         Area mask = new Area();
 
         for (int i = 0; i < image.getWidth(); i++) {
@@ -40,3 +50,4 @@ public class MaskCreationThread extends Thread {
         return mask;
     }
 }
+

@@ -18,8 +18,8 @@ import java.util.Objects;
 public class Player extends Entity {
     GamePanel gp;
     KeyHandler keyH;
-    int x;
-    int y;
+    static int x;
+    static int y;
 
     public ArrayList<Bullet> bullets = new ArrayList<>();
     private int fireCooldown = 0;
@@ -43,13 +43,13 @@ public class Player extends Entity {
         this.keyH = keyH;
         getPlayerImage();
 //        this.colRect = new Rectangle(this.x + playerImage.getWidth(), this.y - playerImage.getHeight() / 2, playerImage.getWidth(), playerImage.getHeight());
-        this.colRect = new Rectangle(this.x + width, this.y - height / 2, width, height);
+        this.colRect = new Rectangle(x + width, y - height / 2, width, height);
         setDefaultValues();
     }
 
     public void setDefaultValues() {
-        this.x = 250;
-        this.y = 250;
+        x = 250;
+        y = 250;
     }
 
     public void getPlayerImage() {
@@ -62,11 +62,10 @@ public class Player extends Entity {
                     playerFrames[i] = frame;
                 } else {
                     System.err.println("Error loading image for frame " + i);
-                    // Handle the error or provide a default image
                 }
             }
             this.image = playerFrames[0];
-            this.maskThread = new MaskCreationThread(this.image, x, y);
+            this.maskThread = new MaskCreationThread(this.image, 0, 0);
             maskThread.start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -90,7 +89,7 @@ public class Player extends Entity {
             double rotationAngleInRadians = Math.atan2(directionY, directionX);
 //            System.out.println(rotationAngleInRadians * 180 / Math.PI);
 
-            bullets.add(new PlayerBullet(this, this.gp, rotationAngleInRadians, this.bulletType, window));
+            bullets.add(new PlayerBullet(this.gp, rotationAngleInRadians, this.bulletType, window));
             fireCooldown = 3;
         }
     }
@@ -168,19 +167,19 @@ public class Player extends Entity {
         }
     }
 
-    public void updatePlayerBullets() {
+    public void updatePlayerBullets(){
         Iterator<Bullet> iterator = bullets.iterator();
         while (iterator.hasNext()) {
             Bullet bullet = iterator.next();
             bullet.update();
-            bullet.checkWallCollision();
+//            bullet.checkWallCollision();
             if (!bullet.isActive()) {
                 iterator.remove();
             }
         }
     }
 
-    public void update(GamePanel gp, WindowContainer window) {
+    public void update(GamePanel gp, WindowContainer window){
         move();
 
         //Shooting
@@ -198,15 +197,10 @@ public class Player extends Entity {
             toggleBulletType();
         }
         //Updating collision box
-        this.colRect.x = this.x - 15;
-        this.colRect.y = this.y - 15;
+        this.colRect.x = this.x;
+        this.colRect.y = this.y;
     }
 
-
-    public void rotateMask(Area mask, double rotationAngleInRadians, double centerX, double centerY) {
-        AffineTransform maskRotation = AffineTransform.getRotateInstance(rotationAngleInRadians, centerX, centerY);
-        mask.transform(maskRotation);
-    }
 
     public void rotate(BufferedImage image, GamePanel gamePanel, AffineTransform at) {
         double directionX = gamePanel.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
@@ -224,18 +218,16 @@ public class Player extends Entity {
 
         AffineTransform at = AffineTransform.getTranslateInstance(this.x - image.getWidth() / 2.0, this.y - image.getHeight() / 2.0);
 
-        // Rotate the image
         rotate(image, gamePanel, at);
         g2.drawImage(image, at, null);
 
-
-        if (maskThread.isAlive()) {
-            try {
-                maskThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+//        if (maskThread.isAlive()) {
+//            try {
+//                maskThread.join();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         Area mask = maskThread.getMask();
 
@@ -244,32 +236,15 @@ public class Player extends Entity {
             double directionY = gamePanel.absoluteMouseY - (gp.getLocationOnScreen().y + this.y);
             double rotationAngleInRadians = Math.atan2(directionY, directionX);
 
-            Area transformedMask = new Area(mask);
+            this.mask = new Area(mask);
 
+            this.mask.transform(AffineTransform.getRotateInstance(rotationAngleInRadians));
+            this.mask.transform(AffineTransform.getTranslateInstance(this.x, this.y));
 
-            double maskInitialX = this.x/* initial X position of the mask */;
-            double maskInitialY = this.y/* initial Y position of the mask */;
-            double offsetX = this.x - maskInitialX;
-            double offsetY = this.y - maskInitialY;
-
-            transformedMask.transform(AffineTransform.getTranslateInstance(this.x, this.y));
-
-            Rectangle bounds = transformedMask.getBounds();
-
-            System.out.println("Mask X: " + bounds.getX() + ", Mask Y: " + bounds.getY());
-            System.out.println("Player X: " + this.x + ", Player Y: " + this.y);
-            bounds.x = this.x;
-            bounds.y = this.y;
             g2.setColor(Color.BLUE);
-            g2.drawOval((int) bounds.getX(), (int) bounds.getY(), 2, 2);
-            g2.fill(bounds);
-            g2.draw(transformedMask);
+            g2.draw(this.mask);
 
             g2.setClip(null);
-        }
-
-        for (Bullet bullet : bullets) {
-            bullet.draw(g2, gamePanel);
         }
 
         g2.drawOval(this.x, this.y, 3, 3);

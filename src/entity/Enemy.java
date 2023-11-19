@@ -1,10 +1,12 @@
 package entity;
 
 import main.GamePanel;
+import main.MaskCreationThread;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,15 +22,29 @@ public abstract class Enemy extends Entity{
     ArrayList<Enemy> enemies;
     public int enemyType;
 
+    MaskCreationThread maskThread;
     public Enemy(GamePanel gp, ArrayList<Enemy> enemies){
         this.gp = gp;
-        Point spawn = validSpawnPoint();
-        this.x = spawn.x;
-        this.y = spawn.y;
+//        Point spawn = validSpawnPoint();
+//        this.x = spawn.x;
+//        this.y = spawn.y;
+        this.x = 100;
+        this.y = 100;
         this.enemies = enemies;
     }
 
-    public abstract void getEnemyImage();
+    public void getEnemyImage(){
+        if(this.enemyType == 1){
+            this.image = rockBulletImage;
+        }else if(this.enemyType == 2){
+            this.image = paperBulletImage;
+        }else{
+            this.image = scissorBulletImage;
+        }
+        this.maskThread = new MaskCreationThread(this.image, 0, 0);
+        maskThread.start();
+    }
+
     public Point validSpawnPoint() {
         int maxAttempts = 100;
         int x;
@@ -67,14 +83,8 @@ public abstract class Enemy extends Entity{
         return false;
     }
 
-    public void update(GamePanel gameWindow) {
+    public void update() {
         int speed = 1;
-        int margin = 10; // Adjust the margin to your preference
-
-//        if (this.x > gameWindow.getWidth() - margin) this.x = margin;
-//        if (this.x < margin) this.x = gameWindow.getWidth() - margin;
-//        if (this.y > gameWindow.getHeight() - margin) this.y = margin;
-//        if (this.y < margin) this.y = gameWindow.getHeight() - margin;
 
         for (Enemy otherEnemy : enemies) {
             if (otherEnemy != this) {
@@ -82,55 +92,62 @@ public abstract class Enemy extends Entity{
                     int dx = this.x - otherEnemy.x;
                     int dy = this.y - otherEnemy.y;
                     double angle = Math.atan2(dy, dx);
-                    this.x += speed * Math.cos(angle);
-                    this.y += speed * Math.sin(angle);
+                    this.x += (int) (speed * Math.cos(angle));
+                    this.y += (int) (speed * Math.sin(angle));
                 }
             }
         }
 
-//        if (gameWindow.getWidth() - this.x + gameWindow.player.x < this.x - gameWindow.player.x) {
-//            this.x++;
-//        } else if (this.x + gameWindow.getWidth() - gameWindow.player.x < gameWindow.player.x - this.x) {
-//            this.x--;
-//        } else {
-            if (this.x < gameWindow.player.x) {
-                this.x += speed;
-            } else if (this.x > gameWindow.player.x) {
-                this.x -= speed;
-            }
+//        if (this.x < Player.x) {
+//            this.x += speed;
+//        } else if (this.x > Player.x) {
+//            this.x -= speed;
 //        }
-
-//        if (gameWindow.getHeight() - this.y + gameWindow.player.y < this.y - gameWindow.player.y) {
-//            this.y++;
-//        } else if (this.y + gameWindow.getHeight() - gameWindow.player.y < gameWindow.player.y - this.y) {
-//            this.y--;
-//        } else {
-            if (this.y < gameWindow.player.y) {
-                this.y += speed;
-            } else if (this.y > gameWindow.player.y) {
-                this.y -= speed;
-            }
+//
+//        if (this.y < Player.y) {
+//            this.y += speed;
+//        } else if (this.y > Player.y) {
+//            this.y -= speed;
 //        }
 
         this.colRect.x = this.x;
         this.colRect.y = this.y;
     }
-
-    public void draw(Graphics2D g2, GamePanel gameWindow) {
-        BufferedImage image = this.image;
-
-        double directionX = gameWindow.player.x - (this.x + (double) this.image.getWidth() / 2);
-        double directionY = gameWindow.player.y - (this.y + (double) this.image.getHeight() / 2);
-
+    public void rotate(AffineTransform at, double rotationAngleInRadians){
+        at.rotate(rotationAngleInRadians, this.image.getWidth() / 2.0, this.image.getHeight() / 2.0);
+    }
+    public void draw(Graphics2D g2) {
+        double directionX = Player.x - (this.x + (double) this.image.getWidth() / 2);
+        double directionY = Player.y - (this.y + (double) this.image.getHeight() / 2);
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
 
-        AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
-        at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
+        AffineTransform at = AffineTransform.getTranslateInstance(this.x - this.image.getWidth() / 2.0, this.y - this.image.getHeight() / 2.0);
+        rotate(at, rotationAngleInRadians);
 
-        g2.drawOval(this.x + this.image.getWidth() / 2, this.y + this.image.getHeight() / 2, 1, 1);
-        g2.draw(this.colRect);
-        g2.drawImage(image, at, null);
+        g2.drawImage(this.image, at, null);
 
+//        if (maskThread.isAlive()) {
+//            try {
+//                maskThread.join();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
+        Area mask = this.maskThread.getMask();
+        if (mask != null) {
+            this.mask = new Area(mask);
+            this.mask.transform(AffineTransform.getRotateInstance(rotationAngleInRadians));
+            this.mask.transform(AffineTransform.getTranslateInstance(this.x, this.y));
+
+            g2.setColor(Color.BLUE);
+            g2.draw(this.mask);
+
+            g2.setClip(null);
+        }
+
+        g2.drawOval(this.x, this.y, 3, 3);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
+
 }

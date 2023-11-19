@@ -2,14 +2,12 @@ package main;
 
 import entity.*;
 
-import javax.imageio.ImageIO;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.Buffer;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class GamePanel extends JPanel implements Runnable{
 
@@ -40,8 +38,8 @@ public class GamePanel extends JPanel implements Runnable{
     private Background background1;
     private Background background2;
 
-    public FPS fps;
-    public GamePanel(){
+    public FPS fps = new FPS();
+    public GamePanel() throws IOException {
         setWindowDefaults();
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
@@ -50,15 +48,10 @@ public class GamePanel extends JPanel implements Runnable{
         this.setFocusable(true);
         this.setSize((int) window.windowHeight, (int)window.windowWidth);
         this.setFocusTraversalKeysEnabled(false);
-        try {
-            this.background1 = new Background(0);
-            this.background2 = new Background(-this.getHeight());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        this.fps = new FPS();
+        this.background1 = new Background(0);
+        this.background2 = new Background(-this.getHeight());
+//        new MaskHandler();
     }
-
 
     public void setWindowDefaults(){
         this.window =  new WindowContainer(576, 576, 300, 0, 0);
@@ -88,8 +81,21 @@ public class GamePanel extends JPanel implements Runnable{
 
 //        enemies.add(new ScissorEnemy(this, enemies));
 //        enemies.add(new ScissorEnemy(this, enemies));
-//        enemies.add(new RockEnemy(this, enemies));
-//        enemies.add(new RockEnemy(this, enemies));
+        enemies.add(new RockEnemy(this, enemies));
+        enemies.add(new RockEnemy(this, enemies));
+
+
+        try {
+            SoundHandler.playSound("../resource/sounds/bgm.wav");
+        } catch (UnsupportedAudioFileException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
+        SoundHandler.setVolume(0.7f);
+
         while(gameThread != null){
             if(gameOver){
                 while(true){
@@ -151,7 +157,7 @@ public class GamePanel extends JPanel implements Runnable{
 
         player.update(this, this.window);
         for(Enemy e : enemies){
-            e.update(this);
+            e.update();
         }
         gameOver = cChecker.check(player, enemies);
     }
@@ -164,8 +170,12 @@ public class GamePanel extends JPanel implements Runnable{
          background2.draw(g2);
          player.draw(g2, this);
          for(Enemy e : enemies) {
-             e.draw(g2, this);
+             e.draw(g2);
          }
+
+        for (Bullet bullet : player.bullets) {
+            bullet.draw(g2, this);
+        }
 
         g2.setColor(Color.GREEN);
         g2.drawString("FPS: " + fps.currentFPS, 5, 10);

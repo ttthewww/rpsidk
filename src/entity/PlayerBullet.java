@@ -5,8 +5,8 @@ import main.WindowContainer;
 
 public class PlayerBullet extends Bullet{
     private final WindowContainer window;
-    public PlayerBullet(Player player, GamePanel gp, double angle, int bulletType, WindowContainer window){
-        super(player, gp, angle, bulletType);
+    public PlayerBullet(GamePanel gp, double angle, int bulletType, WindowContainer window){
+        super(gp, angle, bulletType);
         this.window = window;
     }
 
