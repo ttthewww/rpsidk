@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements Runnable{
 
-    public static WindowContainer window;
+    public WindowContainer window;
 
     public int windowPosX = 500;
     public int windowPosY = 250;
@@ -23,18 +23,18 @@ public class GamePanel extends JPanel implements Runnable{
     public int absoluteMouseY;
     private int FPS = 60;
 
-    KeyHandler keyH = new KeyHandler();
     MouseMotionHandler mouseMotionH = new MouseMotionHandler();
     Thread gameThread;
 
     ArrayList<Enemy> enemies = new ArrayList<>();
     ArrayList<FrameEnemy> frameEnemies = new ArrayList<>();
 
-    CollisionChecker cChecker = new CollisionChecker();
+    CollisionChecker cChecker;
     boolean gameOver = false;
 
     double spawnChance = 0.2;
-    public Player player = new Player(this, this.keyH);
+    public Player player;
+    KeyHandler keyH;
     private Background background1;
     private Background background2;
 
@@ -43,23 +43,29 @@ public class GamePanel extends JPanel implements Runnable{
         setWindowDefaults();
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
-        this.addKeyListener(keyH);
         this.addMouseMotionListener(mouseMotionH);
         this.setFocusable(true);
         this.setSize((int) window.windowHeight, (int)window.windowWidth);
         this.setFocusTraversalKeysEnabled(false);
+
+        this.player = new Player(this);
+        this.keyH = new KeyHandler(player);
+        this.addKeyListener(keyH);
+        player.setKeyHandler(keyH);
+        this.cChecker = new CollisionChecker(this.player);
+        new MaskHandler();
         this.background1 = new Background(0);
         this.background2 = new Background(-this.getHeight());
-        new MaskHandler();
     }
 
     public void setWindowDefaults(){
         this.window =  new WindowContainer(576, 576, 300, 0, 0);
         window.setFocusTraversalKeysEnabled(false);
         window.setResizable(false);
+//        window.setExtendedState(JFrame.MAXIMIZED_BOTH);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setTitle("Game");
-        window.setAlwaysOnTop(true);
+//        window.setAlwaysOnTop(true);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         window.setLocation(dim.width / 2 - windowPosX / 2, dim.height / 2 - windowPosY);
         window.add(this);
@@ -153,8 +159,9 @@ public class GamePanel extends JPanel implements Runnable{
         player.update(this, this.window);
         for(Enemy e : enemies){
             e.update();
+//            e.enemyWindowContainer.update();
         }
-        gameOver = cChecker.check(player, enemies);
+        gameOver = cChecker.check(enemies);
     }
 
     public void paintComponent(Graphics g){
@@ -173,7 +180,8 @@ public class GamePanel extends JPanel implements Runnable{
         player.draw(g2, this);
 
         g2.setColor(Color.GREEN);
-        g2.drawString("FPS: " + fps.currentFPS, 5, 10);
+        g2.drawString("Score: " + player.score, 5, 10);
+        g2.drawString("Health: " + player.health,400, 10);
         g2.dispose();
     }
 }

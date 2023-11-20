@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Objects;
 
 public abstract class Entity {
     public double x, y;
@@ -29,6 +30,11 @@ public abstract class Entity {
     public BufferedImage rockBulletImage;
     public BufferedImage scissorBulletImage;
     public BufferedImage paperBulletImage;
+
+
+    public BufferedImage enemyRockAura;
+    public BufferedImage enemyPaperAura;
+    public BufferedImage enemyScissorsAura;
     public Area mask;
 
     public Entity(){
@@ -40,6 +46,11 @@ public abstract class Entity {
             this.enemyRockImage =  ImageIO.read(getClass().getResourceAsStream("../resource/enemies/rock.png"));
             this.enemyPaperImage =  ImageIO.read(getClass().getResourceAsStream("../resource/enemies/paper.png"));
             this.enemyScissorImage =  ImageIO.read(getClass().getResourceAsStream("../resource/enemies/scissors.png"));
+
+            this.enemyRockAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/rockaura.png")));
+            this.enemyPaperAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/paperaura.png")));
+            this.enemyScissorsAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/scissorsaura.png")));
+
         }catch(IOException e){
             e.printStackTrace();
         }

@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.Objects;
 
 public class Player extends Entity {
+    public int health = 3;
+    public int score = 0;
     GamePanel gp;
     KeyHandler keyH;
     static int x;
@@ -21,8 +23,6 @@ public class Player extends Entity {
     public ArrayList<Bullet> bullets = new ArrayList<>();
     private int fireCooldown = 0;
     public int reloadTime = 30;
-    private int changeBulletTypeCooldown = 20;
-    private int changeBulletTypeTime = 20;
     private double acceleration = 1;
     private int width = 30;
     private int height = 30;
@@ -36,18 +36,20 @@ public class Player extends Entity {
     private BufferedImage bulletTypeImage = rockBulletImage;
     MaskCreationThread maskThread;
 
-    public Player(GamePanel gp, KeyHandler keyH) {
+    public Player(GamePanel gp) {
         this.gp = gp;
-        this.keyH = keyH;
         getPlayerImage();
-//        this.colRect = new Rectangle(this.x + playerImage.getWidth(), this.y - playerImage.getHeight() / 2, playerImage.getWidth(), playerImage.getHeight());
-        this.colRect = new Rectangle(x + width, y - height / 2, width, height);
         setDefaultValues();
+        this.colRect = this.mask.getBounds();
     }
 
     public void setDefaultValues() {
-        x = 250;
-        y = 250;
+        x = this.gp.window.getWidth() / 2;
+        y = this.gp.window.getHeight() / 2;
+    }
+
+    public void setKeyHandler(KeyHandler keyH){
+        this.keyH = keyH;
     }
 
     public void getPlayerImage() {
@@ -62,8 +64,10 @@ public class Player extends Entity {
                     System.err.println("Error loading image for frame " + i);
                 }
             }
+
             this.image = playerFrames[0];
-            this.maskThread = new MaskCreationThread(this.image, 0, 0);
+            this.mask = new Area(MaskHandler.createMaskFromTransparency(this.image, this.x, this.y));
+            this.maskThread = new MaskCreationThread(this.image, this.x, this.y);
             maskThread.start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -71,17 +75,15 @@ public class Player extends Entity {
     }
 
     public void toggleBulletType() {
+        bulletType++;
+        if (bulletType > 3) {
+            bulletType = 1;
+        }
         if(this.bulletType == 1) this.bulletTypeImage = rockBulletImage;
         if(this.bulletType == 2) this.bulletTypeImage = paperBulletImage;
         if(this.bulletType == 3) this.bulletTypeImage = scissorBulletImage;
 
-        if (changeBulletTypeCooldown >= changeBulletTypeTime) {
-            bulletType++;
-            if (bulletType > 3) {
-                bulletType = 1;
-            }
-            changeBulletTypeCooldown = 0;
-        }
+
     }
 
     public void shoot(int targetX, int targetY, WindowContainer window) {
@@ -147,10 +149,10 @@ public class Player extends Entity {
             this.speed_y_up = 0;
         }
 
-        this.x += this.speed_x_right;
-        this.x += this.speed_x_left;
-        this.y += this.speed_y_up;
-        this.y += this.speed_y_down;
+        this.x += (int) this.speed_x_right;
+        this.x += (int) this.speed_x_left;
+        this.y += (int) this.speed_y_up;
+        this.y += (int) this.speed_y_down;
 
         if (this.x - 15 <= 0) {
             this.x = 15;
@@ -167,6 +169,8 @@ public class Player extends Entity {
         if (this.y + 15 >= gp.getHeight()) {
             this.y = gp.getHeight() - 15;
         }
+
+
     }
 
     public void updatePlayerBullets(){
@@ -192,15 +196,8 @@ public class Player extends Entity {
         }
         updatePlayerBullets();
 
-        //Toggling bullet type
-        changeBulletTypeCooldown++;
-        if (changeBulletTypeCooldown >= changeBulletTypeTime) changeBulletTypeCooldown = changeBulletTypeTime;
-        if (keyH.tabPressed) {
-            toggleBulletType();
-        }
         //Updating collision box
-        this.colRect.x = this.x;
-        this.colRect.y = this.y;
+        this.colRect.setLocation(this.x - this.image.getWidth() / 2, this.y - this.image.getHeight() / 2);
     }
 
 
@@ -209,6 +206,22 @@ public class Player extends Entity {
         double directionY = gamePanel.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
         at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
+
+        if (this.maskThread.getMask() != null) {
+            Area newMask = this.maskThread.getMask();
+            if (this.mask != null) {
+                at = AffineTransform.getTranslateInstance(this.x, this.y);
+
+                directionX = this.gp.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
+                directionY = this.gp.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));
+                rotationAngleInRadians = Math.atan2(directionY, directionX);
+
+                at.rotate(rotationAngleInRadians);
+                this.mask.reset();
+                this.mask.add(newMask);
+                this.mask.transform(at);
+            }
+        }
     }
 
     public void draw(Graphics2D g2, GamePanel gamePanel) {
@@ -219,30 +232,17 @@ public class Player extends Entity {
         }
 
         AffineTransform at = AffineTransform.getTranslateInstance(this.x - image.getWidth() / 2.0, this.y - image.getHeight() / 2.0);
-
         rotate(image, gamePanel, at);
+
         g2.drawImage(image, at, null);
-        g2.drawImage(this.bulletTypeImage, AffineTransform.getTranslateInstance(250, 10), null);
+        g2.drawImage(this.bulletTypeImage, AffineTransform.getTranslateInstance(this.gp.getWidth() / 2.0 - this.bulletTypeImage.getWidth() / 2,  10), null);
 
-        Area mask = maskThread.getMask();
 
-        if (mask != null) {
-            double directionX = gamePanel.absoluteMouseX - (gp.getLocationOnScreen().x + this.x);
-            double directionY = gamePanel.absoluteMouseY - (gp.getLocationOnScreen().y + this.y);
-            double rotationAngleInRadians = Math.atan2(directionY, directionX);
+        g2.draw(this.colRect);
+        g2.setColor(Color.RED);
+        g2.draw(this.mask);
 
-            this.mask = new Area(mask);
-
-            this.mask.transform(AffineTransform.getRotateInstance(rotationAngleInRadians));
-            this.mask.transform(AffineTransform.getTranslateInstance(this.x, this.y));
-
-            g2.setColor(Color.BLUE);
-            g2.draw(this.mask);
-
-            g2.setClip(null);
-        }
-
-        g2.drawOval(this.x, this.y, 3, 3);
+        g2.setColor(Color.BLUE);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 }

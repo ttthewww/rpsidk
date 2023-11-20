@@ -12,11 +12,21 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class CollisionChecker {
-
-    public boolean check(Player player, ArrayList<Enemy> enemies){
+    Player player;
+    public CollisionChecker(Player player){
+        this.player = player;
+    }
+    public boolean check(ArrayList<Enemy> enemies){
         for(Enemy e : enemies){
-            if(e.colRect.intersects(player.colRect)){
-                return true;
+            Area intersection = null;
+            intersection = new Area(this.player.mask);
+            intersection.intersect(e.mask);
+            if(!(intersection.isEmpty()) && e.attackCooldown >= e.attackTimer){
+                player.health--;
+                e.attackCooldown = 0;
+                if(player.health <= 0){
+                    return true;
+                }
             }
         }
         return false;
@@ -24,7 +34,11 @@ public class CollisionChecker {
 
     public void deactivate(Entity e){
         e.isActive = false;
+        if(e instanceof Enemy){
+            this.player.score++;
+        }
     }
+
     public void checkPlayerBulletCollision(ArrayList<Bullet> bullets, ArrayList<Enemy> enemies) {
         for (Bullet bullet : bullets) {
             for (Enemy enemy : enemies) {
@@ -33,104 +47,102 @@ public class CollisionChecker {
                 intersection.intersect(enemy.mask);
 
                 if(!intersection.isEmpty()){
-                    if(bullet.colRect.intersects(enemy.colRect)){
-                        switch (bullet.bulletType){
-                            case 1:
-                                if(enemy.enemyType == 3){
-                                    try {
-                                        SoundHandler.playSound("../resource/sounds/scissor.wav");
-                                    } catch (UnsupportedAudioFileException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (LineUnavailableException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                    SoundHandler.setVolume(0.7f);
-                                    deactivate(enemy);
-                                    deactivate(bullet);
-                                    return;
+                    switch (bullet.bulletType){
+                        case 1:
+                            if(enemy.enemyType == 3){
+                                try {
+                                    SoundHandler.playSound("../resource/sounds/scissor.wav");
+                                } catch (UnsupportedAudioFileException e) {
+                                    throw new RuntimeException(e);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                } catch (LineUnavailableException e) {
+                                    throw new RuntimeException(e);
                                 }
-                                if(enemy.enemyType == 2){
-                                    try {
-                                        SoundHandler.playSound("../resource/sounds/paper.wav");
-                                    } catch (UnsupportedAudioFileException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (LineUnavailableException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                    SoundHandler.setVolume(0.8f);
-                                    deactivate(bullet);
-                                    return;
+                                SoundHandler.setVolume(0.7f);
+                                deactivate(enemy);
+                                deactivate(bullet);
+                                return;
+                            }
+                            if(enemy.enemyType == 2){
+                                try {
+                                    SoundHandler.playSound("../resource/sounds/paper.wav");
+                                } catch (UnsupportedAudioFileException e) {
+                                    throw new RuntimeException(e);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                } catch (LineUnavailableException e) {
+                                    throw new RuntimeException(e);
                                 }
-                                break;
-                            case 2:
-                                if(enemy.enemyType == 1){
-                                    try {
-                                        SoundHandler.playSound("../resource/sounds/rock.wav");
-                                    } catch (UnsupportedAudioFileException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (LineUnavailableException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                    SoundHandler.setVolume(0.7f);
-                                    deactivate(enemy);
-                                    deactivate(bullet);
-                                    return;
+                                SoundHandler.setVolume(0.8f);
+                                deactivate(bullet);
+                                return;
+                            }
+                            break;
+                        case 2:
+                            if(enemy.enemyType == 1){
+                                try {
+                                    SoundHandler.playSound("../resource/sounds/rock.wav");
+                                } catch (UnsupportedAudioFileException e) {
+                                    throw new RuntimeException(e);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                } catch (LineUnavailableException e) {
+                                    throw new RuntimeException(e);
                                 }
-                                if(enemy.enemyType == 3){
-                                    try {
-                                        SoundHandler.playSound("../resource/sounds/scissor.wav");
-                                    } catch (UnsupportedAudioFileException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (LineUnavailableException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                    SoundHandler.setVolume(0.7f);
-                                    deactivate(bullet);
-                                    return;
+                                SoundHandler.setVolume(0.7f);
+                                deactivate(enemy);
+                                deactivate(bullet);
+                                return;
+                            }
+                            if(enemy.enemyType == 3){
+                                try {
+                                    SoundHandler.playSound("../resource/sounds/scissor.wav");
+                                } catch (UnsupportedAudioFileException e) {
+                                    throw new RuntimeException(e);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                } catch (LineUnavailableException e) {
+                                    throw new RuntimeException(e);
                                 }
-                                break;
-                            case 3:
-                                if(enemy.enemyType == 2){
-                                    try {
-                                        SoundHandler.playSound("../resource/sounds/paper.wav");
-                                    } catch (UnsupportedAudioFileException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (LineUnavailableException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                    SoundHandler.setVolume(0.8f);
-                                    deactivate(enemy);
-                                    deactivate(bullet);
-                                    return;
+                                SoundHandler.setVolume(0.7f);
+                                deactivate(bullet);
+                                return;
+                            }
+                            break;
+                        case 3:
+                            if(enemy.enemyType == 2){
+                                try {
+                                    SoundHandler.playSound("../resource/sounds/paper.wav");
+                                } catch (UnsupportedAudioFileException e) {
+                                    throw new RuntimeException(e);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                } catch (LineUnavailableException e) {
+                                    throw new RuntimeException(e);
                                 }
-                                if(enemy.enemyType == 1){
-                                    try {
-                                        SoundHandler.playSound("../resource/sounds/rock.wav");
-                                    } catch (UnsupportedAudioFileException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (LineUnavailableException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                    SoundHandler.setVolume(0.7f);
-                                    deactivate(bullet);
-                                    return;
+                                SoundHandler.setVolume(0.8f);
+                                deactivate(enemy);
+                                deactivate(bullet);
+                                return;
+                            }
+                            if(enemy.enemyType == 1){
+                                try {
+                                    SoundHandler.playSound("../resource/sounds/rock.wav");
+                                } catch (UnsupportedAudioFileException e) {
+                                    throw new RuntimeException(e);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                } catch (LineUnavailableException e) {
+                                    throw new RuntimeException(e);
                                 }
-                                break;
-                            default:
-                                break;
-                        }
+                                SoundHandler.setVolume(0.7f);
+                                deactivate(bullet);
+                                return;
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
             }

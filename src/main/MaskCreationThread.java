@@ -1,5 +1,8 @@
 package main;
 
+import entity.Enemy;
+
+import javax.swing.*;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -9,6 +12,9 @@ public class MaskCreationThread extends Thread{
     private double x;
     private double y;
     private volatile Area mask;
+
+
+
     public MaskCreationThread(BufferedImage image, double x, double y) {
         this.image = image;
         this.x = x;
@@ -48,3 +54,5 @@ public class MaskCreationThread extends Thread{
         return mask;
     }
 }
+
+

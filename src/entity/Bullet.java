@@ -108,7 +108,8 @@ public abstract class Bullet extends Entity{
         g2.drawImage(image, at, null);
         g2.setColor(Color.RED);
 
-        g2.draw(this.mask);
+//        g2.draw(this.mask);
+//        g2.draw(this.colRect);
 
         g2.drawOval((int) this.x, (int) this.y, 2, 2);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
