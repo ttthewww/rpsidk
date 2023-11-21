@@ -10,6 +10,5 @@ import java.util.ArrayList;
 public class ScissorEnemy extends Enemy{
     public ScissorEnemy(GamePanel gp, ArrayList<Enemy> enemies) {
         super(gp, enemies, 3);
-//        getEnemyImage();
     }
 }

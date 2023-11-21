@@ -15,6 +15,8 @@ public class GamePanel extends JPanel implements Runnable{
 
     public int windowPosX = 500;
     public int windowPosY = 250;
+    public int screenWidth = 576;
+    public int screenHeight = 576;
 
     public double windowSpeed = 1;
     public int mouseX;
@@ -22,44 +24,62 @@ public class GamePanel extends JPanel implements Runnable{
     public int absoluteMouseX;
     public int absoluteMouseY;
     private int FPS = 60;
-
-    MouseMotionHandler mouseMotionH = new MouseMotionHandler();
     Thread gameThread;
+    public static MaskCreationThread maskCreationThread;
 
-    ArrayList<Enemy> enemies = new ArrayList<>();
+    public EnemyHandler enemyHandler;
+
     ArrayList<FrameEnemy> frameEnemies = new ArrayList<>();
-
     CollisionChecker cChecker;
     boolean gameOver = false;
-
     double spawnChance = 0.2;
     public Player player;
     KeyHandler keyH;
+    MouseHandler mouseH;
+    MouseMotionHandler mouseMotionH;
     private Background background1;
     private Background background2;
 
+    //gameState
+    int mainMenuState = 0, mainGameState = 1, pauseState = 2;
+    int gameState = mainGameState;
+    MainMenu mainMenu;
+
     public FPS fps = new FPS();
+
     public GamePanel() throws IOException {
         setWindowDefaults();
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
-        this.addMouseMotionListener(mouseMotionH);
         this.setFocusable(true);
         this.setSize((int) window.windowHeight, (int)window.windowWidth);
         this.setFocusTraversalKeysEnabled(false);
 
+        this.maskCreationThread = new MaskCreationThread();
+
+        new ImageHandler();
         this.player = new Player(this);
-        this.keyH = new KeyHandler(player);
+        this.mouseMotionH = new MouseMotionHandler();
+        this.addMouseMotionListener(mouseMotionH);
+        this.keyH = new KeyHandler(this.player);
+        this.mouseH = new MouseHandler();
+
         this.addKeyListener(keyH);
-        player.setKeyHandler(keyH);
+        this.addMouseListener(mouseH);
+        player.setHandlers(keyH, mouseH);
+
         this.cChecker = new CollisionChecker(this.player);
-        new MaskHandler();
         this.background1 = new Background(0);
         this.background2 = new Background(-this.getHeight());
+
+        this.mainMenu = new MainMenu(this);
+        this.enemyHandler = new EnemyHandler();
+
+        new MaskHandler();
     }
 
     public void setWindowDefaults(){
-        this.window =  new WindowContainer(576, 576, 300, 0, 0);
+        this.window =  new WindowContainer(screenWidth, screenHeight, 300, 0, 0);
         window.setFocusTraversalKeysEnabled(false);
         window.setResizable(false);
 //        window.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -74,20 +94,13 @@ public class GamePanel extends JPanel implements Runnable{
     public void startGameThread(){
         gameThread = new Thread(this);
         gameThread.start();
+
+        Thread maskThread = new Thread(maskCreationThread);
+        maskThread.start();
     }
 
-    @Override
     public void run(){
-        double drawInterval = 1000000000/FPS;
-        double delta = 0;
-        long lastTime = System.nanoTime();
-        long currentTime;
-        long timer = 0;
-        int drawCount = 0;
-
-//        enemies.add(new RockEnemy(this, enemies));
-//        enemies.add(new PaperEnemy(this, enemies));
-//        enemies.add(new ScissorEnemy(this, enemies));
+//        enemyHandler.summonEnemy(this);
 
         try {
             SoundHandler.playSound("../resource/sounds/bgm.wav");
@@ -101,6 +114,7 @@ public class GamePanel extends JPanel implements Runnable{
         SoundHandler.setVolume(0.7f);
 
         while(gameThread != null){
+            //I FIX ANG MASK NA DLI MU LAG!
             if(gameOver){
                 while(true){
                     System.out.println("GAME OVER");
@@ -117,71 +131,74 @@ public class GamePanel extends JPanel implements Runnable{
 
             fps.update();
 
-            currentTime = System.nanoTime();
-            delta += (currentTime - lastTime) / drawInterval;
-            timer += (currentTime - lastTime);
-            lastTime = currentTime;
+            fps.currentTime = System.nanoTime();
+            fps.delta += (fps.currentTime - fps.lastTime) / fps.drawInterval;
+            fps.timer += (fps.currentTime - fps.lastTime);
+            fps.lastTime = fps.currentTime;
 
             if(fps.delta >= 1){
-                update(enemies);
+                update();
                 background1.update(fps.delta, this);
                 background2.update(fps.delta, this);
 
                 repaint();
-                delta--;
-                drawCount++;
-
                 fps.delta--;
                 fps.drawCount++;
-//                if(Math.random() < .05){
-//                    this.window.shrink();
-//                }
             }
             if(fps.timer>= 1000000000){
-                if (Math.random() < spawnChance) {
-                    enemies.add(new RockEnemy(this, enemies));
-                    enemies.add(new PaperEnemy(this, enemies));
-                    enemies.add(new ScissorEnemy(this, enemies));
-                }
                 fps.currentFPS = fps.drawCount;
-                fps.drawCount= 0;
-                drawCount = 0;
+                fps.drawCount = 0;
                 fps.timer = 0;
             }
         }
     }
+    int timer = 0;
+    public void update(){
+        if(this.gameState == mainGameState){
+            cChecker.checkPlayerBulletCollision(player.bullets, this.enemyHandler.enemies);
+            this.enemyHandler.enemies.removeIf(enemy -> !enemy.isActive);
+            gameOver = cChecker.check(this.enemyHandler.enemies);
 
-    public void update(ArrayList<Enemy> enemies){
-        cChecker.checkPlayerBulletCollision(player.bullets, enemies);
-        enemies.removeIf(enemy -> !enemy.isActive);
-        player.bullets.removeIf(bullet -> !bullet.isActive);
+            player.bullets.removeIf(bullet -> !bullet.isActive);
 
-        player.update(this, this.window);
-        for(Enemy e : enemies){
-            e.update();
-//            e.enemyWindowContainer.update();
+            player.update(this, this.window);
+
+            this.enemyHandler.update();
+
+            timer++;
+            if(timer >= 100){
+                if (Math.random() < spawnChance) {
+                    this.enemyHandler.summonEnemy(this);
+                }
+                timer = 0;
+            }
         }
-        gameOver = cChecker.check(enemies);
     }
 
     public void paintComponent(Graphics g){
          super.paintComponent(g);
          Graphics2D g2 = (Graphics2D)g;
 
-         background1.draw(g2);
-         background2.draw(g2);
-         for(Enemy e : enemies) {
-             e.draw(g2);
+         if(this.gameState == mainMenuState){
+             this.mainMenu.draw(g2);
          }
 
-        for (Bullet bullet : player.bullets) {
-            bullet.draw(g2, this);
-        }
-        player.draw(g2, this);
+         if(this.gameState == mainGameState){
+             background1.draw(g2);
+             background2.draw(g2);
 
-        g2.setColor(Color.GREEN);
-        g2.drawString("Score: " + player.score, 5, 10);
-        g2.drawString("Health: " + player.health,400, 10);
+             this.enemyHandler.draw(g2);
+             for (Bullet bullet : player.bullets) {
+                 bullet.draw(g2, this);
+             }
+             player.draw(g2, this);
+
+
+             g2.setColor(Color.GREEN);
+             g2.drawString("Score: " + player.score, 5, 10);
+             g2.drawString("Health: " + player.health,400, 10);
+         }
+
         g2.dispose();
     }
 }

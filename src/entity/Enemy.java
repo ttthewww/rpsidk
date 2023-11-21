@@ -1,22 +1,13 @@
 package entity;
 
-import main.EnemyWindowContainer;
-import main.GamePanel;
-import main.MaskCreationThread;
-import main.WindowContainer;
+import main.*;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Random;
-
-import static entity.MaskHandler.*;
+import static main.GamePanel.maskCreationThread;
 
 public abstract class Enemy extends Entity{
 
@@ -34,45 +25,45 @@ public abstract class Enemy extends Entity{
     public Enemy(GamePanel gp, ArrayList<Enemy> enemies, int enemyType){
         this.enemyType = enemyType;
         this.gp = gp;
-        getEnemyImage();
+
+//        this.x = 200;
+//        this.y = 20;
+
         Point spawn = validSpawnPoint();
         this.x = spawn.x;
         this.y = spawn.y;
+        getEnemyImage();
+
         this.enemies = enemies;
-//        this.x = 200;
-//        this.y = 0;
         this.colRect = this.mask.getBounds();
 
-        if(this.enemyType == 1){
-            this.enemyWindowContainer= new EnemyWindowContainer(
-                    100,
-                    100,
-                    100,
-                    100,
-                    this,
-                    gp
-            );
-            Thread enemyWindowThread = new Thread(this.enemyWindowContainer);
-            enemyWindowThread.start();
-        }
+//        if(this.enemyType == 1){
+//            this.enemyWindowContainer= new EnemyWindowContainer(
+//                    100,
+//                    100,
+//                    100,
+//                    100,
+//                    this,
+//                    gp
+//            );
+//            Thread enemyWindowThread = new Thread(this.enemyWindowContainer);
+//            enemyWindowThread.start();
+//        }
     }
 
     public void getEnemyImage(){
         if(this.enemyType == 1){
-            this.image = enemyRockImage;
-            this.mask = new Area(MaskHandler.rockEnemyMask);
-            this.aura = enemyRockAura;
+            this.image = ImageHandler.enemyRockImage;
+            this.aura = ImageHandler.enemyRockAura;
         }else if(this.enemyType == 2){
-            this.image = enemyPaperImage;
-            this.mask = new Area(MaskHandler.paperEnemyMask);
-            this.aura = enemyPaperAura;
+            this.image = ImageHandler.enemyPaperImage;
+            this.aura = ImageHandler.enemyPaperAura;
         }else{
-            this.image = enemyScissorImage;
-            this.mask = new Area(MaskHandler.scissorsEnemyMask);
-            this.aura = enemyScissorsAura;
+            this.image = ImageHandler.enemyScissorImage;
+            this.aura = ImageHandler.enemyScissorsAura;
         }
-        this.maskThread = new MaskCreationThread(this.image, this.x, this.y);
-        maskThread.start();
+
+        this.mask = new Area(maskCreationThread.addMask(this));
     }
 
     public Point validSpawnPoint() {
@@ -114,7 +105,6 @@ public abstract class Enemy extends Entity{
     }
 
     public void update() {
-        System.out.println(this.attackCooldown);
         int speed = 1;
 
         if(this.x > Player.x)this.x--;
@@ -134,21 +124,21 @@ public abstract class Enemy extends Entity{
             }
         }
 
-        if (this.maskThread.getMask() != null) {
-            Area newMask = this.maskThread.getMask();
-            if (this.mask != null) {
-                AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
-                double directionX = Player.x - (this.x + (double) this.image.getWidth() / 2);
-                double directionY = Player.y - (this.y + (double) this.image.getHeight() / 2);
-                double rotationAngleInRadians = Math.atan2(directionY, directionX);
+        if (maskCreationThread.getMask(this) != null) {
+            Area newMask = maskCreationThread.getMask(this);
+            AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
+            double directionX = Player.x - (this.x + (double) this.image.getWidth() / 2);
+            double directionY = Player.y - (this.y + (double) this.image.getHeight() / 2);
+            double rotationAngleInRadians = Math.atan2(directionY, directionX);
 
-                at.rotate(rotationAngleInRadians);
-                this.mask.reset();
-                this.mask.add(newMask);
-                this.mask.transform(at);
-            }
+            at.rotate(rotationAngleInRadians);
+            this.mask.reset();
+            this.mask.add(newMask);
+            this.mask.transform(at);
+
+//            System.out.println(this.x + " " + this.y);
+//            System.out.println(this.mask.getBounds().getX() + " " + this.mask.getBounds().getY());
         }
-//        System.out.println(this.mask);
         this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2.0), (int) (this.y - this.image.getHeight() / 2.0));
         this.attackCooldown++;
         if(attackCooldown >= attackTimer){
@@ -160,8 +150,8 @@ public abstract class Enemy extends Entity{
         double directionY = Player.y - (this.y + (double)image.getHeight() / 2);
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
         at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
-
     }
+
     public void draw(Graphics2D g2) {
         AffineTransform at = AffineTransform.getTranslateInstance(this.x - this.image.getWidth() / 2.0, this.y - this.image.getHeight() / 2.0);
         AffineTransform auraAt = AffineTransform.getTranslateInstance(this.x - this.aura.getWidth() / 2.0, this.y - this.aura.getHeight() / 2.0);
@@ -170,11 +160,12 @@ public abstract class Enemy extends Entity{
         rotate(auraAt, this.aura);
 
         g2.setColor(Color.RED);
-        g2.draw(this.mask);
-        g2.draw(this.colRect);
 
         g2.drawImage(this.aura, auraAt, null);
         g2.drawImage(this.image, at, null);
+
+//        g2.draw(this.mask);
+//        g2.draw(this.colRect);
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }

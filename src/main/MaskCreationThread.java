@@ -1,37 +1,56 @@
 package main;
 
 import entity.Enemy;
+import entity.Entity;
 
 import javax.swing.*;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
-public class MaskCreationThread extends Thread{
+public class MaskCreationThread implements Runnable{
     private BufferedImage image;
     private double x;
     private double y;
     private volatile Area mask;
 
+    HashMap<Entity, Area> masks;
 
+//    public MaskCreationThread(BufferedImage image, double x, double y) {
+//        this.image = image;
+//        this.x = x;
+//        this.y = y;
+//        this.masks = new HashMap<Entity, Area>();
+//    }
 
-    public MaskCreationThread(BufferedImage image, double x, double y) {
-        this.image = image;
-        this.x = x;
-        this.y = y;
+    public MaskCreationThread() {
+        this.masks = new HashMap<Entity, Area>();
     }
 
     @Override
     public void run() {
-        try {
-            this.mask = createMaskFromTransparency(image, x - image.getWidth() / 2.0, y - image.getHeight() / 2.0);
-        } catch (Exception e) {
-            e.printStackTrace(); // Or log the exception
+        try{
+            System.out.println("HELLO");
+        }catch (Exception e){
+
         }
     }
 
-    public Area getMask() {
+    public Area addMask(Entity entity){
+        Area mask = createMaskFromTransparency(entity.image, entity.x - entity.image.getWidth() / 2, entity.y - entity.image.getHeight() / 2);
+        masks.put(entity, mask);
+        return mask;
+    }
+
+    public Area getMask(Entity entity) {
         try {
+            for (Map.Entry<Entity, Area> entry : masks.entrySet()) {
+                if(entry.getKey() == entity){
+                    return entry.getValue();
+                }
+            }
             return this.mask;
         }catch (Exception e){
             e.printStackTrace();
@@ -54,5 +73,3 @@ public class MaskCreationThread extends Thread{
         return mask;
     }
 }
-
-

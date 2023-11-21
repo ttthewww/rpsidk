@@ -12,11 +12,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
 
+import static main.GamePanel.maskCreationThread;
+
 public class Player extends Entity {
     public int health = 3;
     public int score = 0;
     GamePanel gp;
     KeyHandler keyH;
+    MouseHandler mouseH;
     static int x;
     static int y;
 
@@ -24,8 +27,6 @@ public class Player extends Entity {
     private int fireCooldown = 0;
     public int reloadTime = 30;
     private double acceleration = 1;
-    private int width = 30;
-    private int height = 30;
     public double speed_x_right = 0;
     public double speed_x_left = 0;
     public double speed_y_up = 0;
@@ -33,8 +34,7 @@ public class Player extends Entity {
     public double top_speed = 4;
     double deceleration = 0.1;
     public int bulletType = 1;
-    private BufferedImage bulletTypeImage = rockBulletImage;
-    MaskCreationThread maskThread;
+    private BufferedImage bulletTypeImage = ImageHandler.rockBulletImage;
 
     public Player(GamePanel gp) {
         this.gp = gp;
@@ -48,7 +48,8 @@ public class Player extends Entity {
         y = this.gp.window.getHeight() / 2;
     }
 
-    public void setKeyHandler(KeyHandler keyH){
+    public void setHandlers(KeyHandler keyH, MouseHandler mouseH){
+        this.mouseH = mouseH;
         this.keyH = keyH;
     }
 
@@ -64,11 +65,8 @@ public class Player extends Entity {
                     System.err.println("Error loading image for frame " + i);
                 }
             }
-
             this.image = playerFrames[0];
-            this.mask = new Area(MaskHandler.createMaskFromTransparency(this.image, this.x, this.y));
-            this.maskThread = new MaskCreationThread(this.image, this.x, this.y);
-            maskThread.start();
+            this.mask = new Area(maskCreationThread.addMask(this));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -79,21 +77,19 @@ public class Player extends Entity {
         if (bulletType > 3) {
             bulletType = 1;
         }
-        if(this.bulletType == 1) this.bulletTypeImage = rockBulletImage;
-        if(this.bulletType == 2) this.bulletTypeImage = paperBulletImage;
-        if(this.bulletType == 3) this.bulletTypeImage = scissorBulletImage;
-
-
+        if(this.bulletType == 1) this.bulletTypeImage = ImageHandler.rockBulletImage;
+        if(this.bulletType == 2) this.bulletTypeImage = ImageHandler.paperBulletImage;
+        if(this.bulletType == 3) this.bulletTypeImage = ImageHandler.scissorBulletImage;
     }
 
-    public void shoot(int targetX, int targetY, WindowContainer window) {
+    public void shoot(int targetX, int targetY) {
         if (fireCooldown >= reloadTime) {
             double directionX = this.gp.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
             double directionY = this.gp.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));
             double rotationAngleInRadians = Math.atan2(directionY, directionX);
 //            System.out.println(rotationAngleInRadians * 180 / Math.PI);
 
-            bullets.add(new PlayerBullet(this.gp, rotationAngleInRadians, this.bulletType, window));
+            bullets.add(new PlayerBullet(this.gp, rotationAngleInRadians, this.bulletType));
             fireCooldown = 3;
         }
     }
@@ -187,15 +183,13 @@ public class Player extends Entity {
 
     public void update(GamePanel gp, WindowContainer window){
         move();
-
         //Shooting
         fireCooldown++;
         if (fireCooldown >= reloadTime) fireCooldown = reloadTime;
-        if (keyH.spacePressed) {
-            shoot(gp.absoluteMouseX, gp.absoluteMouseY, window);
+        if (keyH.spacePressed || mouseH.shoot) {
+            shoot(gp.absoluteMouseX, gp.absoluteMouseY);
         }
         updatePlayerBullets();
-
         //Updating collision box
         this.colRect.setLocation(this.x - this.image.getWidth() / 2, this.y - this.image.getHeight() / 2);
     }
@@ -207,20 +201,18 @@ public class Player extends Entity {
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
         at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
 
-        if (this.maskThread.getMask() != null) {
-            Area newMask = this.maskThread.getMask();
-            if (this.mask != null) {
-                at = AffineTransform.getTranslateInstance(this.x, this.y);
+        if (maskCreationThread.getMask(this) != null) {
+            Area newMask = maskCreationThread.getMask(this);
+            at = AffineTransform.getTranslateInstance(this.x, this.y);
 
-                directionX = this.gp.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
-                directionY = this.gp.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));
-                rotationAngleInRadians = Math.atan2(directionY, directionX);
+            directionX = this.gp.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
+            directionY = this.gp.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));
+            rotationAngleInRadians = Math.atan2(directionY, directionX);
 
-                at.rotate(rotationAngleInRadians);
-                this.mask.reset();
-                this.mask.add(newMask);
-                this.mask.transform(at);
-            }
+            at.rotate(rotationAngleInRadians);
+            this.mask.reset();
+            this.mask.add(newMask);
+            this.mask.transform(at);
         }
     }
 
@@ -233,14 +225,12 @@ public class Player extends Entity {
 
         AffineTransform at = AffineTransform.getTranslateInstance(this.x - image.getWidth() / 2.0, this.y - image.getHeight() / 2.0);
         rotate(image, gamePanel, at);
-
         g2.drawImage(image, at, null);
         g2.drawImage(this.bulletTypeImage, AffineTransform.getTranslateInstance(this.gp.getWidth() / 2.0 - this.bulletTypeImage.getWidth() / 2,  10), null);
 
-
-        g2.draw(this.colRect);
         g2.setColor(Color.RED);
-        g2.draw(this.mask);
+//        g2.draw(this.colRect);
+//        g2.draw(this.mask);
 
         g2.setColor(Color.BLUE);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

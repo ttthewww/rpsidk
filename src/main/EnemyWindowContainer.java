@@ -23,7 +23,7 @@ public class EnemyWindowContainer extends JFrame implements Runnable {
         this.gp = gp;
 
         this.setFocusableWindowState(false);
-        this.setLocation(this.enemy.x + this.gp.getLocationOnScreen().x, this.enemy.y + this.gp.getLocationOnScreen().y);
+        this.setLocation((int) (this.enemy.x + this.gp.getLocationOnScreen().x), (int) (this.enemy.y + this.gp.getLocationOnScreen().y));
         this.setSize(windowHeight, windowWidth);
         this.setVisible(true);
         this.setAlwaysOnTop(true);

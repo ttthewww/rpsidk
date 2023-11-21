@@ -4,10 +4,8 @@ import main.GamePanel;
 import main.WindowContainer;
 
 public class PlayerBullet extends Bullet{
-    private final WindowContainer window;
-    public PlayerBullet(GamePanel gp, double angle, int bulletType, WindowContainer window){
+    public PlayerBullet(GamePanel gp, double angle, int bulletType){
         super(gp, angle, bulletType);
-        this.window = window;
     }
 
     public void checkWallCollision(){

@@ -1,6 +1,7 @@
 package entity;
 
 import main.GamePanel;
+import main.ImageHandler;
 import main.MaskCreationThread;
 
 import java.awt.*;
@@ -9,6 +10,7 @@ import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.*;
 
+import static main.GamePanel.maskCreationThread;
 
 public abstract class Bullet extends Entity{
     double angle;
@@ -49,17 +51,14 @@ public abstract class Bullet extends Entity{
     public void getBulletImage(){
         try{
             if(this.bulletType == 1){
-                this.image = rockBulletImage;
-                this.mask = new Area(MaskHandler.rockBulletMask);
+                this.image = ImageHandler.rockBulletImage;
             }else if(this.bulletType == 2){
-                this.image = paperBulletImage;
-                this.mask = new Area(MaskHandler.paperBulletMask);
+                this.image = ImageHandler.paperBulletImage;
             }else{
-                this.image = scissorBulletImage;
-                this.mask = new Area(MaskHandler.scissorsBulletMask);
+                this.image = ImageHandler.scissorBulletImage;
             }
-            this.maskThread = new MaskCreationThread(this.image, this.x, this.y);
-            this.maskThread.start();
+
+            this.mask = new Area(maskCreationThread.addMask(this));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -88,16 +87,14 @@ public abstract class Bullet extends Entity{
             this.isActive = false;
         }
 
-        if (this.maskThread.getMask() != null) {
-            Area newMask = this.maskThread.getMask();
-            if (this.mask != null) {
-                AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
-                at.rotate(rotationAngleInRadians);
-                this.mask.reset();
-                this.mask.add(newMask);
-                this.mask.transform(at);
-            }
-        }
+
+        Area newMask = maskCreationThread.getMask(this);
+        AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
+        at.rotate(rotationAngleInRadians);
+        this.mask.reset();
+        this.mask.add(newMask);
+        this.mask.transform(at);
+
         this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2.0), (int) (this.y - this.image.getHeight() / 2.0));
     }
 
@@ -113,8 +110,5 @@ public abstract class Bullet extends Entity{
 
         g2.drawOval((int) this.x, (int) this.y, 2, 2);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    }
-    public void checkWallCollision(){
-
     }
 }
