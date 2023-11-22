@@ -7,7 +7,10 @@ import java.awt.event.MouseListener;
 
 public class MouseHandler implements MouseListener {
     public boolean shoot;
-
+    Player player;
+    public MouseHandler(Player player){
+        this.player = player;
+    }
     @Override
     public void mouseClicked(MouseEvent e) {
 
@@ -26,6 +29,9 @@ public class MouseHandler implements MouseListener {
         int code = e.getButton();
         if(code == 1){
             shoot = false;
+        }
+        if(code == 3){
+            player.toggleBulletType();
         }
     }
 

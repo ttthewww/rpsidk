@@ -9,38 +9,51 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.geom.Area;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CollisionChecker {
     Player player;
     public CollisionChecker(Player player){
         this.player = player;
     }
-    public boolean check(ArrayList<Enemy> enemies){
-        for(Enemy e : enemies){
-            Area intersection = null;
-            intersection = new Area(this.player.mask);
-            intersection.intersect(e.mask);
-            if(!(intersection.isEmpty()) && e.attackCooldown >= e.attackTimer){
-                player.health--;
-                e.attackCooldown = 0;
-                if(player.health <= 0){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     public void deactivate(Entity e){
         e.isActive = false;
         if(e instanceof Enemy){
             this.player.score++;
         }
     }
+    public void checkCollisions(CopyOnWriteArrayList<Enemy> enemies, CopyOnWriteArrayList<Bullet> playerbullets){
+        this.player.bullets.removeIf(bullet ->! bullet.isActive);
+        enemies.removeIf(enemy -> !enemy.isActive);
 
-    public void checkPlayerBulletCollision(ArrayList<Bullet> bullets, ArrayList<Enemy> enemies) {
-        for (Bullet bullet : bullets) {
+        for (Enemy e : enemies) {
+            for (Enemy otherEnemy : enemies) {
+                if (e != otherEnemy) {
+                    Area intersection = new Area(e.mask);
+                    intersection.intersect(otherEnemy.mask);
+                    if (!(intersection.isEmpty())) {
+                        double dx = e.x - otherEnemy.x;
+                        double dy = e.y - otherEnemy.y;
+                        double angle = Math.atan2(dy, dx);
+                        e.x += e.speed * Math.cos(angle);
+                        e.y += e.speed * Math.sin(angle);
+                    }
+                }
+            }
+        }
+
+        //check for player-enemyCollision
+        for (Enemy e : enemies) {
+            Area intersection = new Area(this.player.mask);
+            intersection.intersect(e.mask);
+            if (!(intersection.isEmpty()) && e.attackCooldown >= e.attackTimer) {
+                player.health--;
+                e.attackCooldown = 0;
+            }
+        }
+
+        //check for player bullet collision
+        for (Bullet bullet : playerbullets) {
             for (Enemy enemy : enemies) {
                 Area intersection = null;
                 intersection = new Area(bullet.mask);
@@ -148,4 +161,5 @@ public class CollisionChecker {
             }
         }
     }
+
 }

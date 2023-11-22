@@ -62,7 +62,7 @@ public class GamePanel extends JPanel implements Runnable{
         this.mouseMotionH = new MouseMotionHandler();
         this.addMouseMotionListener(mouseMotionH);
         this.keyH = new KeyHandler(this.player);
-        this.mouseH = new MouseHandler();
+        this.mouseH = new MouseHandler(this.player);
 
         this.addKeyListener(keyH);
         this.addMouseListener(mouseH);
@@ -73,7 +73,7 @@ public class GamePanel extends JPanel implements Runnable{
         this.background2 = new Background(-this.getHeight());
 
         this.mainMenu = new MainMenu(this);
-        this.enemyHandler = new EnemyHandler();
+        this.enemyHandler = new EnemyHandler(this, this.player);
 
         new MaskHandler();
     }
@@ -94,6 +94,9 @@ public class GamePanel extends JPanel implements Runnable{
     public void startGameThread(){
         gameThread = new Thread(this);
         gameThread.start();
+
+        Thread enemyHandlerThread = new Thread(this.enemyHandler);
+        enemyHandlerThread.start();
 
         Thread maskThread = new Thread(maskCreationThread);
         maskThread.start();
@@ -152,26 +155,15 @@ public class GamePanel extends JPanel implements Runnable{
             }
         }
     }
-    int timer = 0;
     public void update(){
         if(this.gameState == mainGameState){
-            cChecker.checkPlayerBulletCollision(player.bullets, this.enemyHandler.enemies);
-            this.enemyHandler.enemies.removeIf(enemy -> !enemy.isActive);
-            gameOver = cChecker.check(this.enemyHandler.enemies);
-
-            player.bullets.removeIf(bullet -> !bullet.isActive);
-
+            if(this.player.health <= 0){
+                gameOver = true;
+            }
             player.update(this, this.window);
 
-            this.enemyHandler.update();
-
-            timer++;
-            if(timer >= 100){
-                if (Math.random() < spawnChance) {
-                    this.enemyHandler.summonEnemy(this);
-                }
-                timer = 0;
-            }
+//            this.enemyHandler.update();
+//            this.enemyHandler.summonEnemy(this);
         }
     }
 
@@ -192,7 +184,6 @@ public class GamePanel extends JPanel implements Runnable{
                  bullet.draw(g2, this);
              }
              player.draw(g2, this);
-
 
              g2.setColor(Color.GREEN);
              g2.drawString("Score: " + player.score, 5, 10);
