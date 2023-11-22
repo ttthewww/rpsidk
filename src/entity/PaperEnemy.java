@@ -1,10 +1,11 @@
 package entity;
 
 import main.GamePanel;
-import java.util.ArrayList;
+
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PaperEnemy extends Enemy{
-    public PaperEnemy(GamePanel gp, ArrayList<Enemy> enemies) {
-        super(gp, enemies, 2);
+    public PaperEnemy(GamePanel gp){
+        super(gp,2);
     }
 }

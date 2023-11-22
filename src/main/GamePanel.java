@@ -1,6 +1,7 @@
 package main;
 
 import entity.*;
+import handlers.*;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -40,11 +41,12 @@ public class GamePanel extends JPanel implements Runnable{
     private Background background1;
     private Background background2;
 
-    //gameState
-    int mainMenuState = 0, mainGameState = 1, pauseState = 2;
-    int gameState = mainGameState;
-    MainMenu mainMenu;
+    private Thread enemyHandlerThread;
 
+    //gameState
+    public int mainMenuState = 0, mainGameState = 1, pauseState = 2;
+    public int gameState = mainMenuState;
+    MainMenu mainMenu;
     public FPS fps = new FPS();
 
     public GamePanel() throws IOException {
@@ -72,7 +74,7 @@ public class GamePanel extends JPanel implements Runnable{
         this.background1 = new Background(0);
         this.background2 = new Background(-this.getHeight());
 
-        this.mainMenu = new MainMenu(this);
+        this.mainMenu = new MainMenu(this, this.mouseH);
         this.enemyHandler = new EnemyHandler(this, this.player);
 
         new MaskHandler();
@@ -88,6 +90,8 @@ public class GamePanel extends JPanel implements Runnable{
 //        window.setAlwaysOnTop(true);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         window.setLocation(dim.width / 2 - windowPosX / 2, dim.height / 2 - windowPosY);
+        window.setLayout(null);
+        window.setVisible(true);
         window.add(this);
     }
 
@@ -95,8 +99,8 @@ public class GamePanel extends JPanel implements Runnable{
         gameThread = new Thread(this);
         gameThread.start();
 
-        Thread enemyHandlerThread = new Thread(this.enemyHandler);
-        enemyHandlerThread.start();
+        this.enemyHandlerThread = new Thread(this.enemyHandler);
+        this.enemyHandlerThread.start();
 
         Thread maskThread = new Thread(maskCreationThread);
         maskThread.start();
@@ -117,7 +121,6 @@ public class GamePanel extends JPanel implements Runnable{
         SoundHandler.setVolume(0.7f);
 
         while(gameThread != null){
-            //I FIX ANG MASK NA DLI MU LAG!
             if(gameOver){
                 while(true){
                     System.out.println("GAME OVER");
@@ -133,7 +136,6 @@ public class GamePanel extends JPanel implements Runnable{
             }
 
             fps.update();
-
             fps.currentTime = System.nanoTime();
             fps.delta += (fps.currentTime - fps.lastTime) / fps.drawInterval;
             fps.timer += (fps.currentTime - fps.lastTime);
@@ -141,9 +143,6 @@ public class GamePanel extends JPanel implements Runnable{
 
             if(fps.delta >= 1){
                 update();
-                background1.update(fps.delta, this);
-                background2.update(fps.delta, this);
-
                 repaint();
                 fps.delta--;
                 fps.drawCount++;
@@ -156,14 +155,24 @@ public class GamePanel extends JPanel implements Runnable{
         }
     }
     public void update(){
+        if(this.gameState == pauseState){
+            if(!this.keyH.escToggled){
+                this.gameState = mainGameState;
+
+            }
+        }
         if(this.gameState == mainGameState){
+            if(this.keyH.escToggled){
+                this.gameState = pauseState;
+
+            }
+            background1.update(fps.delta, this);
+            background2.update(fps.delta, this);
+
             if(this.player.health <= 0){
                 gameOver = true;
             }
             player.update(this, this.window);
-
-//            this.enemyHandler.update();
-//            this.enemyHandler.summonEnemy(this);
         }
     }
 
@@ -175,6 +184,9 @@ public class GamePanel extends JPanel implements Runnable{
              this.mainMenu.draw(g2);
          }
 
+        if(this.gameState == pauseState){
+
+        }
          if(this.gameState == mainGameState){
              background1.draw(g2);
              background2.draw(g2);
@@ -184,12 +196,10 @@ public class GamePanel extends JPanel implements Runnable{
                  bullet.draw(g2, this);
              }
              player.draw(g2, this);
-
              g2.setColor(Color.GREEN);
              g2.drawString("Score: " + player.score, 5, 10);
              g2.drawString("Health: " + player.health,400, 10);
          }
-
         g2.dispose();
     }
 }

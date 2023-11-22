@@ -1,10 +1,11 @@
-package main;
+package handlers;
 
 import entity.*;
+import handlers.CollisionChecker;
+import main.FPS;
+import main.GamePanel;
 
-import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -13,7 +14,7 @@ public class EnemyHandler implements Runnable {
     int summonCooldown = 0;
     int summonTimer = 200;
     GamePanel gp;
-    boolean running = true;
+    public boolean running = true;
     FPS fps;
     CollisionChecker collisionChecker;
     Player player;
@@ -30,15 +31,19 @@ public class EnemyHandler implements Runnable {
 
     public void run(){
         while(running){
-            fps.update();
-            fps.currentTime = System.nanoTime();
-            fps.delta += (fps.currentTime - fps.lastTime) / fps.drawInterval;
-            fps.timer += (fps.currentTime - fps.lastTime);
-            fps.lastTime = fps.currentTime;
-            if(fps.delta >= 1){
-                update();
-                fps.delta--;
-                fps.drawCount++;
+            if(this.gp.gameState != this.gp.pauseState){
+                fps.update();
+                fps.currentTime = System.nanoTime();
+                fps.delta += (fps.currentTime - fps.lastTime) / fps.drawInterval;
+                fps.timer += (fps.currentTime - fps.lastTime);
+                fps.lastTime = fps.currentTime;
+                if(fps.delta >= 1){
+                    update();
+                    fps.delta--;
+                    fps.drawCount++;
+                }
+            }else{
+                System.out.println("NAKAPAUSE");
             }
         }
     }

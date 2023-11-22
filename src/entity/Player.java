@@ -1,5 +1,8 @@
 package entity;
 
+import handlers.ImageHandler;
+import handlers.KeyHandler;
+import handlers.MouseHandler;
 import main.*;
 
 import javax.imageio.ImageIO;
@@ -8,9 +11,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static main.GamePanel.maskCreationThread;
 
@@ -23,7 +26,8 @@ public class Player extends Entity {
     static int x;
     static int y;
 
-    public ArrayList<Bullet> bullets = new ArrayList<>();
+//    public ArrayList<Bullet> bullets;
+    public CopyOnWriteArrayList<Bullet> bullets = new CopyOnWriteArrayList<>();
     private int fireCooldown = 0;
     public int reloadTime = 30;
     private double acceleration = 1;
@@ -174,10 +178,6 @@ public class Player extends Entity {
         while (iterator.hasNext()) {
             Bullet bullet = iterator.next();
             bullet.update();
-//            bullet.checkWallCollision();
-            if (!bullet.isActive()) {
-                iterator.remove();
-            }
         }
     }
 
@@ -190,6 +190,7 @@ public class Player extends Entity {
             shoot(gp.absoluteMouseX, gp.absoluteMouseY);
         }
         updatePlayerBullets();
+
         //Updating collision box
         this.colRect.setLocation(this.x - this.image.getWidth() / 2, this.y - this.image.getHeight() / 2);
     }

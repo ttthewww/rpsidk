@@ -1,14 +1,13 @@
 package entity;
 
 import main.GamePanel;
-import main.ImageHandler;
+import handlers.ImageHandler;
 import main.MaskCreationThread;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.util.concurrent.*;
 
 import static main.GamePanel.maskCreationThread;
 
@@ -64,10 +63,6 @@ public abstract class Bullet extends Entity{
         }
     }
 
-    public boolean isActive() {
-        return isActive;
-    }
-
     public void rotate(BufferedImage image , AffineTransform at){
         double rotationAngleInRadians = Math.atan2(this.directionY, this.directionX);
         at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
@@ -86,7 +81,6 @@ public abstract class Bullet extends Entity{
         if(this.x > gp.getWidth() || this.x < 0 || this.y > gp.getHeight() || this.y < 0){
             this.isActive = false;
         }
-
 
         Area newMask = maskCreationThread.getMask(this);
         AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);

@@ -1,4 +1,6 @@
-package main;
+package handlers;
+
+import main.Background;
 
 import javax.imageio.ImageIO;
 import java.awt.geom.Area;
@@ -18,7 +20,7 @@ public class ImageHandler {
     public static BufferedImage enemyRockAura;
     public static BufferedImage enemyPaperAura;
     public static BufferedImage enemyScissorsAura;
-
+    public static BufferedImage mainMenuBackgroundImage;
     public ImageHandler(){
         try{
             this.paperBulletImage =  ImageIO.read(getClass().getResourceAsStream("../resource/bullets/paper.png"));
@@ -32,6 +34,8 @@ public class ImageHandler {
             this.enemyRockAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/rockaura.png")));
             this.enemyPaperAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/paperaura.png")));
             this.enemyScissorsAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/scissorsaura.png")));
+
+            this.mainMenuBackgroundImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac1.png")));
 
         }catch(IOException e){
             e.printStackTrace();

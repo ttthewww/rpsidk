@@ -1,4 +1,4 @@
-package entity;
+package handlers;
 
 import javax.imageio.ImageIO;
 import java.awt.geom.Area;

@@ -31,11 +31,7 @@ public class MaskCreationThread implements Runnable{
 
     @Override
     public void run() {
-        try{
-            System.out.println("HELLO");
-        }catch (Exception e){
 
-        }
     }
 
     public Area addMask(Entity entity){

@@ -1,40 +1,36 @@
 package entity;
 
+import handlers.ImageHandler;
 import main.*;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
+
 import static main.GamePanel.maskCreationThread;
 
 public abstract class Enemy extends Entity{
-
     GamePanel gp;
-    public int x;
-    public int y;
-
-    ArrayList<Enemy> enemies;
+    public double x;
+    public double y;
     public int enemyType;
     MaskCreationThread maskThread;
     public int attackTimer = 150;
     public int attackCooldown = 0;
     public EnemyWindowContainer enemyWindowContainer;
     private BufferedImage aura;
-    public Enemy(GamePanel gp, ArrayList<Enemy> enemies, int enemyType){
+    public Enemy(GamePanel gp,int enemyType){
+        this.speed = 1;
         this.enemyType = enemyType;
         this.gp = gp;
-
 //        this.x = 200;
 //        this.y = 20;
-
         Point spawn = validSpawnPoint();
         this.x = spawn.x;
         this.y = spawn.y;
         getEnemyImage();
 
-        this.enemies = enemies;
         this.colRect = this.mask.getBounds();
 
 //        if(this.enemyType == 1){
@@ -86,58 +82,47 @@ public abstract class Enemy extends Entity{
             int distanceX = Math.abs(x - gp.player.x);
             int distanceY = Math.abs(y - gp.player.y);
 
-            if (!(distanceX < 200 || distanceY < 200 || checkCollisionWithEnemies(x, y))) {
-                return new Point(x, y);
-            }
+//            if (!(distanceX < 200 || distanceY < 200 || checkCollisionWithEnemies(x, y))) {
+//                return new Point(x, y);
+//            }
+            return new Point(x, y);
         }
         return null;
     }
 
-    private boolean checkCollisionWithEnemies(int x, int y) {
-        if (this.enemies != null && !this.enemies.isEmpty()) {
-            for (Enemy otherEnemy : this.enemies) {
-                if (otherEnemy != this && this.colRect.intersects(otherEnemy.colRect)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+//    private boolean checkCollisionWithEnemies(int x, int y) {
+//        if (this.enemies != null && !this.enemies.isEmpty()) {
+//            for (Enemy otherEnemy : this.enemies) {
+//                if (otherEnemy != this && this.colRect.intersects(otherEnemy.colRect)) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
     public void update() {
-        int speed = 1;
+        double directionX = this.gp.player.x - ((this.x));
+        double directionY = this.gp.player.y - ((this.y));
 
-        if(this.x > Player.x)this.x--;
-        if(this.x < Player.x)this.x++;
-        if(this.y > Player.y)this.y--;
-        if(this.y < Player.y)this.y++;
+        double angle = Math.atan2(directionY, directionX);
+        double dx = Math.cos(angle) * this.speed;
+        double dy = Math.sin(angle) * this.speed;
 
-        for (Enemy otherEnemy : enemies) {
-            if (otherEnemy != this) {
-                if (this.colRect.intersects(otherEnemy.colRect)) {
-                    int dx = this.x - otherEnemy.x;
-                    int dy = this.y - otherEnemy.y;
-                    double angle = Math.atan2(dy, dx);
-                    this.x += (int) (speed * Math.cos(angle));
-                    this.y += (int) (speed * Math.sin(angle));
-                }
-            }
-        }
+        this.x += dx;
+        this.y += dy;
 
         if (maskCreationThread.getMask(this) != null) {
             Area newMask = maskCreationThread.getMask(this);
             AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
-            double directionX = Player.x - (this.x + (double) this.image.getWidth() / 2);
-            double directionY = Player.y - (this.y + (double) this.image.getHeight() / 2);
+            directionX = Player.x - (this.x + (double) this.image.getWidth() / 2);
+            directionY = Player.y - (this.y + (double) this.image.getHeight() / 2);
             double rotationAngleInRadians = Math.atan2(directionY, directionX);
 
             at.rotate(rotationAngleInRadians);
             this.mask.reset();
             this.mask.add(newMask);
             this.mask.transform(at);
-
-//            System.out.println(this.x + " " + this.y);
-//            System.out.println(this.mask.getBounds().getX() + " " + this.mask.getBounds().getY());
         }
         this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2.0), (int) (this.y - this.image.getHeight() / 2.0));
         this.attackCooldown++;

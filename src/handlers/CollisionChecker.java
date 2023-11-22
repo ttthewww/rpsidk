@@ -1,4 +1,4 @@
-package main;
+package handlers;
 
 import entity.Bullet;
 import entity.Enemy;

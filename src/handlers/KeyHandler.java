@@ -1,4 +1,4 @@
-package main;
+package handlers;
 
 import entity.Player;
 
@@ -8,13 +8,18 @@ import java.awt.event.KeyListener;
 public class KeyHandler implements KeyListener {
     public boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed, shiftPressed, tabPressed;
     Player player;
+
+    public boolean escToggled;
     public KeyHandler(Player player){
         this.player = player;
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
-        int code = e.getKeyCode();
+        char keyChar = e.getKeyChar();
+        if (keyChar == KeyEvent.VK_ESCAPE) {
+            escToggled = !escToggled;
+        }
     }
 
     @Override
