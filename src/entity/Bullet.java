@@ -17,22 +17,19 @@ public abstract class Bullet extends Entity{
     double dy;
     int targetX;
     int targetY;
+    public int speed = 8;
     public int bulletType;
     GamePanel gp;
     double directionX;
     double directionY;
-
-    MaskCreationThread maskThread;
-
     double rotationAngleInRadians;
 
-    public Bullet(GamePanel gp, double angle, int bulletType){
-        this.bulletType = bulletType;
+    public Bullet(GamePanel gp, double angle, Player player){
+        this.bulletType = player.bulletType;
         getBulletImage();
         this.gp = gp;
-        this.speed = 8;
-        this.x = Player.x;
-        this.y = Player.y;
+        this.x = player.x;
+        this.y = player.y;
 
         directionX = this.gp.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
         directionY = this.gp.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));

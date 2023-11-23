@@ -43,7 +43,7 @@ public class EnemyHandler implements Runnable {
                     fps.drawCount++;
                 }
             }else{
-                System.out.println("NAKAPAUSE");
+//                System.out.println("NAKAPAUSE");
             }
         }
     }

@@ -27,10 +27,9 @@ public class Background {
      * @param Y Initial Y coordinate of the background.
      * @throws IOException Exception may occur during the image loading process.
      */
-    public Background(double Y) throws IOException {
+    public Background(double Y){
         this.Y = Y;
 
-        // Load background images
         try{
             backgrounds = new BufferedImage[NUM_BACKGROUNDS];
 

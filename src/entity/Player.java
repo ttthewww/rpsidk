@@ -20,13 +20,12 @@ import static main.GamePanel.maskCreationThread;
 public class Player extends Entity {
     public int health = 3;
     public int score = 0;
+    public static double x;
+    public static double y;
     GamePanel gp;
     KeyHandler keyH;
     MouseHandler mouseH;
-    static int x;
-    static int y;
-
-//    public ArrayList<Bullet> bullets;
+    public BufferedImage[] playerFrames;
     public CopyOnWriteArrayList<Bullet> bullets = new CopyOnWriteArrayList<>();
     private int fireCooldown = 0;
     public int reloadTime = 30;
@@ -93,7 +92,7 @@ public class Player extends Entity {
             double rotationAngleInRadians = Math.atan2(directionY, directionX);
 //            System.out.println(rotationAngleInRadians * 180 / Math.PI);
 
-            bullets.add(new PlayerBullet(this.gp, rotationAngleInRadians, this.bulletType));
+            bullets.add(new PlayerBullet(this.gp, rotationAngleInRadians, this));
             fireCooldown = 3;
         }
     }
@@ -192,7 +191,7 @@ public class Player extends Entity {
         updatePlayerBullets();
 
         //Updating collision box
-        this.colRect.setLocation(this.x - this.image.getWidth() / 2, this.y - this.image.getHeight() / 2);
+        this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2), (int) (this.y - this.image.getHeight() / 2));
     }
 
 
@@ -231,7 +230,7 @@ public class Player extends Entity {
 
         g2.setColor(Color.RED);
 //        g2.draw(this.colRect);
-//        g2.draw(this.mask);
+        g2.draw(this.mask);
 
         g2.setColor(Color.BLUE);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

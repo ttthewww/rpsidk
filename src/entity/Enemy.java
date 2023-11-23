@@ -18,7 +18,6 @@ public abstract class Enemy extends Entity{
     MaskCreationThread maskThread;
     public int attackTimer = 150;
     public int attackCooldown = 0;
-    public EnemyWindowContainer enemyWindowContainer;
     private BufferedImage aura;
     public Enemy(GamePanel gp,int enemyType){
         this.speed = 1;
@@ -79,12 +78,6 @@ public abstract class Enemy extends Entity{
                 y = (int) (Math.random() * gp.getHeight() + 200) + gp.getHeight();
             }
 
-            int distanceX = Math.abs(x - gp.player.x);
-            int distanceY = Math.abs(y - gp.player.y);
-
-//            if (!(distanceX < 200 || distanceY < 200 || checkCollisionWithEnemies(x, y))) {
-//                return new Point(x, y);
-//            }
             return new Point(x, y);
         }
         return null;
@@ -149,7 +142,7 @@ public abstract class Enemy extends Entity{
         g2.drawImage(this.aura, auraAt, null);
         g2.drawImage(this.image, at, null);
 
-//        g2.draw(this.mask);
+        g2.draw(this.mask);
 //        g2.draw(this.colRect);
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

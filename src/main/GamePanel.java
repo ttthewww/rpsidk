@@ -49,7 +49,7 @@ public class GamePanel extends JPanel implements Runnable{
     MainMenu mainMenu;
     public FPS fps = new FPS();
 
-    public GamePanel() throws IOException {
+    public GamePanel(){
         setWindowDefaults();
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
@@ -63,12 +63,8 @@ public class GamePanel extends JPanel implements Runnable{
         this.player = new Player(this);
         this.mouseMotionH = new MouseMotionHandler();
         this.addMouseMotionListener(mouseMotionH);
-        this.keyH = new KeyHandler(this.player);
+        this.keyH = new KeyHandler();
         this.mouseH = new MouseHandler(this.player);
-
-        this.addKeyListener(keyH);
-        this.addMouseListener(mouseH);
-        player.setHandlers(keyH, mouseH);
 
         this.cChecker = new CollisionChecker(this.player);
         this.background1 = new Background(0);
@@ -78,6 +74,10 @@ public class GamePanel extends JPanel implements Runnable{
         this.enemyHandler = new EnemyHandler(this, this.player);
 
         new MaskHandler();
+
+        this.addKeyListener(keyH);
+        this.addMouseListener(mouseH);
+        player.setHandlers(keyH, mouseH);
     }
 
     public void setWindowDefaults(){
@@ -158,7 +158,6 @@ public class GamePanel extends JPanel implements Runnable{
         if(this.gameState == pauseState){
             if(!this.keyH.escToggled){
                 this.gameState = mainGameState;
-
             }
         }
         if(this.gameState == mainGameState){
@@ -181,13 +180,10 @@ public class GamePanel extends JPanel implements Runnable{
          Graphics2D g2 = (Graphics2D)g;
 
          if(this.gameState == mainMenuState){
-             this.mainMenu.draw(g2);
+             mainMenu.draw(g2);
          }
 
-        if(this.gameState == pauseState){
-
-        }
-         if(this.gameState == mainGameState){
+         if(this.gameState == mainGameState || this.gameState == pauseState){
              background1.draw(g2);
              background2.draw(g2);
 
@@ -200,6 +196,6 @@ public class GamePanel extends JPanel implements Runnable{
              g2.drawString("Score: " + player.score, 5, 10);
              g2.drawString("Health: " + player.health,400, 10);
          }
-        g2.dispose();
+         g2.dispose();
     }
 }
