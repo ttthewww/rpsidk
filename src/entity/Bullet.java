@@ -2,7 +2,6 @@ package entity;
 
 import main.GamePanel;
 import handlers.ImageHandler;
-import main.MaskCreationThread;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;

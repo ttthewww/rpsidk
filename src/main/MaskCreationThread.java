@@ -11,24 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MaskCreationThread implements Runnable{
-    private BufferedImage image;
-    private double x;
-    private double y;
-    private volatile Area mask;
-
     HashMap<Entity, Area> masks;
-
-//    public MaskCreationThread(BufferedImage image, double x, double y) {
-//        this.image = image;
-//        this.x = x;
-//        this.y = y;
-//        this.masks = new HashMap<Entity, Area>();
-//    }
-
     public MaskCreationThread() {
-        this.masks = new HashMap<Entity, Area>();
+        this.masks = new HashMap<>();
     }
-
     @Override
     public void run() {
 
@@ -47,7 +33,6 @@ public class MaskCreationThread implements Runnable{
                     return entry.getValue();
                 }
             }
-            return this.mask;
         }catch (Exception e){
             e.printStackTrace();
         }

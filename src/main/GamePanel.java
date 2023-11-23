@@ -158,12 +158,13 @@ public class GamePanel extends JPanel implements Runnable{
         if(this.gameState == pauseState){
             if(!this.keyH.escToggled){
                 this.gameState = mainGameState;
+                this.enemyHandler.resumeThread();
             }
         }
         if(this.gameState == mainGameState){
             if(this.keyH.escToggled){
+                this.enemyHandler.pauseThread();
                 this.gameState = pauseState;
-
             }
             background1.update(fps.delta, this);
             background2.update(fps.delta, this);

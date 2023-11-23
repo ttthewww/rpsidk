@@ -15,7 +15,6 @@ public abstract class Enemy extends Entity{
     public double x;
     public double y;
     public int enemyType;
-    MaskCreationThread maskThread;
     public int attackTimer = 150;
     public int attackCooldown = 0;
     private BufferedImage aura;

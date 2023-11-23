@@ -10,15 +10,13 @@ import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EnemyHandler implements Runnable {
-
-    int summonCooldown = 0;
-    int summonTimer = 200;
     GamePanel gp;
+    double spawnChance =  0.5;
     public boolean running = true;
     FPS fps;
     CollisionChecker collisionChecker;
     Player player;
-    double spawnChance =  0.5;
+    public boolean paused;
 
     public CopyOnWriteArrayList<Enemy> enemies;
     public EnemyHandler(GamePanel gp, Player player){
@@ -30,8 +28,18 @@ public class EnemyHandler implements Runnable {
     }
 
     public void run(){
-        while(running){
-            if(this.gp.gameState != this.gp.pauseState){
+        while (running) {
+            synchronized (this) {
+                while (paused) {
+                    try {
+                        this.wait();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+
+            if (this.gp.gameState != this.gp.pauseState) {
                 fps.update();
                 fps.currentTime = System.nanoTime();
                 fps.delta += (fps.currentTime - fps.lastTime) / fps.drawInterval;
@@ -42,9 +50,20 @@ public class EnemyHandler implements Runnable {
                     fps.delta--;
                     fps.drawCount++;
                 }
-            }else{
-//                System.out.println("NAKAPAUSE");
+            } else {
+
             }
+        }
+    }
+
+    public void pauseThread() {
+        paused = true;
+    }
+
+    public void resumeThread() {
+        paused = false;
+        synchronized (this) {
+            this.notify();
         }
     }
 
@@ -63,6 +82,7 @@ public class EnemyHandler implements Runnable {
             summonEnemy();
             fps.timer = 0;
         }
+
         for(Enemy e : enemies) {
             e.update();
         }
