@@ -46,6 +46,7 @@ public class GamePanel extends JPanel implements Runnable{
     //gameState
     public int mainMenuState = 0, mainGameState = 1, pauseState = 2;
     public int gameState = mainMenuState;
+    String playerName = null;
     MainMenu mainMenu;
     public FPS fps = new FPS();
 
@@ -119,9 +120,15 @@ public class GamePanel extends JPanel implements Runnable{
 
         while(gameThread != null){
             if(gameOver){
-                while(true){
-                    System.out.println("GAME OVER");
-                }
+                int score = player.score;
+                ScoreBoard playerScore = new ScoreBoard();
+                playerScore.addScore(playerName, score);
+                System.out.println(score);
+                JOptionPane.showConfirmDialog(this, "This your score: " + score);
+//                while(true){
+//                    System.out.println("GAME OVER");
+//                }
+                gameOver = true;
             }
 
             this.absoluteMouseX =  MouseInfo.getPointerInfo().getLocation().x;
