@@ -17,7 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static main.GamePanel.maskCreationThread;
 
-public class Player extends Entity {
+public class Player extends Entity implements Rotate{
     public int health = 3;
     public int score = 0;
     public static double x;
@@ -41,7 +41,7 @@ public class Player extends Entity {
 
     public Player(GamePanel gp) {
         this.gp = gp;
-        getPlayerImage();
+        getImage();
         setDefaultValues();
         this.colRect = this.mask.getBounds();
     }
@@ -56,7 +56,7 @@ public class Player extends Entity {
         this.keyH = keyH;
     }
 
-    public void getPlayerImage() {
+    public void getImage() {
         try {
             playerFrames = new BufferedImage[5];
 
@@ -73,6 +73,11 @@ public class Player extends Entity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void draw(Graphics2D g2) {
+        draw(g2, null);
     }
 
     public void toggleBulletType() {
@@ -195,6 +200,10 @@ public class Player extends Entity {
     }
 
 
+    @Override
+    public void rotate(BufferedImage image, AffineTransform at) {
+        rotate(image, null, at);
+    }
     public void rotate(BufferedImage image, GamePanel gamePanel, AffineTransform at) {
         double directionX = gamePanel.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
         double directionY = gamePanel.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));
@@ -235,4 +244,5 @@ public class Player extends Entity {
         g2.setColor(Color.BLUE);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
+
 }

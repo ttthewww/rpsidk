@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 
 import static main.GamePanel.maskCreationThread;
 
-public abstract class Enemy extends Entity{
+public class Enemy extends Entity implements Rotate{
     GamePanel gp;
     public double x;
     public double y;
@@ -27,7 +27,7 @@ public abstract class Enemy extends Entity{
         Point spawn = validSpawnPoint();
         this.x = spawn.x;
         this.y = spawn.y;
-        getEnemyImage();
+        getImage();
 
         this.colRect = this.mask.getBounds();
 
@@ -45,7 +45,7 @@ public abstract class Enemy extends Entity{
 //        }
     }
 
-    public void getEnemyImage(){
+    public void getImage(){
         if(this.enemyType == 1){
             this.image = ImageHandler.enemyRockImage;
             this.aura = ImageHandler.enemyRockAura;
@@ -122,7 +122,7 @@ public abstract class Enemy extends Entity{
             attackCooldown = attackTimer;
         }
     }
-    public void rotate(AffineTransform at, BufferedImage image){
+    public void rotate(BufferedImage image, AffineTransform at){
         double directionX = Player.x - (this.x + (double)image.getWidth() / 2);
         double directionY = Player.y - (this.y + (double)image.getHeight() / 2);
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
@@ -133,8 +133,8 @@ public abstract class Enemy extends Entity{
         AffineTransform at = AffineTransform.getTranslateInstance(this.x - this.image.getWidth() / 2.0, this.y - this.image.getHeight() / 2.0);
         AffineTransform auraAt = AffineTransform.getTranslateInstance(this.x - this.aura.getWidth() / 2.0, this.y - this.aura.getHeight() / 2.0);
 
-        rotate(at, this.image);
-        rotate(auraAt, this.aura);
+        rotate(this.image, at);
+        rotate(this.aura, auraAt);
 
         g2.setColor(Color.RED);
 
@@ -146,4 +146,5 @@ public abstract class Enemy extends Entity{
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
+
 }

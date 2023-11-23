@@ -78,6 +78,7 @@ public class GamePanel extends JPanel implements Runnable{
         this.addKeyListener(keyH);
         this.addMouseListener(mouseH);
         player.setHandlers(keyH, mouseH);
+        this.requestFocusInWindow();
     }
 
     public void setWindowDefaults(){
@@ -110,12 +111,8 @@ public class GamePanel extends JPanel implements Runnable{
 //        enemyHandler.summonEnemy(this);
 
         try {
-            SoundHandler.playSound("../resource/sounds/bgm.wav");
-        } catch (UnsupportedAudioFileException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (LineUnavailableException e) {
+            SoundHandler.playSound("../resource/sounds/bgm.wav", true);
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             throw new RuntimeException(e);
         }
         SoundHandler.setVolume(0.7f);

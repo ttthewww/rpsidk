@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 
 import static main.GamePanel.maskCreationThread;
 
-public abstract class Bullet extends Entity{
+public class Bullet extends Entity{
     double angle;
     double dx;
     double dy;
@@ -25,7 +25,7 @@ public abstract class Bullet extends Entity{
 
     public Bullet(GamePanel gp, double angle, Player player){
         this.bulletType = player.bulletType;
-        getBulletImage();
+        getImage();
         this.gp = gp;
         this.x = player.x;
         this.y = player.y;
@@ -43,7 +43,7 @@ public abstract class Bullet extends Entity{
         this.colRect.y = (int) (this.y - this.image.getHeight() / 2.0);
     }
 
-    public void getBulletImage(){
+    public void getImage(){
         try{
             if(this.bulletType == 1){
                 this.image = ImageHandler.rockBulletImage;
@@ -57,6 +57,11 @@ public abstract class Bullet extends Entity{
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void draw(Graphics2D g2) {
+        draw(g2, null);
     }
 
     public void rotate(BufferedImage image , AffineTransform at){

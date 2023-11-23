@@ -64,7 +64,7 @@ public class CollisionChecker {
                         case 1:
                             if(enemy.enemyType == 3){
                                 try {
-                                    SoundHandler.playSound("../resource/sounds/scissor.wav");
+                                    SoundHandler.playSound("../resource/sounds/scissor.wav", false);
                                 } catch (UnsupportedAudioFileException e) {
                                     throw new RuntimeException(e);
                                 } catch (IOException e) {
@@ -79,7 +79,7 @@ public class CollisionChecker {
                             }
                             if(enemy.enemyType == 2){
                                 try {
-                                    SoundHandler.playSound("../resource/sounds/paper.wav");
+                                    SoundHandler.playSound("../resource/sounds/paper.wav", false);
                                 } catch (UnsupportedAudioFileException e) {
                                     throw new RuntimeException(e);
                                 } catch (IOException e) {
@@ -95,7 +95,7 @@ public class CollisionChecker {
                         case 2:
                             if(enemy.enemyType == 1){
                                 try {
-                                    SoundHandler.playSound("../resource/sounds/rock.wav");
+                                    SoundHandler.playSound("../resource/sounds/rock.wav", false);
                                 } catch (UnsupportedAudioFileException e) {
                                     throw new RuntimeException(e);
                                 } catch (IOException e) {
@@ -110,7 +110,7 @@ public class CollisionChecker {
                             }
                             if(enemy.enemyType == 3){
                                 try {
-                                    SoundHandler.playSound("../resource/sounds/scissor.wav");
+                                    SoundHandler.playSound("../resource/sounds/scissor.wav", false);
                                 } catch (UnsupportedAudioFileException e) {
                                     throw new RuntimeException(e);
                                 } catch (IOException e) {
@@ -126,7 +126,7 @@ public class CollisionChecker {
                         case 3:
                             if(enemy.enemyType == 2){
                                 try {
-                                    SoundHandler.playSound("../resource/sounds/paper.wav");
+                                    SoundHandler.playSound("../resource/sounds/paper.wav", false);
                                 } catch (UnsupportedAudioFileException e) {
                                     throw new RuntimeException(e);
                                 } catch (IOException e) {
@@ -141,7 +141,7 @@ public class CollisionChecker {
                             }
                             if(enemy.enemyType == 1){
                                 try {
-                                    SoundHandler.playSound("../resource/sounds/rock.wav");
+                                    SoundHandler.playSound("../resource/sounds/rock.wav", false);
                                 } catch (UnsupportedAudioFileException e) {
                                     throw new RuntimeException(e);
                                 } catch (IOException e) {

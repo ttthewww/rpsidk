@@ -1,7 +1,6 @@
 package handlers;
 
 import entity.*;
-import handlers.CollisionChecker;
 import main.FPS;
 import main.GamePanel;
 

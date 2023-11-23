@@ -2,6 +2,7 @@ package entity;
 
 import main.GamePanel;
 
+import java.awt.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ScissorEnemy extends Enemy{

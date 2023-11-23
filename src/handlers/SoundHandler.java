@@ -5,20 +5,29 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class SoundHandler {
-    static Clip clip;
+    private static Clip clip;
 
-    public static void playSound(String filePath) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
+    public static void playSound(String filePath, boolean loop) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
         try (InputStream audioStream = SoundHandler.class.getResourceAsStream(filePath)) {
             if (audioStream == null) {
                 throw new IOException("Audio file not found: " + filePath);
             }
-
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioStream);
 
-            // Use the class-level clip variable instead of declaring a new local variable
             clip = AudioSystem.getClip();
             clip.open(audioInputStream);
-            clip.setMicrosecondPosition(0);
+
+            if (loop) {
+                // Set up a listener to detect when the music ends
+                clip.addLineListener(event -> {
+                    if (event.getType() == LineEvent.Type.STOP) {
+                        // Music has stopped, rewind and play again for looping
+                        clip.setMicrosecondPosition(0);
+                        clip.start();
+                    }
+                });
+            }
+
             clip.start();
         }
     }
