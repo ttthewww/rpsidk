@@ -48,6 +48,7 @@ public class GamePanel extends JPanel implements Runnable{
     public int gameState = mainMenuState;
     String playerName = null;
     MainMenu mainMenu;
+    PauseMenu pauseMenu;
     public FPS fps = new FPS();
 
     public GamePanel(){
@@ -72,6 +73,7 @@ public class GamePanel extends JPanel implements Runnable{
         this.background2 = new Background(-this.getHeight());
 
         this.mainMenu = new MainMenu(this, this.mouseH);
+        this.pauseMenu = new PauseMenu(this, this.mouseH);
         this.enemyHandler = new EnemyHandler(this, this.player);
 
         new MaskHandler();
@@ -100,9 +102,6 @@ public class GamePanel extends JPanel implements Runnable{
     public void startGameThread(){
         gameThread = new Thread(this);
         gameThread.start();
-
-        this.enemyHandlerThread = new Thread(this.enemyHandler);
-        this.enemyHandlerThread.start();
 
         Thread maskThread = new Thread(maskCreationThread);
         maskThread.start();
@@ -162,9 +161,10 @@ public class GamePanel extends JPanel implements Runnable{
         if(this.gameState == pauseState){
             if(!this.keyH.escToggled){
                 this.gameState = mainGameState;
-                this.enemyHandler.resumeThread();
             }
+            return;
         }
+
         if(this.gameState == mainGameState){
             if(this.keyH.escToggled){
                 this.enemyHandler.pauseThread();
@@ -177,6 +177,7 @@ public class GamePanel extends JPanel implements Runnable{
                 gameOver = true;
             }
             player.update(this, this.window);
+            enemyHandler.update();
         }
     }
 
@@ -200,6 +201,9 @@ public class GamePanel extends JPanel implements Runnable{
              g2.setColor(Color.GREEN);
              g2.drawString("Score: " + player.score, 5, 10);
              g2.drawString("Health: " + player.health,400, 10);
+         }
+         if(this.gameState == pauseState){
+             this.pauseMenu.draw(g2);
          }
          g2.dispose();
     }

@@ -29,6 +29,7 @@ public class CollisionChecker {
         for (Enemy e : enemies) {
             for (Enemy otherEnemy : enemies) {
                 if (e != otherEnemy) {
+                    if(Math.sqrt((e.x - otherEnemy.x) + (e.y - otherEnemy.y)) > 200) continue;
                     Area intersection = new Area(e.mask);
                     intersection.intersect(otherEnemy.mask);
                     if (!(intersection.isEmpty())) {
@@ -44,6 +45,7 @@ public class CollisionChecker {
 
         //check for player-enemyCollision
         for (Enemy e : enemies) {
+            if(Math.sqrt((e.x - this.player.x) + (e.y - this.player.y)) > 200) continue;
             Area intersection = new Area(this.player.mask);
             intersection.intersect(e.mask);
             if (!(intersection.isEmpty()) && e.attackCooldown >= e.attackTimer) {
@@ -55,6 +57,7 @@ public class CollisionChecker {
         //check for player bullet collision
         for (Bullet bullet : playerbullets) {
             for (Enemy enemy : enemies) {
+                if(Math.sqrt((bullet.x - enemy.x) + (bullet.y - enemy.y)) > 200) continue;
                 Area intersection = null;
                 intersection = new Area(bullet.mask);
                 intersection.intersect(enemy.mask);

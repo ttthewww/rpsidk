@@ -1,20 +1,17 @@
 package main;
 
-import handlers.ImageHandler;
 import handlers.MouseHandler;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
-public class MainMenu {
+public class  PauseMenu{
     GamePanel gp;
     MouseHandler mouseHandler;
-    public MainMenu(GamePanel gp, MouseHandler mouseHandler){
+    public PauseMenu(GamePanel gp, MouseHandler mouseHandler){
         this.gp = gp;
         this.mouseHandler = mouseHandler;
     }
-
     public void update(Point playPoint, Graphics2D g2){
-        int playStringLength = getTextWidth(g2, "PLAY");
+        int playStringLength = getTextWidth(g2, "RESUME");
         int playStringHeight = getTextHeight(g2);
 
         if(gp.mouseX > playPoint.x &&
@@ -29,18 +26,15 @@ public class MainMenu {
     }
 
     public void draw(Graphics2D g2){
-        BufferedImage backgroundImage = ImageHandler.mainMenuBackgroundImage;
-        g2.drawImage(backgroundImage, 0,0, backgroundImage.getWidth(), backgroundImage.getHeight(), null);
-
         g2.setFont(g2.getFont().deriveFont(Font.BOLD, 28F));
         g2.setColor(Color.GREEN);
 
-        Point titlePoint = new Point(getXforCenteredText(g2, "GAME"),100);
-        g2.drawString("GAME", titlePoint.x, titlePoint.y);
+        Point titlePoint = new Point(getXforCenteredText(g2, "PAUSED"),100);
+        g2.drawString("PAUSED", titlePoint.x, titlePoint.y);
 
-        Point playPoint = new Point(getXforCenteredText(g2, "PLAY"), 200);
-        g2.drawString("PLAY", playPoint.x, playPoint.y);
-        update(playPoint, g2);
+        Point playPoint = new Point(getXforCenteredText(g2, "RESUME"), 200);
+        g2.drawString("RESUME", playPoint.x, playPoint.y);
+        this.update(playPoint, g2);
     }
 
     public int getTextWidth(Graphics2D g2, String text) {

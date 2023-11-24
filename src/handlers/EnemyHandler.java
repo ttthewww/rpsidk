@@ -8,7 +8,7 @@ import java.awt.*;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class EnemyHandler implements Runnable {
+public class EnemyHandler{
     GamePanel gp;
     double spawnChance =  0.5;
     public boolean running = true;
@@ -67,7 +67,7 @@ public class EnemyHandler implements Runnable {
     }
 
     public void summonEnemy(){
-        if(Math.random() < spawnChance){
+        if(Math.random() < 0.01){
             Random rand = new Random();
             int n = rand.nextInt(3);
             if(n == 0)enemies.add(new RockEnemy(gp));
@@ -77,10 +77,10 @@ public class EnemyHandler implements Runnable {
     }
 
     public void update(){
-        if(fps.timer>= 1000000000){
+//        if(fps.timer>= 1000000000){
             summonEnemy();
             fps.timer = 0;
-        }
+//        }
 
         for(Enemy e : enemies) {
             e.update();
