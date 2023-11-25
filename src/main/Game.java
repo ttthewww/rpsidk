@@ -8,50 +8,40 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.time.LocalDate;
 
-public class GamePanel extends JPanel implements Runnable{
-
+public class Game extends JPanel implements Runnable{
     public WindowContainer window;
-
     public int windowPosX = 500;
     public int windowPosY = 250;
     public int screenWidth = 576;
     public int screenHeight = 576;
-
-    public double windowSpeed = 1;
     public int mouseX;
     public int mouseY;
     public int absoluteMouseX;
     public int absoluteMouseY;
-    private int FPS = 60;
     Thread gameThread;
     public static MaskCreationThread maskCreationThread;
-
     public EnemyHandler enemyHandler;
-
-    ArrayList<FrameEnemy> frameEnemies = new ArrayList<>();
     CollisionChecker cChecker;
     boolean gameOver = false;
-    double spawnChance = 0.2;
     public Player player;
-    KeyHandler keyH;
+    public KeyHandler keyH;
     MouseHandler mouseH;
     MouseMotionHandler mouseMotionH;
     private Background background1;
     private Background background2;
 
-    private Thread enemyHandlerThread;
-
     //gameState
-    public int mainMenuState = 0, mainGameState = 1, pauseState = 2;
+    public int mainMenuState = 0, mainGameState = 1, gameOverState = 2;
     public int gameState = mainMenuState;
-    String playerName = null;
-    MainMenu mainMenu;
-    PauseMenu pauseMenu;
+    public boolean paused;
+    public MainMenu mainMenu;
+    public PauseMenu pauseMenu;
+    public GameOverMenu gameOverMenu;
     public FPS fps = new FPS();
-
-    public GamePanel(){
+    ScoreBoard scoreBoard;
+    public Game(){
         setWindowDefaults();
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
@@ -66,21 +56,25 @@ public class GamePanel extends JPanel implements Runnable{
         this.mouseMotionH = new MouseMotionHandler();
         this.addMouseMotionListener(mouseMotionH);
         this.keyH = new KeyHandler();
-        this.mouseH = new MouseHandler(this.player);
+
+        this.mainMenu = new MainMenu(this);
+        this.pauseMenu = new PauseMenu(this);
+        this.gameOverMenu = new GameOverMenu(this);
+
+        this.mouseH = new MouseHandler(this);
 
         this.cChecker = new CollisionChecker(this.player);
         this.background1 = new Background(0);
         this.background2 = new Background(-this.getHeight());
 
-        this.mainMenu = new MainMenu(this, this.mouseH);
-        this.pauseMenu = new PauseMenu(this, this.mouseH);
-        this.enemyHandler = new EnemyHandler(this, this.player);
+        this.enemyHandler = new EnemyHandler(this);
 
         new MaskHandler();
 
         this.addKeyListener(keyH);
         this.addMouseListener(mouseH);
         player.setHandlers(keyH, mouseH);
+        this.scoreBoard = new ScoreBoard();
         this.requestFocusInWindow();
     }
 
@@ -107,9 +101,15 @@ public class GamePanel extends JPanel implements Runnable{
         maskThread.start();
     }
 
+    public void reset(){
+        this.player.reset();
+        this.enemyHandler.reset();
+        this.gameState = mainGameState;
+    }
+
+
     public void run(){
 //        enemyHandler.summonEnemy(this);
-
         try {
             SoundHandler.playSound("../resource/sounds/bgm.wav", true);
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
@@ -118,18 +118,6 @@ public class GamePanel extends JPanel implements Runnable{
         SoundHandler.setVolume(0.7f);
 
         while(gameThread != null){
-            if(gameOver){
-                int score = player.score;
-                ScoreBoard playerScore = new ScoreBoard();
-                playerScore.addScore(playerName, score);
-                System.out.println(score);
-                JOptionPane.showConfirmDialog(this, "This your score: " + score);
-//                while(true){
-//                    System.out.println("GAME OVER");
-//                }
-                gameOver = true;
-            }
-
             this.absoluteMouseX =  MouseInfo.getPointerInfo().getLocation().x;
             this.absoluteMouseY = MouseInfo.getPointerInfo().getLocation().y;
 
@@ -158,26 +146,27 @@ public class GamePanel extends JPanel implements Runnable{
         }
     }
     public void update(){
-        if(this.gameState == pauseState){
-            if(!this.keyH.escToggled){
-                this.gameState = mainGameState;
-            }
-            return;
-        }
-
-        if(this.gameState == mainGameState){
+        if(this.gameState == this.mainGameState){
             if(this.keyH.escToggled){
-                this.enemyHandler.pauseThread();
-                this.gameState = pauseState;
+                this.paused = true;
             }
-            background1.update(fps.delta, this);
-            background2.update(fps.delta, this);
 
-            if(this.player.health <= 0){
-                gameOver = true;
+            if(!this.keyH.escToggled){
+                this.paused = false;
             }
-            player.update(this, this.window);
-            enemyHandler.update();
+
+            if(!this.paused){
+                background1.update(fps.delta, this);
+                background2.update(fps.delta, this);
+
+                if(this.player.health <= 0){
+                    scoreBoard.addScore(String.valueOf(LocalDate.now()), player.score);
+                    this.gameState = gameOverState;
+                }
+
+                player.update(this, this.window);
+                enemyHandler.update();
+            }
         }
     }
 
@@ -185,11 +174,12 @@ public class GamePanel extends JPanel implements Runnable{
          super.paintComponent(g);
          Graphics2D g2 = (Graphics2D)g;
 
-         if(this.gameState == mainMenuState){
+         if(this.gameState == 0){
              mainMenu.draw(g2);
          }
 
-         if(this.gameState == mainGameState || this.gameState == pauseState){
+         if(this.gameState ==  1){
+
              background1.draw(g2);
              background2.draw(g2);
 
@@ -197,14 +187,21 @@ public class GamePanel extends JPanel implements Runnable{
              for (Bullet bullet : player.bullets) {
                  bullet.draw(g2, this);
              }
+
              player.draw(g2, this);
              g2.setColor(Color.GREEN);
              g2.drawString("Score: " + player.score, 5, 10);
              g2.drawString("Health: " + player.health,400, 10);
+
+             if(this.paused){
+                 this.pauseMenu.draw(g2);
+             }
          }
-         if(this.gameState == pauseState){
-             this.pauseMenu.draw(g2);
+
+         if(this.gameState == 2){
+             this.gameOverMenu.draw(g2);
          }
+
          g2.dispose();
     }
 }

@@ -1,34 +1,42 @@
 package main;
 
 import java.io.*;
+import java.util.*;
 
 public class ScoreBoard {
     private static final String SCORE_FILE = "src/resource/Scores.txt";
-    static void addScore(String playerName, int score) {
+    void addScore(String date, int score) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SCORE_FILE, true))) {
-            // Append the new score to the file
-            writer.write(playerName + "," + score);
+            writer.write(score + " | " + date);
             writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static void displayScoreBoard() {
+    public ArrayList<String> getTopScores() {
+        ArrayList<String> topScoresList = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(SCORE_FILE))) {
-            System.out.println("Score Board:");
-
+            ArrayList<String> scores = new ArrayList<>();
             String line;
             while ((line = reader.readLine()) != null) {
-                // Split the line into player name and score
-                String[] parts = line.split(",");
-                String playerName = parts[0];
-                int score = Integer.parseInt(parts[1]);
-
-                System.out.println(playerName + ": " + score);
+                scores.add(line);
             }
+
+            Collections.sort(scores, (s1, s2) -> {
+                int score1 = Integer.parseInt(s1.split(" | ")[0]);
+                int score2 = Integer.parseInt(s2.split(" | ")[0]);
+                return Integer.compare(score2, score1);
+            });
+            if (scores.size() > 5) {
+                scores.subList(5, scores.size()).clear();
+            }
+
+            topScoresList.addAll(scores);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return topScoresList;
     }
 }

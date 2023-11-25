@@ -8,17 +8,17 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
-import static main.GamePanel.maskCreationThread;
+import static main.Game.maskCreationThread;
 
 public class Enemy extends Entity implements Rotate{
-    GamePanel gp;
+    Game gp;
     public double x;
     public double y;
     public int enemyType;
     public int attackTimer = 150;
     public int attackCooldown = 0;
     private BufferedImage aura;
-    public Enemy(GamePanel gp,int enemyType){
+    public Enemy(Game gp, int enemyType){
         this.speed = 1;
         this.enemyType = enemyType;
         this.gp = gp;

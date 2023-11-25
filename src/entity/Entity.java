@@ -1,8 +1,6 @@
 package entity;
 
 
-import main.GamePanel;
-
 import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;

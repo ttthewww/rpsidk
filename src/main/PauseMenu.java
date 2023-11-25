@@ -1,53 +1,75 @@
 package main;
 
-import handlers.MouseHandler;
 import java.awt.*;
+import java.util.ArrayList;
 
-public class  PauseMenu{
-    GamePanel gp;
-    MouseHandler mouseHandler;
-    public PauseMenu(GamePanel gp, MouseHandler mouseHandler){
-        this.gp = gp;
-        this.mouseHandler = mouseHandler;
+public class  PauseMenu extends Menu{
+
+    public boolean mainMenuHovered;
+    public boolean resumeHovered;
+    public boolean quitHovered;
+
+    public PauseMenu(Game gp){
+        super(gp);
     }
-    public void update(Point playPoint, Graphics2D g2){
-        int playStringLength = getTextWidth(g2, "RESUME");
-        int playStringHeight = getTextHeight(g2);
 
-        if(gp.mouseX > playPoint.x &&
-                gp.mouseX < playPoint.x + playStringLength &&
-                gp.mouseY > playPoint.y - playStringHeight &&
-                gp.mouseY < playPoint.y)
+    @Override
+    public void update(ArrayList<Point> points, Graphics2D g2) {
+        mainMenuHovered = false;
+        resumeHovered = false;
+        quitHovered = false;
+
+        int mainMenuStringLength = getTextWidth(g2, "Main Menu");
+        int mainMenuStringHeight = getTextHeight(g2);
+        if(gp.mouseX > points.get(1).x &&
+                gp.mouseX < points.get(0).x + mainMenuStringLength &&
+                gp.mouseY > points.get(0).y - mainMenuStringHeight + 12 &&
+                gp.mouseY < points.get(0).y)
         {
-            if(mouseHandler.leftClicked){
-                gp.gameState = gp.mainGameState;
-            }
+            mainMenuHovered = true;
+        }
+
+        int resumeStringLength = getTextWidth(g2, "Resume");
+        int resumeStringHeight = getTextHeight(g2);
+        if(gp.mouseX > points.get(1).x &&
+                gp.mouseX < points.get(1).x + resumeStringLength &&
+                gp.mouseY > points.get(1).y - resumeStringHeight + 12 &&
+                gp.mouseY < points.get(1).y)
+        {
+            resumeHovered = true;
+        }
+
+        int quitStringLength = getTextWidth(g2, "Quit");
+        int quitStringHeight = getTextHeight(g2);
+        if(gp.mouseX > points.get(1).x &&
+                gp.mouseX < points.get(2).x + quitStringLength &&
+                gp.mouseY > points.get(2).y - quitStringHeight + 12 &&
+                gp.mouseY < points.get(2).y)
+        {
+            quitHovered = true;
         }
     }
 
     public void draw(Graphics2D g2){
+        ArrayList<Point> points = new ArrayList<>();
+        g2.setColor(new Color(0, 0, 0, 0.7F));
+        g2.fillRect(0, 0, gp.getWidth(), gp.getHeight());
+
         g2.setFont(g2.getFont().deriveFont(Font.BOLD, 28F));
         g2.setColor(Color.GREEN);
 
-        Point titlePoint = new Point(getXforCenteredText(g2, "PAUSED"),100);
+        Point titlePoint = getCenteredTextPoint(g2, "Paused", 100);
         g2.drawString("PAUSED", titlePoint.x, titlePoint.y);
 
-        Point playPoint = new Point(getXforCenteredText(g2, "RESUME"), 200);
-        g2.drawString("RESUME", playPoint.x, playPoint.y);
-        this.update(playPoint, g2);
-    }
+        String[] menuItems = {"Main Menu", "Resume", "Quit"};
+        int[] menuItemsOffset = {200, 250, 300};
 
-    public int getTextWidth(Graphics2D g2, String text) {
-        FontMetrics fm = g2.getFontMetrics();
-        return fm.stringWidth(text);
-    }
-    public int getTextHeight(Graphics2D g2) {
-        FontMetrics fm = g2.getFontMetrics();
-        return fm.getHeight();
-    }
-    public int getXforCenteredText(Graphics2D g2, String text){
-        int length = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
-        int x = this.gp.screenWidth / 2 - length / 2;
-        return x;
+        for(int i = 0; i < menuItems.length; i++){
+            Point point = getCenteredTextPoint(g2, menuItems[i], menuItemsOffset[i]);
+            g2.drawString(menuItems[i], point.x, point.y);
+            points.add(point);
+        }
+
+        update(points, g2);
     }
 }

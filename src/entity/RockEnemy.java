@@ -1,11 +1,9 @@
 package entity;
 
-import main.GamePanel;
-
-import java.util.concurrent.CopyOnWriteArrayList;
+import main.Game;
 
 public class RockEnemy extends Enemy{
-    public RockEnemy(GamePanel gp){
+    public RockEnemy(Game gp){
         super(gp,1);
     }
 }

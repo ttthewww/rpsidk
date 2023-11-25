@@ -1,12 +1,9 @@
 package entity;
 
-import main.GamePanel;
-
-import java.awt.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import main.Game;
 
 public class ScissorEnemy extends Enemy{
-    public ScissorEnemy(GamePanel gp) {
+    public ScissorEnemy(Game gp) {
         super(gp,3);
     }
 }

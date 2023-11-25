@@ -1,9 +1,9 @@
 package entity;
 
-import main.GamePanel;
+import main.Game;
 
 public class PlayerBullet extends Bullet{
-    public PlayerBullet(GamePanel gp, double angle, Player bulletType){
+    public PlayerBullet(Game gp, double angle, Player bulletType){
         super(gp, angle, bulletType);
     }
 

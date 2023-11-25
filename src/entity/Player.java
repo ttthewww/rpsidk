@@ -15,14 +15,14 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static main.GamePanel.maskCreationThread;
+import static main.Game.maskCreationThread;
 
 public class Player extends Entity implements Rotate{
-    public int health = 3;
-    public int score = 0;
+    public int health;
+    public int score;
     public static double x;
     public static double y;
-    GamePanel gp;
+    Game gp;
     KeyHandler keyH;
     MouseHandler mouseH;
     public BufferedImage[] playerFrames;
@@ -39,16 +39,19 @@ public class Player extends Entity implements Rotate{
     public int bulletType = 1;
     private BufferedImage bulletTypeImage = ImageHandler.rockBulletImage;
 
-    public Player(GamePanel gp) {
+    public Player(Game gp) {
         this.gp = gp;
         getImage();
-        setDefaultValues();
+        reset();
         this.colRect = this.mask.getBounds();
     }
 
-    public void setDefaultValues() {
+    public void reset() {
         x = this.gp.window.getWidth() / 2;
         y = this.gp.window.getHeight() / 2;
+        this.mask = new Area(maskCreationThread.addMask(this));
+        this.health = 1;
+        this.score = 0;
     }
 
     public void setHandlers(KeyHandler keyH, MouseHandler mouseH){
@@ -69,7 +72,6 @@ public class Player extends Entity implements Rotate{
                 }
             }
             this.image = playerFrames[0];
-            this.mask = new Area(maskCreationThread.addMask(this));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -185,7 +187,7 @@ public class Player extends Entity implements Rotate{
         }
     }
 
-    public void update(GamePanel gp, WindowContainer window){
+    public void update(Game gp, WindowContainer window){
         move();
         //Shooting
         fireCooldown++;
@@ -204,7 +206,7 @@ public class Player extends Entity implements Rotate{
     public void rotate(BufferedImage image, AffineTransform at) {
         rotate(image, null, at);
     }
-    public void rotate(BufferedImage image, GamePanel gamePanel, AffineTransform at) {
+    public void rotate(BufferedImage image, Game gamePanel, AffineTransform at) {
         double directionX = gamePanel.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
         double directionY = gamePanel.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
@@ -225,7 +227,7 @@ public class Player extends Entity implements Rotate{
         }
     }
 
-    public void draw(Graphics2D g2, GamePanel gamePanel) {
+    public void draw(Graphics2D g2, Game gamePanel) {
         BufferedImage image = playerFrames[0];
         if (playerFrames != null && playerFrames.length > 0) {
             int frameIndex = (int) ((System.currentTimeMillis() / 100) % playerFrames.length);

@@ -10,11 +10,11 @@ public class EnemyWindowContainer extends JFrame implements Runnable {
     int windowHeight;
     int windowWidth;
     Enemy enemy;
-    GamePanel gp;
+    Game gp;
 
     private volatile boolean running = true;
 
-    public EnemyWindowContainer(int windowHeight, int windowWidth, int windowPosX, int windowPosY, Enemy enemy, GamePanel gp) {
+    public EnemyWindowContainer(int windowHeight, int windowWidth, int windowPosX, int windowPosY, Enemy enemy, Game gp) {
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
         this.windowPosX = windowPosX;

@@ -1,6 +1,6 @@
 package entity;
 
-import main.GamePanel;
+import main.Game;
 import handlers.ImageHandler;
 
 import java.awt.*;
@@ -8,7 +8,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
-import static main.GamePanel.maskCreationThread;
+import static main.Game.maskCreationThread;
 
 public class Bullet extends Entity{
     double angle;
@@ -18,12 +18,12 @@ public class Bullet extends Entity{
     int targetY;
     public int speed = 8;
     public int bulletType;
-    GamePanel gp;
+    Game gp;
     double directionX;
     double directionY;
     double rotationAngleInRadians;
 
-    public Bullet(GamePanel gp, double angle, Player player){
+    public Bullet(Game gp, double angle, Player player){
         this.bulletType = player.bulletType;
         getImage();
         this.gp = gp;
@@ -94,7 +94,7 @@ public class Bullet extends Entity{
     }
 
 
-    public void draw(Graphics2D g2, GamePanel gamePanel){
+    public void draw(Graphics2D g2, Game gamePanel){
         AffineTransform at =  AffineTransform.getTranslateInstance(this.x - this.image.getWidth() / 2.0, this.y - this.image.getHeight() / 2.0);
         rotate(this.image, at);
         g2.drawImage(image, at, null);

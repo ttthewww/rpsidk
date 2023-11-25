@@ -8,7 +8,7 @@ public class WindowContainer extends JFrame {
     double windowPosX;
     double windowPosY;
     final double windowMin;
-    public WindowContainer(double windowHeight, double windowWidth, int windowMin, int windowPosX, int windowPosY) {
+    public WindowContainer(double windowWidth, double windowHeight, int windowMin, int windowPosX, int windowPosY) {
         this.windowHeight = windowHeight;
         this.windowWidth = windowWidth;
         this.windowMin = windowMin;

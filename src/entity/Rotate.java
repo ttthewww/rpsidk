@@ -1,7 +1,5 @@
 package entity;
 
-import main.GamePanel;
-
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
