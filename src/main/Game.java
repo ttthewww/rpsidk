@@ -10,7 +10,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDate;
 
-public class Game extends JPanel implements Runnable{
+public class Game extends JPanel implements Runnable, Sound{
     public WindowContainer window;
     public int windowPosX = 500;
     public int windowPosY = 250;
@@ -96,7 +96,7 @@ public class Game extends JPanel implements Runnable{
     public void startGameThread(){
         gameThread = new Thread(this);
         gameThread.start();
-
+        playMusic(0);
         Thread maskThread = new Thread(maskCreationThread);
         maskThread.start();
     }
@@ -109,13 +109,6 @@ public class Game extends JPanel implements Runnable{
 
 
     public void run(){
-//        enemyHandler.summonEnemy(this);
-        try {
-            SoundHandler.playSound("../resource/sounds/bgm.wav", true);
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            throw new RuntimeException(e);
-        }
-        SoundHandler.setVolume(0.7f);
 
         while(gameThread != null){
             this.absoluteMouseX =  MouseInfo.getPointerInfo().getLocation().x;
