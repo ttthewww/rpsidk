@@ -6,7 +6,10 @@ import main.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 public class FrameEnemy extends JPanel implements Runnable, Rotate{
     public JFrame window;
@@ -28,6 +31,7 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
     private int playerY;
     double directionX;
     double directionY;
+    Line2D line;
 
     public FrameEnemy(Game game){
         getImage();
@@ -46,8 +50,9 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
     }
     public void setWindowDefaults(){
         this.window = new JFrame();
-        this.window.setLocation(0, 0);
         this.window.setSize(200, 200);
+        Point spawn = setValidSpawnPoint();
+        this.window.setLocation(spawn.x, spawn.y);
         this.window.setVisible(true);
         ImageIcon img = new ImageIcon("src/resource/pepe.png");
         this.window.setIconImage(img.getImage());
@@ -58,6 +63,21 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
         window.setLayout(null);
         window.add(this);
     }
+
+    private Point setValidSpawnPoint(){
+        Random random = new Random();
+        int posX;
+        int posY;
+        //FIX
+        posY = random.nextInt((this.game.getLocationOnScreen().y + this.window.getHeight()));
+        if(random.nextInt(2) == 1){
+            posX = random.nextInt(this.game.getLocationOnScreen().x - this.window.getWidth());
+        }else{
+            posX = random.nextInt(300) + this.game.getLocationOnScreen().x + this.game.getWidth() + this.window.getWidth();
+        }
+        return new Point(posX, posY);
+    }
+
 
     public void startFrameEnemyThread(){
         frameEnemyThread = new Thread(this);
@@ -86,6 +106,10 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
         }
     }
 
+    public void teleport(){
+
+    }
+
     public void rotate(BufferedImage image, AffineTransform at){
         if(!this.isShooting){
             directionX = this.game.player.xLocationOnScreen - (this.xLocationOnScreen + (double) image.getWidth() / 2);
@@ -100,22 +124,13 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
     public void update(){
         this.xLocationOnScreen = this.enemyX + this.window.getLocationOnScreen().x;
         this.yLocationOnScreen = this.enemyY + this.window.getLocationOnScreen().y;
-//        this.y += 1;
-//        this.window.setLocation(x, y);
-//        if(this.y > 500){
-//            this.y = 500;
-//        }
 
 
-        if (this.isShooting) {
-            if (isShootingTimer < isShootingDuration) {
-                isShootingTimer++;
-                strokeWidth = minStrokeWidth + ((maxStrokeWidth - minStrokeWidth) * isShootingTimer / isShootingDuration);
-            } else {
-                this.isShooting = false;
-                isShootingTimer = 0;
-                strokeWidth = minStrokeWidth;
-            }
+        //fix chance every second and also shrink window
+        if(Math.random() < 0.01 && !isShooting){
+            System.out.println("TELEPORT RAUR");
+            Point newSpawn = setValidSpawnPoint();
+            this.window.setLocation(newSpawn.x, newSpawn.y);
         }
     }
 
@@ -126,15 +141,32 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
         AffineTransform at = AffineTransform.getTranslateInstance(this.enemyX - image.getWidth() / 2.0, this.enemyY - image.getHeight() / 2.0);
         rotate(image, at);
 
+        g2.setColor(Color.RED);
         if(!this.isShooting){
             playerX = (int) (-this.getLocationOnScreen().x + this.game.player.xLocationOnScreen);
             playerY = (int) (-this.getLocationOnScreen().y + this.game.player.yLocationOnScreen);
         }
 
         if (this.isShooting) {
-            g2.setColor(Color.RED);
-            g2.setStroke(new BasicStroke(strokeWidth));
-            g2.drawLine(this.enemyX, this.enemyY, playerX, playerY);
+//            g2.drawLine(this.enemyX, this.enemyY, playerX, playerY);
+
+            if (isShootingTimer < isShootingDuration) {
+                this.line = new Line2D.Double(this.enemyX, this.enemyY, playerX, playerY);
+                g2.setStroke(new BasicStroke(strokeWidth));
+                isShootingTimer++;
+                if(isShootingTimer > 60){
+                    g2.setColor(Color.BLUE);
+                    strokeWidth = maxStrokeWidth;
+
+                }else{
+                    strokeWidth = minStrokeWidth + ((maxStrokeWidth - minStrokeWidth) * isShootingTimer / isShootingDuration);
+                }
+                g2.draw(this.line);
+            } else {
+                this.isShooting = false;
+                isShootingTimer = 0;
+                strokeWidth = minStrokeWidth;
+            }
         }
 
         g2.drawImage(this.image, at, null);

@@ -24,10 +24,6 @@ public class Boss extends Enemy{
         this.frameEnemy = frameEnemy;
     }
 
-    public void update(){
-
-    }
-
     public void draw(Graphics2D g2){
         g2.setColor(Color.RED);
         if(!this.isShooting){
@@ -37,45 +33,36 @@ public class Boss extends Enemy{
 
         if (this.isShooting) {
             if (isShootingTimer < isShootingDuration) {
-//                double startX = -this.gp.window.getLocationOnScreen().x + this.frameEnemy.xLocationOnScreen;
-//                double startY = -this.gp.window.getLocationOnScreen().y + this.frameEnemy.yLocationOnScreen;
-                double startX = -this.gp.window.getLocationOnScreen().x + this.frameEnemy.xLocationOnScreen;
-                double startY = -this.gp.window.getLocationOnScreen().y + this.frameEnemy.yLocationOnScreen;
+                double originX = -this.gp.window.getLocationOnScreen().x + this.frameEnemy.xLocationOnScreen;
+                double originY = -this.gp.window.getLocationOnScreen().y + this.frameEnemy.yLocationOnScreen;
 
-                double endX = playerX;
-                double endY = playerY;
+                double rise = playerY - originY;
+                double run = playerX - originX;
 
-                // Limit the end point to the window boundaries
-                Point limitedEndPoint = limitEndPointToWindow(startX, startY, endX, endY);
-                double adjustedEndX = limitedEndPoint.x + playerX;
-                double adjustedEndY = limitedEndPoint.y + playerY;
-                this.line = new Line2D.Double(startX, startY, adjustedEndX, adjustedEndY);
+                this.line = new Line2D.Double(playerX + (run * 10), playerY + (rise * 10), originX, originY);
+                g2.setStroke(new BasicStroke(strokeWidth));
                 isShootingTimer++;
-                if(isShootingTimer > 50){
+
+                if(isShootingTimer > 60){
+                    g2.setColor(Color.BLUE);
+                    strokeWidth = maxStrokeWidth;
+
+                    //setup collision
+                    BasicStroke stroke = new BasicStroke(strokeWidth);
+                    Shape lineShape = stroke.createStrokedShape(line);
+                    Area lineArea = new Area(lineShape);
+                    lineArea.intersect(this.gp.player.mask);
+                    if(!lineArea.isEmpty()){
+                        this.gp.player.health--;
+                    }
+                }else{
                     strokeWidth = minStrokeWidth + ((maxStrokeWidth - minStrokeWidth) * isShootingTimer / isShootingDuration);
-//                    strokeWidth = maxStrokeWidth;
                 }
+                g2.draw(this.line);
             } else {
                 this.isShooting = false;
                 isShootingTimer = 0;
                 strokeWidth = minStrokeWidth;
-            }
-        }
-
-        if (this.isShooting) {
-            g2.setColor(Color.RED);
-            g2.setStroke(new BasicStroke(strokeWidth));
-            g2.draw(this.line);
-
-            BasicStroke stroke = new BasicStroke(strokeWidth);
-            Shape lineShape = stroke.createStrokedShape(line);
-
-            Area lineArea = new Area(lineShape);
-            lineArea.intersect(this.gp.player.mask);
-            if(isShootingTimer > 60){
-                if(!lineArea.isEmpty()){
-                    this.gp.player.health--;
-                }
             }
         }
     }

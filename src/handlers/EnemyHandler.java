@@ -38,6 +38,12 @@ public class EnemyHandler{
             frameEnemies.add(frameEnemy);
             frameEnemies.get(0).startFrameEnemyThread();
             boss.add(new Boss(this.game,frameEnemy));
+
+
+            FrameEnemy frameEnemy2 = new FrameEnemy(this.game);
+            frameEnemies.add(frameEnemy2);
+            frameEnemies.get(1).startFrameEnemyThread();
+            boss.add(new Boss(this.game,frameEnemy2));
         }
 
 //        if(Math.random() < spawnChance){
@@ -55,10 +61,7 @@ public class EnemyHandler{
             e.update();
         }
 
-
-
         shootChance = Math.random();
-
         collisionChecker.checkCollisions(this.enemies, player.bullets);
     }
     public void draw(Graphics2D g2){
@@ -72,15 +75,15 @@ public class EnemyHandler{
         }
 
         if(shootChance < chance){
-            for (Boss b : boss) {
-                b.isShooting = true;
-            }
-
             for(FrameEnemy e: frameEnemies){
                 e.update();
                 if(shootChance < chance){
                     e.isShooting = true;
                 }
+            }
+
+            for (Boss b : boss) {
+                b.isShooting = true;
             }
         }
     }
