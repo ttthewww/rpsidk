@@ -37,7 +37,19 @@ public class Boss extends Enemy{
 
         if (this.isShooting) {
             if (isShootingTimer < isShootingDuration) {
-                this.line = new Line2D.Double(playerX, playerY, -this.gp.window.getLocationOnScreen().x + this.frameEnemy.xLocationOnScreen, -this.gp.window.getLocationOnScreen().y + this.frameEnemy.yLocationOnScreen);
+//                double startX = -this.gp.window.getLocationOnScreen().x + this.frameEnemy.xLocationOnScreen;
+//                double startY = -this.gp.window.getLocationOnScreen().y + this.frameEnemy.yLocationOnScreen;
+                double startX = -this.gp.window.getLocationOnScreen().x + this.frameEnemy.xLocationOnScreen;
+                double startY = -this.gp.window.getLocationOnScreen().y + this.frameEnemy.yLocationOnScreen;
+
+                double endX = playerX;
+                double endY = playerY;
+
+                // Limit the end point to the window boundaries
+                Point limitedEndPoint = limitEndPointToWindow(startX, startY, endX, endY);
+                double adjustedEndX = limitedEndPoint.x + playerX;
+                double adjustedEndY = limitedEndPoint.y + playerY;
+                this.line = new Line2D.Double(startX, startY, adjustedEndX, adjustedEndY);
                 isShootingTimer++;
                 if(isShootingTimer > 50){
                     strokeWidth = minStrokeWidth + ((maxStrokeWidth - minStrokeWidth) * isShootingTimer / isShootingDuration);
@@ -66,5 +78,13 @@ public class Boss extends Enemy{
                 }
             }
         }
+    }
+    private Point limitEndPointToWindow(double startX, double startY, double endX, double endY) {
+        Rectangle windowBounds = this.gp.window.getBounds();
+
+        double limitedEndX = Math.min(windowBounds.getMaxX(), Math.max(windowBounds.getMinX(), endX));
+        double limitedEndY = Math.min(windowBounds.getMaxY(), Math.max(windowBounds.getMinY(), endY));
+
+        return new Point((int) limitedEndX, (int) limitedEndY);
     }
 };
