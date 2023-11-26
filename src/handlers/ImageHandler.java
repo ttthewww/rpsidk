@@ -21,6 +21,12 @@ public class ImageHandler {
     public static BufferedImage enemyPaperAura;
     public static BufferedImage enemyScissorsAura;
     public static BufferedImage mainMenuBackgroundImage;
+
+    public static BufferedImage background1;
+    public static BufferedImage background2;
+    public static BufferedImage background3;
+    public static BufferedImage background4;
+
     public ImageHandler(){
         try{
             this.paperBulletImage =  ImageIO.read(getClass().getResourceAsStream("../resource/bullets/paper.png"));
@@ -37,6 +43,11 @@ public class ImageHandler {
 
             this.mainMenuBackgroundImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac1.png")));
 
+
+            this.background1 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac1.png")));
+            this.background2 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac2.png")));
+            this.background3 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac3.png")));
+            this.background4 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac4.png")));
         }catch(IOException e){
             e.printStackTrace();
         }

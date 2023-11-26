@@ -104,6 +104,11 @@ public class Enemy extends Entity implements Rotate{
         this.x += dx;
         this.y += dy;
 
+        this.x -= this.gp.player.speed_x_right * 0.5;
+        this.x -= this.gp.player.speed_x_left * 0.5;
+        this.y -= this.gp.player.speed_y_up * 0.5;
+        this.y -= this.gp.player.speed_y_down * 0.5;
+
         if (maskCreationThread.getMask(this) != null) {
             Area newMask = maskCreationThread.getMask(this);
             AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
@@ -141,7 +146,7 @@ public class Enemy extends Entity implements Rotate{
         g2.drawImage(this.aura, auraAt, null);
         g2.drawImage(this.image, at, null);
 
-        g2.draw(this.mask);
+//        g2.draw(this.mask);
 //        g2.draw(this.colRect);
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

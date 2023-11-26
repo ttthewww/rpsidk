@@ -22,6 +22,9 @@ public class Player extends Entity implements Rotate{
     public int score;
     public static double x;
     public static double y;
+    public double absoluteX;
+    public double absoluteY;
+
     Game gp;
     KeyHandler keyH;
     MouseHandler mouseH;
@@ -29,12 +32,12 @@ public class Player extends Entity implements Rotate{
     public CopyOnWriteArrayList<Bullet> bullets = new CopyOnWriteArrayList<>();
     private int fireCooldown = 0;
     public int reloadTime = 30;
-    private double acceleration = 1;
+    private double acceleration = 0.1;
     public double speed_x_right = 0;
     public double speed_x_left = 0;
     public double speed_y_up = 0;
     public double speed_y_down = 0;
-    public double top_speed = 4;
+    public double top_speed = 3;
     double deceleration = 0.1;
     public int bulletType = 1;
     private BufferedImage bulletTypeImage = ImageHandler.rockBulletImage;
@@ -50,7 +53,7 @@ public class Player extends Entity implements Rotate{
         x = this.gp.window.getWidth() / 2;
         y = this.gp.window.getHeight() / 2;
         this.mask = new Area(maskCreationThread.addMask(this));
-        this.health = 1;
+        this.health = 999;
         this.score = 0;
     }
 
@@ -76,12 +79,6 @@ public class Player extends Entity implements Rotate{
             e.printStackTrace();
         }
     }
-
-    @Override
-    public void draw(Graphics2D g2) {
-        draw(g2, null);
-    }
-
     public void toggleBulletType() {
         bulletType++;
         if (bulletType > 3) {
@@ -155,28 +152,31 @@ public class Player extends Entity implements Rotate{
             this.speed_y_up = 0;
         }
 
-        this.x += (int) this.speed_x_right;
-        this.x += (int) this.speed_x_left;
-        this.y += (int) this.speed_y_up;
-        this.y += (int) this.speed_y_down;
+        this.x += this.speed_x_right;
+        this.x += this.speed_x_left;
+        this.y += this.speed_y_up;
+        this.y += this.speed_y_down;
 
-        if (this.x - 15 <= 0) {
-            this.x = 15;
+        this.absoluteX += this.speed_x_right;
+        this.absoluteX += this.speed_x_left;
+        this.absoluteY += this.speed_y_up;
+        this.absoluteY += this.speed_y_down;
+
+        if (this.x - 30 <= 0) {
+            this.x = 30;
         }
 
-        if (this.x + 15 >= gp.getWidth()) {
-            this.x = gp.getWidth() - 15;
+        if (this.x + 30 >= gp.getWidth()) {
+            this.x = gp.getWidth() - 30;
         }
 
-        if (this.y - 15 <= 0) {
-            this.y = 15;
+        if (this.y - 30 <= 0) {
+            this.y = 30;
         }
 
-        if (this.y + 15 >= gp.getHeight()) {
-            this.y = gp.getHeight() - 15;
+        if (this.y + 30 >= gp.getHeight()) {
+            this.y = gp.getHeight() - 30;
         }
-
-
     }
 
     public void updatePlayerBullets(){
@@ -227,7 +227,7 @@ public class Player extends Entity implements Rotate{
         }
     }
 
-    public void draw(Graphics2D g2, Game gamePanel) {
+    public void draw(Graphics2D g2) {
         BufferedImage image = playerFrames[0];
         if (playerFrames != null && playerFrames.length > 0) {
             int frameIndex = (int) ((System.currentTimeMillis() / 100) % playerFrames.length);
@@ -235,16 +235,16 @@ public class Player extends Entity implements Rotate{
         }
 
         AffineTransform at = AffineTransform.getTranslateInstance(this.x - image.getWidth() / 2.0, this.y - image.getHeight() / 2.0);
-        rotate(image, gamePanel, at);
-        g2.drawImage(image, at, null);
+        rotate(image, this.gp, at);
         g2.drawImage(this.bulletTypeImage, AffineTransform.getTranslateInstance(this.gp.getWidth() / 2.0 - this.bulletTypeImage.getWidth() / 2,  10), null);
 
-        g2.setColor(Color.RED);
 //        g2.draw(this.colRect);
-        g2.draw(this.mask);
+//        g2.draw(this.mask);
 
-        g2.setColor(Color.BLUE);
+
+        g2.drawImage(image, at, null);
+//        g2.setColor(Color.RED);
+//        g2.drawOval((int) this.x, (int) this.y, 2, 2);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
-
 }

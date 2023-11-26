@@ -3,11 +3,8 @@ package main;
 import entity.*;
 import handlers.*;
 
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 import java.time.LocalDate;
 
 public class Game extends JPanel implements Runnable, Sound{
@@ -21,7 +18,7 @@ public class Game extends JPanel implements Runnable, Sound{
     public int absoluteMouseX;
     public int absoluteMouseY;
     Thread gameThread;
-    public static MaskCreationThread maskCreationThread;
+    public static MaskHandler maskCreationThread;
     public EnemyHandler enemyHandler;
     CollisionChecker cChecker;
     boolean gameOver = false;
@@ -29,12 +26,10 @@ public class Game extends JPanel implements Runnable, Sound{
     public KeyHandler keyH;
     MouseHandler mouseH;
     MouseMotionHandler mouseMotionH;
-    private Background background1;
-    private Background background2;
-
+    BackgroundHandler backgroundHandler;
     //gameState
     public int mainMenuState = 0, mainGameState = 1, gameOverState = 2;
-    public int gameState = mainMenuState;
+    public int gameState = mainGameState;
     public boolean paused;
     public MainMenu mainMenu;
     public PauseMenu pauseMenu;
@@ -46,10 +41,10 @@ public class Game extends JPanel implements Runnable, Sound{
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
         this.setFocusable(true);
-        this.setSize((int) window.windowHeight, (int)window.windowWidth);
+        this.setSize((int) window.windowWidth, (int)window.windowHeight);
         this.setFocusTraversalKeysEnabled(false);
 
-        this.maskCreationThread = new MaskCreationThread();
+        this.maskCreationThread = new MaskHandler();
 
         new ImageHandler();
         this.player = new Player(this);
@@ -64,12 +59,9 @@ public class Game extends JPanel implements Runnable, Sound{
         this.mouseH = new MouseHandler(this);
 
         this.cChecker = new CollisionChecker(this.player);
-        this.background1 = new Background(0);
-        this.background2 = new Background(-this.getHeight());
+        this.backgroundHandler = new BackgroundHandler(this);
 
         this.enemyHandler = new EnemyHandler(this);
-
-        new MaskHandler();
 
         this.addKeyListener(keyH);
         this.addMouseListener(mouseH);
@@ -96,9 +88,12 @@ public class Game extends JPanel implements Runnable, Sound{
     public void startGameThread(){
         gameThread = new Thread(this);
         gameThread.start();
-        playMusic(0);
-        Thread maskThread = new Thread(maskCreationThread);
-        maskThread.start();
+//        playMusic(0);
+
+
+
+//        Thread maskThread = new Thread(maskCreationThread);
+//        maskThread.start();
     }
 
     public void reset(){
@@ -149,8 +144,7 @@ public class Game extends JPanel implements Runnable, Sound{
             }
 
             if(!this.paused){
-                background1.update(fps.delta, this);
-                background2.update(fps.delta, this);
+                this.backgroundHandler.update();
 
                 if(this.player.health <= 0){
                     scoreBoard.addScore(String.valueOf(LocalDate.now()), player.score);
@@ -173,15 +167,13 @@ public class Game extends JPanel implements Runnable, Sound{
 
          if(this.gameState ==  1){
 
-             background1.draw(g2);
-             background2.draw(g2);
+             this.backgroundHandler.draw(g2);
 
              this.enemyHandler.draw(g2);
              for (Bullet bullet : player.bullets) {
                  bullet.draw(g2, this);
              }
 
-             player.draw(g2, this);
              g2.setColor(Color.GREEN);
              g2.drawString("Score: " + player.score, 5, 10);
              g2.drawString("Health: " + player.health,400, 10);
@@ -189,6 +181,8 @@ public class Game extends JPanel implements Runnable, Sound{
              if(this.paused){
                  this.pauseMenu.draw(g2);
              }
+
+             player.draw(g2);
          }
 
          if(this.gameState == 2){

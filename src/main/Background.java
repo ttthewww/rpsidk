@@ -1,55 +1,41 @@
 package main;
 
+import handlers.ImageHandler;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Random;
 
 public class Background {
-    private static final double WIDTH = 960;
-    private static final double HEIGHT = 540;
-    private static final double X = 0;  // Assuming X is always 0 for the background
-    private static final int NUM_BACKGROUNDS = 4;
-
-    // Fields
-    private double Y;
-    private double speed = 1;
-    private BufferedImage[] backgrounds;
-    private int currentBackgroundIndex = 0;
-
-    /**
-     * Constructor
-     *
-     * Initializes a Background object with the specified initial Y coordinate.
-     *
-     * @param Y Initial Y coordinate of the background.
-     * @throws IOException Exception may occur during the image loading process.
-     */
-    public Background(double Y){
-        this.Y = Y;
-
-        try{
-            backgrounds = new BufferedImage[NUM_BACKGROUNDS];
-
-            for (int i = 1; i <= NUM_BACKGROUNDS; i++) {
-                backgrounds[i - 1] = ImageIO.read(Objects.requireNonNull(getClass().getResource("../resource/background/bac" + i + ".png")));
-            }
-        }catch (IOException e){
-            e.printStackTrace();
+    public BufferedImage image;
+    public double x;
+    public double y;
+    public Background(double x, double  y){
+        this.x = x;
+        this.y = y;
+        Random rand = new Random();
+        int n = rand.nextInt(4);
+        if(n == 0){
+           this.image = ImageHandler.background1;
+        }
+        if(n == 1){
+            this.image = ImageHandler.background2;
+        }
+        if(n == 2){
+            this.image = ImageHandler.background3;
+        }
+        if(n == 3){
+            this.image = ImageHandler.background4;
         }
     }
-    public void update(double delta, JPanel panel) {
-        Y += speed * delta;
+    public void update() {
 
-        if (Y >= panel.getWidth() - 30) {
-            Y = - panel.getHeight();
-            // Move to the next background image
-            currentBackgroundIndex = (currentBackgroundIndex + 1) % backgrounds.length;
-        }
     }
 
     public void draw(Graphics2D g) {
-        g.drawImage(backgrounds[currentBackgroundIndex], (int)this.X, (int)this.Y, (int)this.WIDTH, (int) this.HEIGHT, null);
+        g.drawImage(this.image, (int)this.x, (int)this.y, 960, 540, null);
     }}

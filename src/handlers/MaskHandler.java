@@ -1,36 +1,41 @@
 package handlers;
 
-import javax.imageio.ImageIO;
+import entity.Entity;
+
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MaskHandler {
-
-    public static Area rockBulletMask;
-    public static Area paperBulletMask;
-    public static Area scissorsBulletMask;
-    public static Area rockEnemyMask;
-    public static Area paperEnemyMask;
-    public static Area scissorsEnemyMask;
-
-    public MaskHandler(){
-        try{
-            rockBulletMask = createMaskFromTransparency(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/bullets/rock.png"))),10000,10000);
-            paperBulletMask = createMaskFromTransparency(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/bullets/paper.png"))), 10000, 10000);
-            scissorsBulletMask = createMaskFromTransparency(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/bullets/scissors.png"))),10000, 10000);
-            rockEnemyMask = createMaskFromTransparency(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/rock.png"))),10000, 10000);
-            paperEnemyMask = createMaskFromTransparency(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/paper.png"))),10000, 10000);
-            scissorsEnemyMask = createMaskFromTransparency(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/scissors.png"))),10000, 10000);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+    HashMap<Entity, Area> masks;
+    public MaskHandler() {
+        this.masks = new HashMap<>();
     }
 
-    public static Area createMaskFromTransparency(BufferedImage image, double x, double y) {
+    public Area addMask(Entity entity){
+        Area mask = createMaskFromTransparency(entity.image, entity.x - entity.image.getWidth() / 2, entity.y - entity.image.getHeight() / 2);
+        masks.put(entity, mask);
+        return mask;
+    }
+
+    public Area getMask(Entity entity) {
+        try {
+            for (Map.Entry<Entity, Area> entry : masks.entrySet()) {
+                if(entry.getKey() == entity){
+                    return entry.getValue();
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Area createMaskFromTransparency(BufferedImage image, double x, double y) {
         Area mask = new Area();
+
         for (int i = 0; i < image.getWidth(); i++) {
             for (int j = 0; j < image.getHeight(); j++) {
                 int alpha = (image.getRGB(i, j) >> 24) & 0xFF;
