@@ -24,6 +24,8 @@ public class Player extends Entity implements Rotate{
     public static double y;
     public double absoluteX;
     public double absoluteY;
+    public double xLocationOnScreen;
+    public double yLocationOnScreen;
 
     Game gp;
     KeyHandler keyH;
@@ -161,6 +163,10 @@ public class Player extends Entity implements Rotate{
         this.absoluteX += this.speed_x_left;
         this.absoluteY += this.speed_y_up;
         this.absoluteY += this.speed_y_down;
+
+        this.xLocationOnScreen = this.gp.getLocationOnScreen().x + this.x;
+        this.yLocationOnScreen = this.gp.getLocationOnScreen().y + this.y;
+
 
         if (this.x - 30 <= 0) {
             this.x = 30;

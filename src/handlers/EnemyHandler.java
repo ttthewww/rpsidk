@@ -14,6 +14,11 @@ public class EnemyHandler{
     CollisionChecker collisionChecker;
     Player player;
     public CopyOnWriteArrayList<Enemy> enemies;
+    public CopyOnWriteArrayList<FrameEnemy> frameEnemies;
+    public CopyOnWriteArrayList<Boss> boss;
+    public double shootChance;
+    public double chance = 0.05;
+
     public EnemyHandler(Game game){
         this.game = game;
         this.player = game.player;
@@ -23,9 +28,18 @@ public class EnemyHandler{
 
     public void reset(){
         this.enemies = new CopyOnWriteArrayList<>();
+        this.frameEnemies = new CopyOnWriteArrayList<>();
+        this.boss = new CopyOnWriteArrayList<>();
     }
 
     public void summonEnemy(){
+        if(frameEnemies.isEmpty()) {
+            FrameEnemy frameEnemy = new FrameEnemy(this.game);
+            frameEnemies.add(frameEnemy);
+            frameEnemies.get(0).startFrameEnemyThread();
+            boss.add(new Boss(this.game,frameEnemy));
+        }
+
 //        if(Math.random() < spawnChance){
 //            Random rand = new Random();
 //            int n = rand.nextInt(3);
@@ -41,11 +55,33 @@ public class EnemyHandler{
             e.update();
         }
 
+
+
+        shootChance = Math.random();
+
         collisionChecker.checkCollisions(this.enemies, player.bullets);
     }
     public void draw(Graphics2D g2){
         for(Enemy e : enemies){
             e.draw(g2);
+        }
+
+
+        for (Boss b : boss) {
+            b.draw(g2);
+        }
+
+        if(shootChance < chance){
+            for (Boss b : boss) {
+                b.isShooting = true;
+            }
+
+            for(FrameEnemy e: frameEnemies){
+                e.update();
+                if(shootChance < chance){
+                    e.isShooting = true;
+                }
+            }
         }
     }
 }

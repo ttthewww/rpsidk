@@ -71,17 +71,14 @@ public class Game extends JPanel implements Runnable, Sound{
     }
 
     public void setWindowDefaults(){
-        this.window =  new WindowContainer(screenWidth, screenHeight, 300, 0, 0);
+        this.window =  new WindowContainer(screenWidth, screenHeight,0, 0);
         window.setFocusTraversalKeysEnabled(false);
         window.setResizable(false);
-//        window.setExtendedState(JFrame.MAXIMIZED_BOTH);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setTitle("Game");
-//        window.setAlwaysOnTop(true);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        window.setLocation(dim.width / 2 - windowPosX / 2, dim.height / 2 - windowPosY);
+        window.setLocation(dim.width / 2 - windowPosX / 2, dim.height / 2 - windowPosY - 50);
         window.setLayout(null);
-        window.setVisible(true);
         window.add(this);
     }
 
@@ -89,11 +86,6 @@ public class Game extends JPanel implements Runnable, Sound{
         gameThread = new Thread(this);
         gameThread.start();
 //        playMusic(0);
-
-
-
-//        Thread maskThread = new Thread(maskCreationThread);
-//        maskThread.start();
     }
 
     public void reset(){
@@ -104,7 +96,6 @@ public class Game extends JPanel implements Runnable, Sound{
 
 
     public void run(){
-
         while(gameThread != null){
             this.absoluteMouseX =  MouseInfo.getPointerInfo().getLocation().x;
             this.absoluteMouseY = MouseInfo.getPointerInfo().getLocation().y;
@@ -178,11 +169,11 @@ public class Game extends JPanel implements Runnable, Sound{
              g2.drawString("Score: " + player.score, 5, 10);
              g2.drawString("Health: " + player.health,400, 10);
 
+             player.draw(g2);
+
              if(this.paused){
                  this.pauseMenu.draw(g2);
              }
-
-             player.draw(g2);
          }
 
          if(this.gameState == 2){

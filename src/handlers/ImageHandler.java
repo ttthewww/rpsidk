@@ -26,6 +26,7 @@ public class ImageHandler {
     public static BufferedImage background2;
     public static BufferedImage background3;
     public static BufferedImage background4;
+    public static BufferedImage boss1;
 
     public ImageHandler(){
         try{
@@ -48,6 +49,9 @@ public class ImageHandler {
             this.background2 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac2.png")));
             this.background3 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac3.png")));
             this.background4 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac4.png")));
+
+            this.boss1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/boss1.png")));
+
         }catch(IOException e){
             e.printStackTrace();
         }
