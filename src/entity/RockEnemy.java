@@ -1,10 +1,9 @@
 package entity;
 
-import main.GamePanel;
-import java.util.ArrayList;
+import main.Game;
 
 public class RockEnemy extends Enemy{
-    public RockEnemy(GamePanel gp, ArrayList<Enemy> enemies) {
-        super(gp, enemies, 1);
+    public RockEnemy(Game game){
+        super(game,1);
     }
 }

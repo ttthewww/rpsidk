@@ -1,21 +1,20 @@
 package entity;
 
-import main.GamePanel;
-import main.MaskCreationThread;
 
-import javax.imageio.ImageIO;
+import main.Game;
+
 import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.Objects;
 
 public abstract class Entity {
-    public int x, y;
-    public int speed;
+    public double x, y;
+    Game game;
+    public double speed;
     public Rectangle colRect;
     public boolean isActive = true;
     public BufferedImage image;
-    public BufferedImage[] playerFrames;
     public Area mask;
+    public abstract void getImage();
+    public abstract void draw(Graphics2D g2);
 }

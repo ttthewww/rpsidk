@@ -39,12 +39,4 @@ public class EntityMask {
         }
         return mask;
     }
-
-    public void update(){
-
-    }
-    public void draw(){
-
-    }
-
 }

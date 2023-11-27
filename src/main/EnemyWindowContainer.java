@@ -10,11 +10,11 @@ public class EnemyWindowContainer extends JFrame implements Runnable {
     int windowHeight;
     int windowWidth;
     Enemy enemy;
-    GamePanel gp;
+    Game gp;
 
     private volatile boolean running = true;
 
-    public EnemyWindowContainer(int windowHeight, int windowWidth, int windowPosX, int windowPosY, Enemy enemy, GamePanel gp) {
+    public EnemyWindowContainer(int windowHeight, int windowWidth, int windowPosX, int windowPosY, Enemy enemy, Game gp) {
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
         this.windowPosX = windowPosX;
@@ -48,8 +48,8 @@ public class EnemyWindowContainer extends JFrame implements Runnable {
     }
 
     public void update() {
-        int newWindowPosX = this.enemy.x + gp.getLocationOnScreen().x;
-        int newWindowPosY = this.enemy.y + gp.getLocationOnScreen().y;
+        int newWindowPosX = (int) (this.enemy.x + gp.getLocationOnScreen().x);
+        int newWindowPosY = (int) (this.enemy.y + gp.getLocationOnScreen().y);
 
         if (checkOverlap(newWindowPosX, newWindowPosY)) {
             System.out.println("Window position overlaps with GamePanel position!");

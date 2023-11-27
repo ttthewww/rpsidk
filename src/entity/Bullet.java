@@ -1,42 +1,33 @@
 package entity;
 
-import main.GamePanel;
-import main.ImageHandler;
-import main.MaskCreationThread;
-
+import main.Game;
+import handlers.ImageHandler;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.util.concurrent.*;
 
-import static main.GamePanel.maskCreationThread;
-
-public abstract class Bullet extends Entity{
+public class Bullet extends Entity{
+    public int bulletType;
     double angle;
     double dx;
     double dy;
     int targetX;
     int targetY;
-    public int bulletType;
-    GamePanel gp;
     double directionX;
     double directionY;
-
-    MaskCreationThread maskThread;
-
     double rotationAngleInRadians;
 
-    public Bullet(GamePanel gp, double angle, int bulletType){
-        this.bulletType = bulletType;
-        getBulletImage();
-        this.gp = gp;
+    public Bullet(Game game, double angle){
         this.speed = 8;
-        this.x = Player.x;
-        this.y = Player.y;
+        this.bulletType = game.player.bulletType;
+        this.game = game;
+        getImage();
+        this.x = game.player.x;
+        this.y = game.player.y;
 
-        directionX = this.gp.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
-        directionY = this.gp.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));
+        directionX = this.game.absoluteMouseX - ((game.getLocationOnScreen().x + this.x));
+        directionY = this.game.absoluteMouseY - ((game.getLocationOnScreen().y + this.y));
         this.angle = Math.atan2(directionY, directionX);
         this.rotationAngleInRadians = Math.atan2(directionY, directionX);
         this.dx = Math.cos(angle) * this.speed;
@@ -48,24 +39,16 @@ public abstract class Bullet extends Entity{
         this.colRect.y = (int) (this.y - this.image.getHeight() / 2.0);
     }
 
-    public void getBulletImage(){
-        try{
-            if(this.bulletType == 1){
-                this.image = ImageHandler.rockBulletImage;
-            }else if(this.bulletType == 2){
-                this.image = ImageHandler.paperBulletImage;
-            }else{
-                this.image = ImageHandler.scissorBulletImage;
-            }
-
-            this.mask = new Area(maskCreationThread.addMask(this));
-        }catch (Exception e){
-            e.printStackTrace();
+    public void getImage(){
+        if(this.bulletType == 1){
+            this.image = ImageHandler.rockBulletImage;
+        }else if(this.bulletType == 2){
+            this.image = ImageHandler.paperBulletImage;
+        }else{
+            this.image = ImageHandler.scissorBulletImage;
         }
-    }
 
-    public boolean isActive() {
-        return isActive;
+        this.mask = new Area(this.game.maskCreationThread.addMask(this));
     }
 
     public void rotate(BufferedImage image , AffineTransform at){
@@ -82,33 +65,26 @@ public abstract class Bullet extends Entity{
         this.x +=  this.dx;
         this.y +=  this.dy;
 
-
-        if(this.x > gp.getWidth() || this.x < 0 || this.y > gp.getHeight() || this.y < 0){
+        //todo should hit frame enemies
+        if(this.x > game.getWidth() || this.x < 0 || this.y > game.getHeight() || this.y < 0){
             this.isActive = false;
         }
 
-
-        Area newMask = maskCreationThread.getMask(this);
+        Area newMask = this.game.maskCreationThread.getMask(this);
         AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
         at.rotate(rotationAngleInRadians);
         this.mask.reset();
         this.mask.add(newMask);
         this.mask.transform(at);
-
         this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2.0), (int) (this.y - this.image.getHeight() / 2.0));
     }
 
 
-    public void draw(Graphics2D g2, GamePanel gamePanel){
+    public void draw(Graphics2D g2){
         AffineTransform at =  AffineTransform.getTranslateInstance(this.x - this.image.getWidth() / 2.0, this.y - this.image.getHeight() / 2.0);
         rotate(this.image, at);
         g2.drawImage(image, at, null);
         g2.setColor(Color.RED);
-
-//        g2.draw(this.mask);
-//        g2.draw(this.colRect);
-
-        g2.drawOval((int) this.x, (int) this.y, 2, 2);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 }

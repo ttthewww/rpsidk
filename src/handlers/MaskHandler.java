@@ -1,41 +1,17 @@
-package main;
+package handlers;
 
-import entity.Enemy;
 import entity.Entity;
 
-import javax.swing.*;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MaskCreationThread implements Runnable{
-    private BufferedImage image;
-    private double x;
-    private double y;
-    private volatile Area mask;
-
+public class MaskHandler {
     HashMap<Entity, Area> masks;
-
-//    public MaskCreationThread(BufferedImage image, double x, double y) {
-//        this.image = image;
-//        this.x = x;
-//        this.y = y;
-//        this.masks = new HashMap<Entity, Area>();
-//    }
-
-    public MaskCreationThread() {
-        this.masks = new HashMap<Entity, Area>();
-    }
-
-    @Override
-    public void run() {
-        try{
-            System.out.println("HELLO");
-        }catch (Exception e){
-
-        }
+    public MaskHandler() {
+        this.masks = new HashMap<>();
     }
 
     public Area addMask(Entity entity){
@@ -51,7 +27,6 @@ public class MaskCreationThread implements Runnable{
                     return entry.getValue();
                 }
             }
-            return this.mask;
         }catch (Exception e){
             e.printStackTrace();
         }

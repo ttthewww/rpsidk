@@ -1,10 +1,9 @@
 package entity;
 
-import main.GamePanel;
-import java.util.ArrayList;
+import main.Game;
 
 public class PaperEnemy extends Enemy{
-    public PaperEnemy(GamePanel gp, ArrayList<Enemy> enemies) {
-        super(gp, enemies, 2);
+    public PaperEnemy(Game game){
+        super(game,2);
     }
 }

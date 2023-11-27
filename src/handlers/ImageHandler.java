@@ -1,4 +1,6 @@
-package main;
+package handlers;
+
+import main.Background;
 
 import javax.imageio.ImageIO;
 import java.awt.geom.Area;
@@ -18,6 +20,13 @@ public class ImageHandler {
     public static BufferedImage enemyRockAura;
     public static BufferedImage enemyPaperAura;
     public static BufferedImage enemyScissorsAura;
+    public static BufferedImage mainMenuBackgroundImage;
+
+    public static BufferedImage background1;
+    public static BufferedImage background2;
+    public static BufferedImage background3;
+    public static BufferedImage background4;
+    public static BufferedImage boss1;
 
     public ImageHandler(){
         try{
@@ -32,6 +41,16 @@ public class ImageHandler {
             this.enemyRockAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/rockaura.png")));
             this.enemyPaperAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/paperaura.png")));
             this.enemyScissorsAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/scissorsaura.png")));
+
+            this.mainMenuBackgroundImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac1.png")));
+
+
+            this.background1 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac1.png")));
+            this.background2 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac2.png")));
+            this.background3 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac3.png")));
+            this.background4 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac4.png")));
+
+            this.boss1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/boss1.png")));
 
         }catch(IOException e){
             e.printStackTrace();
