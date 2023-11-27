@@ -17,7 +17,7 @@ public class Game extends JPanel implements Runnable, Sound{
     public int mouseY;
     public int absoluteMouseX;
     public int absoluteMouseY;
-    public static MaskHandler maskCreationThread;
+    public MaskHandler maskCreationThread;
     public EnemyHandler enemyHandler;
     public CollisionChecker cChecker;
     public Player player;
@@ -27,7 +27,7 @@ public class Game extends JPanel implements Runnable, Sound{
     public BackgroundHandler backgroundHandler;
     // GameState variables
     public int mainMenuState = 0, mainGameState = 1, gameOverState = 2;
-    public int gameState = mainGameState;
+    public int gameState = mainMenuState;
     public boolean paused;
     public MainMenu mainMenu;
     public PauseMenu pauseMenu;
@@ -123,14 +123,6 @@ public class Game extends JPanel implements Runnable, Sound{
         }
     }
     public void update(){
-        //test
-//        this.windowPosX += 1;
-//        this.windowPosY += 1;
-//        this.screenWidth -= 2;
-//        this.screenHeight -= 2;
-//        this.window.setLocation(windowPosX, windowPosY);
-//        this.window.setSize(screenWidth, screenHeight);
-
         if(this.gameState == this.mainGameState){
             if(this.keyH.escToggled){
                 this.paused = true;

@@ -9,8 +9,6 @@ import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 
-import static main.Game.maskCreationThread;
-
 public class Boss extends Enemy{
     FrameEnemy frameEnemy;
 
@@ -35,7 +33,7 @@ public class Boss extends Enemy{
 
     public void getImage(){
         this.image = ImageHandler.boss1;
-        this.mask = new Area(maskCreationThread.addMask(this));
+        this.mask = new Area(this.game.maskCreationThread.addMask(this));
     }
 
 //    public void rotate(BufferedImage image, AffineTransform at){

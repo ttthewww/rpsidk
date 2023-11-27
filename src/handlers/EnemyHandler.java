@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EnemyHandler{
     Game game;
-    double spawnChance =  0.01;
+    double spawnChance =  0.005;
     CollisionChecker collisionChecker;
     Player player;
     public CopyOnWriteArrayList<Enemy> enemies;
@@ -49,13 +49,13 @@ public class EnemyHandler{
             boss.add(new Boss(this.game,frameEnemy2));
         }
 
-//        if(Math.random() < spawnChance){
-//            Random rand = new Random();
-//            int n = rand.nextInt(3);
-//            if(n == 0)enemies.add(new RockEnemy(game));
-//            if(n == 1)enemies.add(new PaperEnemy(game));
-//            if(n == 2)enemies.add(new ScissorEnemy(game));
-//        }
+        if(Math.random() < spawnChance){
+            Random rand = new Random();
+            int n = rand.nextInt(3);
+            if(n == 0)enemies.add(new RockEnemy(game));
+            if(n == 1)enemies.add(new PaperEnemy(game));
+            if(n == 2)enemies.add(new ScissorEnemy(game));
+        }
     }
 
     public void update(){

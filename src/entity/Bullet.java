@@ -7,10 +7,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
-import static main.Game.maskCreationThread;
-
 public class Bullet extends Entity{
-    public int speed = 8;
     public int bulletType;
     double angle;
     double dx;
@@ -20,12 +17,12 @@ public class Bullet extends Entity{
     double directionX;
     double directionY;
     double rotationAngleInRadians;
-    Game game;
 
     public Bullet(Game game, double angle){
+        this.speed = 8;
         this.bulletType = game.player.bulletType;
-        getImage();
         this.game = game;
+        getImage();
         this.x = game.player.x;
         this.y = game.player.y;
 
@@ -51,7 +48,7 @@ public class Bullet extends Entity{
             this.image = ImageHandler.scissorBulletImage;
         }
 
-        this.mask = new Area(maskCreationThread.addMask(this));
+        this.mask = new Area(this.game.maskCreationThread.addMask(this));
     }
 
     public void rotate(BufferedImage image , AffineTransform at){
@@ -73,7 +70,7 @@ public class Bullet extends Entity{
             this.isActive = false;
         }
 
-        Area newMask = maskCreationThread.getMask(this);
+        Area newMask = this.game.maskCreationThread.getMask(this);
         AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
         at.rotate(rotationAngleInRadians);
         this.mask.reset();

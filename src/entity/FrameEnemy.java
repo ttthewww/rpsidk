@@ -76,6 +76,7 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
         this.window.setIconImage(img.getImage());
 
         window.setFocusTraversalKeysEnabled(false);
+        window.setFocusableWindowState(false);
         window.setResizable(false);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setLayout(null);
@@ -131,8 +132,7 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
         }
     }
     public void getNewDestination(){
-        Point newDestination = setValidSpawnPoint();
-        this.destination = newDestination;
+        this.destination = setValidSpawnPoint();
     }
 
     public void rotate(BufferedImage image, AffineTransform at){

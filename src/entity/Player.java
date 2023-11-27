@@ -15,8 +15,6 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static main.Game.maskCreationThread;
-
 public class Player extends Entity implements Rotate{
     public int health;
     public int score;
@@ -24,8 +22,6 @@ public class Player extends Entity implements Rotate{
     public int reloadTime = 30;
     public int bulletType = 1;
 
-    public double x;
-    public double y;
     public double absoluteX;
     public double absoluteY;
     public double xLocationOnScreen;
@@ -38,7 +34,6 @@ public class Player extends Entity implements Rotate{
     public double top_speed = 3;
     double deceleration = 0.1;
 
-    Game game;
     KeyHandler keyH;
     MouseHandler mouseH;
     public BufferedImage[] playerFrames;
@@ -55,7 +50,7 @@ public class Player extends Entity implements Rotate{
     public void reset() {
         x = this.game.window.getWidth() / 2;
         y = this.game.window.getHeight() / 2;
-        this.mask = new Area(maskCreationThread.addMask(this));
+        this.mask = new Area(this.game.maskCreationThread.addMask(this));
         this.health = 999;
         this.score = 0;
     }
@@ -92,14 +87,12 @@ public class Player extends Entity implements Rotate{
         if(this.bulletType == 3) this.bulletTypeImage = ImageHandler.scissorBulletImage;
     }
 
-    public void shoot(int targetX, int targetY) {
+    public void shoot() {
         if (fireCooldown >= reloadTime) {
             double directionX = this.game.absoluteMouseX - ((game.getLocationOnScreen().x + this.x));
             double directionY = this.game.absoluteMouseY - ((game.getLocationOnScreen().y + this.y));
             double rotationAngleInRadians = Math.atan2(directionY, directionX);
-//            System.out.println(rotationAngleInRadians * 180 / Math.PI);
-
-            bullets.add(new PlayerBullet(this.game, rotationAngleInRadians, this));
+            bullets.add(new PlayerBullet(this.game, rotationAngleInRadians, this.bulletType));
             fireCooldown = 3;
         }
     }
@@ -200,7 +193,7 @@ public class Player extends Entity implements Rotate{
         fireCooldown++;
         if (fireCooldown >= reloadTime) fireCooldown = reloadTime;
         if (keyH.spacePressed || mouseH.shoot) {
-            shoot(game.absoluteMouseX, game.absoluteMouseY);
+            shoot();
         }
         updatePlayerBullets();
 
@@ -219,8 +212,8 @@ public class Player extends Entity implements Rotate{
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
         at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
 
-        if (maskCreationThread.getMask(this) != null) {
-            Area newMask = maskCreationThread.getMask(this);
+        if (this.game.maskCreationThread.getMask(this) != null) {
+            Area newMask = this.game.maskCreationThread.getMask(this);
             at = AffineTransform.getTranslateInstance(this.x, this.y);
 
             directionX = this.game.absoluteMouseX - ((game.getLocationOnScreen().x + this.x));

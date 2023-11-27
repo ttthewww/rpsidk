@@ -8,10 +8,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
-import static main.Game.maskCreationThread;
-
 public class Enemy extends Entity implements Rotate{
-    Game game;
     public double x;
     public double y;
     public int enemyType;
@@ -28,19 +25,6 @@ public class Enemy extends Entity implements Rotate{
         getImage();
 
         this.colRect = this.mask.getBounds();
-
-//        if(this.enemyType == 1){
-//            this.enemyWindowContainer= new EnemyWindowContainer(
-//                    100,
-//                    100,
-//                    100,
-//                    100,
-//                    this,
-//                    game
-//            );
-//            Thread enemyWindowThread = new Thread(this.enemyWindowContainer);
-//            enemyWindowThread.start();
-//        }
     }
 
     public void getImage(){
@@ -54,8 +38,7 @@ public class Enemy extends Entity implements Rotate{
             this.image = ImageHandler.enemyScissorImage;
             this.aura = ImageHandler.enemyScissorsAura;
         }
-
-        this.mask = new Area(maskCreationThread.addMask(this));
+        this.mask = new Area(this.game.maskCreationThread.addMask(this));
     }
 
     public Point validSpawnPoint() {
@@ -79,18 +62,6 @@ public class Enemy extends Entity implements Rotate{
         }
         return null;
     }
-
-//    private boolean checkCollisionWithEnemies(int x, int y) {
-//        if (this.enemies != null && !this.enemies.isEmpty()) {
-//            for (Enemy otherEnemy : this.enemies) {
-//                if (otherEnemy != this && this.colRect.intersects(otherEnemy.colRect)) {
-//                    return true;
-//                }
-//            }
-//        }
-//        return false;
-//    }
-
     public void update() {
         double directionX = this.game.player.x - ((this.x));
         double directionY = this.game.player.y - ((this.y));
@@ -107,8 +78,8 @@ public class Enemy extends Entity implements Rotate{
         this.y -= this.game.player.speed_y_up * 0.5;
         this.y -= this.game.player.speed_y_down * 0.5;
 
-        if (maskCreationThread.getMask(this) != null) {
-            Area newMask = maskCreationThread.getMask(this);
+        if (this.game.maskCreationThread.getMask(this) != null) {
+            Area newMask = this.game.maskCreationThread.getMask(this);
             AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
             directionX = this.game.player.x - (this.x + (double) this.image.getWidth() / 2);
             directionY = this.game.player.y - (this.y + (double) this.image.getHeight() / 2);
