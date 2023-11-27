@@ -27,7 +27,7 @@ public class Game extends JPanel implements Runnable, Sound{
     public BackgroundHandler backgroundHandler;
     // GameState variables
     public int mainMenuState = 0, mainGameState = 1, gameOverState = 2;
-    public int gameState = mainMenuState;
+    public int gameState = mainGameState;
     public boolean paused;
     public MainMenu mainMenu;
     public PauseMenu pauseMenu;
@@ -123,6 +123,10 @@ public class Game extends JPanel implements Runnable, Sound{
         }
     }
     public void update(){
+        if(this.gameState == this.mainMenuState){
+            this.enemyHandler.reset();
+        }
+
         if(this.gameState == this.mainGameState){
             if(this.keyH.escToggled){
                 this.paused = true;
@@ -154,10 +158,8 @@ public class Game extends JPanel implements Runnable, Sound{
              mainMenu.draw(g2);
          }
 
-         if(this.gameState ==  1){
-
+         if(this.gameState ==  mainGameState){
              this.backgroundHandler.draw(g2);
-
              this.enemyHandler.draw(g2);
              for (Bullet bullet : player.bullets) {
                  bullet.draw(g2);
@@ -174,7 +176,7 @@ public class Game extends JPanel implements Runnable, Sound{
              }
          }
 
-         if(this.gameState == 2){
+         if(this.gameState == gameOverState){
              this.gameOverMenu.draw(g2);
          }
 

@@ -115,7 +115,7 @@ public class Enemy extends Entity implements Rotate{
         g2.drawImage(this.aura, auraAt, null);
         g2.drawImage(this.image, at, null);
 
-//        g2.draw(this.mask);
+        g2.draw(this.mask);
 //        g2.draw(this.colRect);
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

@@ -1,14 +1,11 @@
 package handlers;
 
+import entity.Player;
 import entity.Bullet;
 import entity.Enemy;
 import entity.Entity;
-import entity.Player;
 
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.geom.Area;
-import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CollisionChecker implements Sound{

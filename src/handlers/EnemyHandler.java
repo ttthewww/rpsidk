@@ -23,15 +23,19 @@ public class EnemyHandler{
         this.game = game;
         this.player = game.player;
         this.collisionChecker = new CollisionChecker(game.player);
-        reset();
+        this.enemies = new CopyOnWriteArrayList<>();
+        this.frameEnemies = new CopyOnWriteArrayList<>();
+        this.boss = new CopyOnWriteArrayList<>();
     }
 
     public void reset(){
         this.enemies = new CopyOnWriteArrayList<>();
-        this.frameEnemies = new CopyOnWriteArrayList<>();
-        for(FrameEnemy e : frameEnemies){
-            //should close the frames when restart
+        if(!frameEnemies.isEmpty()){
+            for(FrameEnemy e : frameEnemies){
+                e.window.dispose();
+            }
         }
+        this.frameEnemies = new CopyOnWriteArrayList<>();
         this.boss = new CopyOnWriteArrayList<>();
     }
 
@@ -76,10 +80,15 @@ public class EnemyHandler{
         }
 
         for (int i = 0; i < frameEnemies.size(); i++){
-            frameEnemies.get(i).update();
-            if(Math.random() < shootChance){
-                frameEnemies.get(i).isShooting = true;
-                boss.get(i).isShooting = true;
+            if(this.game.paused){
+                frameEnemies.get(i).isRunning = false;
+            }else{
+                frameEnemies.get(i).isRunning = true;
+                frameEnemies.get(i).update();
+                if(Math.random() < shootChance){
+                    frameEnemies.get(i).isShooting = true;
+                    boss.get(i).isShooting = true;
+                }
             }
         }
     }

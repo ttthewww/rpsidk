@@ -43,6 +43,7 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
     double directionY;
     Line2D line;
     Random random = new Random();
+    public boolean isRunning = true;
 
     Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
     public FrameEnemy(Game game){
@@ -69,7 +70,6 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
         this.windowPosX = spawn.x;
         this.windowPosY = spawn.y;
 
-//        this.window.setAlwaysOnTop(true);
         this.window.setLocation(spawn.x, spawn.y);
         this.window.setVisible(true);
         ImageIcon img = new ImageIcon("src/resource/pepe.png");
@@ -106,7 +106,7 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
     }
 
     public void run(){
-        while(frameEnemyThread != null){
+        while(frameEnemyThread != null && isRunning){
             fps.update();
             fps.currentTime = System.nanoTime();
             fps.delta += (fps.currentTime - fps.lastTime) / fps.drawInterval;
