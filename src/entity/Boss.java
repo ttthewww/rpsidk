@@ -1,10 +1,15 @@
 package entity;
 
+import handlers.ImageHandler;
 import main.Game;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
+import java.awt.image.BufferedImage;
+
+import static main.Game.maskCreationThread;
 
 public class Boss extends Enemy{
     FrameEnemy frameEnemy;
@@ -18,23 +23,58 @@ public class Boss extends Enemy{
     Line2D line;
     public double playerX;
     public double playerY;
+    double originX;
+    double originY;
+    double directionX;
+    double directionY;
 
-    public Boss(Game gp, FrameEnemy frameEnemy) {
-        super(gp, 4);
+    public Boss(Game game, FrameEnemy frameEnemy) {
+        super(game, 4);
         this.frameEnemy = frameEnemy;
     }
 
-    public void draw(Graphics2D g2){
-        g2.setColor(Color.RED);
-        if(!this.isShooting){
-            playerX = this.gp.player.x;
-            playerY = this.gp.player.y;
+    public void getImage(){
+        this.image = ImageHandler.boss1;
+        this.mask = new Area(maskCreationThread.addMask(this));
+    }
+
+//    public void rotate(BufferedImage image, AffineTransform at){
+//        if(!this.isShooting){
+//            directionX = this.game.player.xLocationOnScreen - (this.xLocationOnScreen + (double) image.getWidth() / 2);
+//            directionY = this.game.player.yLocationOnScreen - (this.yLocationOnScreen + (double) image.getHeight() / 2);
+//        }
+//
+//        double rotationAngleInRadians = Math.atan2(directionY, directionX);
+//        at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
+//    }
+
+    public void rotate(BufferedImage image, AffineTransform at){
+        if(this.frameEnemy.isShootingTimer < 30){
+            directionX = this.game.player.x - (originX + (double)image.getWidth() / 2);
+            directionY = this.game.player.y - (originY + (double)image.getHeight() / 2);
         }
+
+        double rotationAngleInRadians = Math.atan2(directionY, directionX);
+        at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
+    }
+
+    public void draw(Graphics2D g2){
+        originX = -this.game.window.getLocationOnScreen().x + this.frameEnemy.enemyXLocationOnScreen;
+        originY = -this.game.window.getLocationOnScreen().y + this.frameEnemy.enemyYLocationOnScreen;
+
+        AffineTransform at = AffineTransform.getTranslateInstance(originX - image.getWidth() / 2.0, originY - image.getHeight() / 2.0);
+        rotate(image, at);
+
+        g2.setColor(Color.RED);
 
         if (this.isShooting) {
             if (isShootingTimer < isShootingDuration) {
-                double originX = -this.gp.window.getLocationOnScreen().x + this.frameEnemy.xLocationOnScreen;
-                double originY = -this.gp.window.getLocationOnScreen().y + this.frameEnemy.yLocationOnScreen;
+                if(isShootingTimer < 30){
+                    playerX = this.game.player.x;
+                    playerY = this.game.player.y;
+                }
+//                double originX = -this.game.window.getLocationOnScreen().x + this.frameEnemy.xLocationOnScreen;
+//                double originY = -this.game.window.getLocationOnScreen().y + this.frameEnemy.yLocationOnScreen;
 
                 double rise = playerY - originY;
                 double run = playerX - originX;
@@ -51,9 +91,9 @@ public class Boss extends Enemy{
                     BasicStroke stroke = new BasicStroke(strokeWidth);
                     Shape lineShape = stroke.createStrokedShape(line);
                     Area lineArea = new Area(lineShape);
-                    lineArea.intersect(this.gp.player.mask);
+                    lineArea.intersect(this.game.player.mask);
                     if(!lineArea.isEmpty()){
-                        this.gp.player.health--;
+                        this.game.player.health--;
                     }
                 }else{
                     strokeWidth = minStrokeWidth + ((maxStrokeWidth - minStrokeWidth) * isShootingTimer / isShootingDuration);
@@ -65,13 +105,8 @@ public class Boss extends Enemy{
                 strokeWidth = minStrokeWidth;
             }
         }
-    }
-    private Point limitEndPointToWindow(double startX, double startY, double endX, double endY) {
-        Rectangle windowBounds = this.gp.window.getBounds();
+        g2.drawImage(this.image, at, null);
 
-        double limitedEndX = Math.min(windowBounds.getMaxX(), Math.max(windowBounds.getMinX(), endX));
-        double limitedEndY = Math.min(windowBounds.getMaxY(), Math.max(windowBounds.getMinY(), endY));
-
-        return new Point((int) limitedEndX, (int) limitedEndY);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 };

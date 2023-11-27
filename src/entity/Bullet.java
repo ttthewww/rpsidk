@@ -2,7 +2,6 @@ package entity;
 
 import main.Game;
 import handlers.ImageHandler;
-
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -11,27 +10,27 @@ import java.awt.image.BufferedImage;
 import static main.Game.maskCreationThread;
 
 public class Bullet extends Entity{
+    public int speed = 8;
+    public int bulletType;
     double angle;
     double dx;
     double dy;
     int targetX;
     int targetY;
-    public int speed = 8;
-    public int bulletType;
-    Game gp;
     double directionX;
     double directionY;
     double rotationAngleInRadians;
+    Game game;
 
-    public Bullet(Game gp, double angle, Player player){
-        this.bulletType = player.bulletType;
+    public Bullet(Game game, double angle){
+        this.bulletType = game.player.bulletType;
         getImage();
-        this.gp = gp;
-        this.x = player.x;
-        this.y = player.y;
+        this.game = game;
+        this.x = game.player.x;
+        this.y = game.player.y;
 
-        directionX = this.gp.absoluteMouseX - ((gp.getLocationOnScreen().x + this.x));
-        directionY = this.gp.absoluteMouseY - ((gp.getLocationOnScreen().y + this.y));
+        directionX = this.game.absoluteMouseX - ((game.getLocationOnScreen().x + this.x));
+        directionY = this.game.absoluteMouseY - ((game.getLocationOnScreen().y + this.y));
         this.angle = Math.atan2(directionY, directionX);
         this.rotationAngleInRadians = Math.atan2(directionY, directionX);
         this.dx = Math.cos(angle) * this.speed;
@@ -44,24 +43,15 @@ public class Bullet extends Entity{
     }
 
     public void getImage(){
-        try{
-            if(this.bulletType == 1){
-                this.image = ImageHandler.rockBulletImage;
-            }else if(this.bulletType == 2){
-                this.image = ImageHandler.paperBulletImage;
-            }else{
-                this.image = ImageHandler.scissorBulletImage;
-            }
-
-            this.mask = new Area(maskCreationThread.addMask(this));
-        }catch (Exception e){
-            e.printStackTrace();
+        if(this.bulletType == 1){
+            this.image = ImageHandler.rockBulletImage;
+        }else if(this.bulletType == 2){
+            this.image = ImageHandler.paperBulletImage;
+        }else{
+            this.image = ImageHandler.scissorBulletImage;
         }
-    }
 
-    @Override
-    public void draw(Graphics2D g2) {
-        draw(g2, null);
+        this.mask = new Area(maskCreationThread.addMask(this));
     }
 
     public void rotate(BufferedImage image , AffineTransform at){
@@ -78,8 +68,8 @@ public class Bullet extends Entity{
         this.x +=  this.dx;
         this.y +=  this.dy;
 
-
-        if(this.x > gp.getWidth() || this.x < 0 || this.y > gp.getHeight() || this.y < 0){
+        //todo should hit frame enemies
+        if(this.x > game.getWidth() || this.x < 0 || this.y > game.getHeight() || this.y < 0){
             this.isActive = false;
         }
 
@@ -89,21 +79,15 @@ public class Bullet extends Entity{
         this.mask.reset();
         this.mask.add(newMask);
         this.mask.transform(at);
-
         this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2.0), (int) (this.y - this.image.getHeight() / 2.0));
     }
 
 
-    public void draw(Graphics2D g2, Game gamePanel){
+    public void draw(Graphics2D g2){
         AffineTransform at =  AffineTransform.getTranslateInstance(this.x - this.image.getWidth() / 2.0, this.y - this.image.getHeight() / 2.0);
         rotate(this.image, at);
         g2.drawImage(image, at, null);
         g2.setColor(Color.RED);
-
-//        g2.draw(this.mask);
-//        g2.draw(this.colRect);
-
-        g2.drawOval((int) this.x, (int) this.y, 2, 2);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 }

@@ -11,19 +11,17 @@ import java.awt.image.BufferedImage;
 import static main.Game.maskCreationThread;
 
 public class Enemy extends Entity implements Rotate{
-    Game gp;
+    Game game;
     public double x;
     public double y;
     public int enemyType;
     public int attackTimer = 150;
     public int attackCooldown = 0;
     private BufferedImage aura;
-    public Enemy(Game gp, int enemyType){
+    public Enemy(Game game, int enemyType){
         this.speed = 1;
         this.enemyType = enemyType;
-        this.gp = gp;
-//        this.x = 200;
-//        this.y = 20;
+        this.game = game;
         Point spawn = validSpawnPoint();
         this.x = spawn.x;
         this.y = spawn.y;
@@ -38,7 +36,7 @@ public class Enemy extends Entity implements Rotate{
 //                    100,
 //                    100,
 //                    this,
-//                    gp
+//                    game
 //            );
 //            Thread enemyWindowThread = new Thread(this.enemyWindowContainer);
 //            enemyWindowThread.start();
@@ -68,13 +66,13 @@ public class Enemy extends Entity implements Rotate{
             if (Math.random() < 0.5) {
                 x = (int) (Math.random() * -200);
             } else {
-                x = (int) (Math.random() * gp.getWidth() + 200) + gp.getWidth();
+                x = (int) (Math.random() * game.getWidth() + 200) + game.getWidth();
             }
 
             if (Math.random() < 0.5) {
-                y = (int) (Math.random() * gp.getHeight() - 200);
+                y = (int) (Math.random() * game.getHeight() - 200);
             } else {
-                y = (int) (Math.random() * gp.getHeight() + 200) + gp.getHeight();
+                y = (int) (Math.random() * game.getHeight() + 200) + game.getHeight();
             }
 
             return new Point(x, y);
@@ -94,8 +92,8 @@ public class Enemy extends Entity implements Rotate{
 //    }
 
     public void update() {
-        double directionX = this.gp.player.x - ((this.x));
-        double directionY = this.gp.player.y - ((this.y));
+        double directionX = this.game.player.x - ((this.x));
+        double directionY = this.game.player.y - ((this.y));
 
         double angle = Math.atan2(directionY, directionX);
         double dx = Math.cos(angle) * this.speed;
@@ -104,16 +102,16 @@ public class Enemy extends Entity implements Rotate{
         this.x += dx;
         this.y += dy;
 
-        this.x -= this.gp.player.speed_x_right * 0.5;
-        this.x -= this.gp.player.speed_x_left * 0.5;
-        this.y -= this.gp.player.speed_y_up * 0.5;
-        this.y -= this.gp.player.speed_y_down * 0.5;
+        this.x -= this.game.player.speed_x_right * 0.5;
+        this.x -= this.game.player.speed_x_left * 0.5;
+        this.y -= this.game.player.speed_y_up * 0.5;
+        this.y -= this.game.player.speed_y_down * 0.5;
 
         if (maskCreationThread.getMask(this) != null) {
             Area newMask = maskCreationThread.getMask(this);
             AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
-            directionX = Player.x - (this.x + (double) this.image.getWidth() / 2);
-            directionY = Player.y - (this.y + (double) this.image.getHeight() / 2);
+            directionX = this.game.player.x - (this.x + (double) this.image.getWidth() / 2);
+            directionY = this.game.player.y - (this.y + (double) this.image.getHeight() / 2);
             double rotationAngleInRadians = Math.atan2(directionY, directionX);
 
             at.rotate(rotationAngleInRadians);
@@ -128,8 +126,8 @@ public class Enemy extends Entity implements Rotate{
         }
     }
     public void rotate(BufferedImage image, AffineTransform at){
-        double directionX = Player.x - (this.x + (double)image.getWidth() / 2);
-        double directionY = Player.y - (this.y + (double)image.getHeight() / 2);
+        double directionX = this.game.player.x - (this.x + (double)image.getWidth() / 2);
+        double directionY = this.game.player.y - (this.y + (double)image.getHeight() / 2);
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
         at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
     }

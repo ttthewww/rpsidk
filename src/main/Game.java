@@ -17,17 +17,15 @@ public class Game extends JPanel implements Runnable, Sound{
     public int mouseY;
     public int absoluteMouseX;
     public int absoluteMouseY;
-    Thread gameThread;
     public static MaskHandler maskCreationThread;
     public EnemyHandler enemyHandler;
-    CollisionChecker cChecker;
-    boolean gameOver = false;
+    public CollisionChecker cChecker;
     public Player player;
     public KeyHandler keyH;
-    MouseHandler mouseH;
-    MouseMotionHandler mouseMotionH;
-    BackgroundHandler backgroundHandler;
-    //gameState
+    public MouseHandler mouseH;
+    public MouseMotionHandler mouseMotionH;
+    public BackgroundHandler backgroundHandler;
+    // GameState variables
     public int mainMenuState = 0, mainGameState = 1, gameOverState = 2;
     public int gameState = mainGameState;
     public boolean paused;
@@ -35,7 +33,8 @@ public class Game extends JPanel implements Runnable, Sound{
     public PauseMenu pauseMenu;
     public GameOverMenu gameOverMenu;
     public FPS fps = new FPS();
-    ScoreBoard scoreBoard;
+    public ScoreBoard scoreBoard;
+    Thread gameThread;
     public Game(){
         setWindowDefaults();
         this.setBackground(Color.black);
@@ -99,7 +98,6 @@ public class Game extends JPanel implements Runnable, Sound{
         while(gameThread != null){
             this.absoluteMouseX =  MouseInfo.getPointerInfo().getLocation().x;
             this.absoluteMouseY = MouseInfo.getPointerInfo().getLocation().y;
-
             if(mouseMotionH.hasMouseMoved()){
                 this.mouseX = mouseMotionH.getMouseX();
                 this.mouseY = mouseMotionH.getMouseY();
@@ -125,6 +123,14 @@ public class Game extends JPanel implements Runnable, Sound{
         }
     }
     public void update(){
+        //test
+//        this.windowPosX += 1;
+//        this.windowPosY += 1;
+//        this.screenWidth -= 2;
+//        this.screenHeight -= 2;
+//        this.window.setLocation(windowPosX, windowPosY);
+//        this.window.setSize(screenWidth, screenHeight);
+
         if(this.gameState == this.mainGameState){
             if(this.keyH.escToggled){
                 this.paused = true;
@@ -162,7 +168,7 @@ public class Game extends JPanel implements Runnable, Sound{
 
              this.enemyHandler.draw(g2);
              for (Bullet bullet : player.bullets) {
-                 bullet.draw(g2, this);
+                 bullet.draw(g2);
              }
 
              g2.setColor(Color.GREEN);

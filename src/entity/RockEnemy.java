@@ -3,7 +3,7 @@ package entity;
 import main.Game;
 
 public class RockEnemy extends Enemy{
-    public RockEnemy(Game gp){
-        super(gp,1);
+    public RockEnemy(Game game){
+        super(game,1);
     }
 }

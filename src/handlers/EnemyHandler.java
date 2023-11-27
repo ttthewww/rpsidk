@@ -5,6 +5,7 @@ import main.FPS;
 import main.Game;
 
 import java.awt.*;
+import java.awt.event.WindowEvent;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -16,8 +17,7 @@ public class EnemyHandler{
     public CopyOnWriteArrayList<Enemy> enemies;
     public CopyOnWriteArrayList<FrameEnemy> frameEnemies;
     public CopyOnWriteArrayList<Boss> boss;
-    public double shootChance;
-    public double chance = 0.05;
+    public double shootChance = 0.005;
 
     public EnemyHandler(Game game){
         this.game = game;
@@ -29,6 +29,9 @@ public class EnemyHandler{
     public void reset(){
         this.enemies = new CopyOnWriteArrayList<>();
         this.frameEnemies = new CopyOnWriteArrayList<>();
+        for(FrameEnemy e : frameEnemies){
+            //should close the frames when restart
+        }
         this.boss = new CopyOnWriteArrayList<>();
     }
 
@@ -61,7 +64,6 @@ public class EnemyHandler{
             e.update();
         }
 
-        shootChance = Math.random();
         collisionChecker.checkCollisions(this.enemies, player.bullets);
     }
     public void draw(Graphics2D g2){
@@ -69,21 +71,15 @@ public class EnemyHandler{
             e.draw(g2);
         }
 
-
         for (Boss b : boss) {
             b.draw(g2);
         }
 
-        if(shootChance < chance){
-            for(FrameEnemy e: frameEnemies){
-                e.update();
-                if(shootChance < chance){
-                    e.isShooting = true;
-                }
-            }
-
-            for (Boss b : boss) {
-                b.isShooting = true;
+        for (int i = 0; i < frameEnemies.size(); i++){
+            frameEnemies.get(i).update();
+            if(Math.random() < shootChance){
+                frameEnemies.get(i).isShooting = true;
+                boss.get(i).isShooting = true;
             }
         }
     }
