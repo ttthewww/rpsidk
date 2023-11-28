@@ -160,7 +160,9 @@ public class Game extends JPanel implements Runnable, Sound{
 
          if(this.gameState ==  mainGameState){
              this.backgroundHandler.draw(g2);
-             this.enemyHandler.draw(g2);
+             if(!this.paused){
+                 this.enemyHandler.draw(g2);
+             }
              for (Bullet bullet : player.bullets) {
                  bullet.draw(g2);
              }

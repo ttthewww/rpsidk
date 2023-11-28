@@ -14,6 +14,7 @@ public class SoundHandler {
         soundURL[1] = getClass().getResource("/resource/sounds/rock.wav");
         soundURL[2] = getClass().getResource("/resource/sounds/paper.wav");
         soundURL[3] = getClass().getResource("/resource/sounds/scissor.wav");
+        soundURL[4] = getClass().getResource("/resource/sounds/lasershot.wav");
     }
     public void setFile (int i){
         try{

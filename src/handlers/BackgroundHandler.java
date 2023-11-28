@@ -26,26 +26,26 @@ public class BackgroundHandler {
         this.background1.x = -player.absoluteX * backgroundSpeed;
         this.background1.y = -player.absoluteY * backgroundSpeed;
 
-        this.background2.x = -player.absoluteX * backgroundSpeed;
-        this.background2.y = -player.absoluteY * backgroundSpeed;
+//        this.background2.x = -player.absoluteX * backgroundSpeed;
+//        this.background2.y = -player.absoluteY * backgroundSpeed;
 
 //        System.out.println(player.absoluteX + " " + player.absoluteY);
     }
 
     public void draw(Graphics2D g2){
-        this.activeBackground = background1;
-        if(player.absoluteY < 0){
-            this.background2.y = -this.game.window.getHeight() + 40 - player.absoluteY * backgroundSpeed;
-            this.background2.draw(g2);
-            activeBackground = background2;
-        }
+//        this.activeBackground = background1;
+//        if(player.absoluteY < 0){
+//            this.background2.y = -this.game.window.getHeight() + 40 - player.absoluteY * backgroundSpeed;
+//            this.background2.draw(g2);
+//            activeBackground = background2;
+//        }
 
 //        if(player.absoluteY > 0){
 //            this.background2.y = this.game.window.getHeight() - 40 - player.absoluteY * backgroundSpeed;
 //            this.background2.draw(g2);
 //        }
         this.background1.draw(g2);
-        this.activeBackground.draw(g2);
+//        this.activeBackground.draw(g2);
 
 
 //        this.background3.draw(g2);

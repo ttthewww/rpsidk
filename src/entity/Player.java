@@ -246,8 +246,7 @@ public class Player extends Entity implements Rotate{
 
         g2.setColor(Color.RED);
 //        g2.draw(this.colRect);
-        g2.draw(this.mask);
-
+//        g2.draw(this.mask);
         g2.setColor(Color.BLUE);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }

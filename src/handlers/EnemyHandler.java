@@ -81,9 +81,11 @@ public class EnemyHandler{
 
         for (int i = 0; i < frameEnemies.size(); i++){
             if(this.game.paused){
-                frameEnemies.get(i).isRunning = false;
+                //should do this onclick event
+                frameEnemies.get(i).stop();
             }else{
-                frameEnemies.get(i).isRunning = true;
+                //should do this onclick event
+                frameEnemies.get(i).resume();
                 frameEnemies.get(i).update();
                 if(Math.random() < shootChance){
                     frameEnemies.get(i).isShooting = true;

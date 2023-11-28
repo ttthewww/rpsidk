@@ -16,7 +16,7 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
     public int enemyX, enemyY;
     public int enemyXLocationOnScreen, enemyYLocationOnScreen;
     public FPS fps = new FPS();
-    Thread frameEnemyThread;
+    public Thread frameEnemyThread;
     Game game;
     BufferedImage image;
     private int maxWindowWidth = 200;
@@ -43,8 +43,8 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
     double directionY;
     Line2D line;
     Random random = new Random();
+    private final Object pauseLock = new Object();
     public boolean isRunning = true;
-
     Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
     public FrameEnemy(Game game){
         getImage();
@@ -88,13 +88,13 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
         int posX;
         int posY;
 
-
         posY = random.nextInt(dim.height - this.window.getHeight());
 
         if(random.nextInt(2) == 1){
-            posX = random.nextInt(this.game.getLocationOnScreen().x - this.window.getWidth());
+            posX = random.nextInt(Math.abs(this.game.getLocationOnScreen().x - this.window.getWidth()));
         }else{
-            posX = random.nextInt(dim.width - (this.game.getLocationOnScreen().x + this.game.getWidth())) + this.game.getLocationOnScreen().x + this.game.getWidth();
+            int pos = Math.abs(dim.width - (this.game.getLocationOnScreen().x + this.game.getWidth()));
+            posX = random.nextInt(pos) + this.game.getLocationOnScreen().x + this.game.getWidth();
         }
         return new Point(posX, posY);
     }
@@ -106,7 +106,17 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
     }
 
     public void run(){
-        while(frameEnemyThread != null && isRunning){
+        while(isRunning){
+            synchronized (pauseLock){
+                if(this.game.paused){
+                    try{
+                        pauseLock.wait();
+                    }catch (Exception e){
+                        System.err.println(e.getMessage());
+                    }
+                }
+            }
+
             fps.update();
             fps.currentTime = System.nanoTime();
             fps.delta += (fps.currentTime - fps.lastTime) / fps.drawInterval;
@@ -131,14 +141,23 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
             }
         }
     }
+    public void stop() {
+        isRunning = false;
+    }
+    public void resume(){
+        synchronized (pauseLock){
+            isRunning = true;
+            pauseLock.notifyAll();
+        }
+    }
     public void getNewDestination(){
         this.destination = setValidSpawnPoint();
     }
 
     public void rotate(BufferedImage image, AffineTransform at){
         if(this.isShootingTimer < 30){
-            directionX = this.game.player.xLocationOnScreen - (this.getLocationOnScreen().x +  image.getWidth() / 2);
-            directionY = this.game.player.yLocationOnScreen - (this.getLocationOnScreen().y +  image.getHeight() / 2);
+            directionX = this.game.player.xLocationOnScreen - (this.getLocationOnScreen().x +   image.getWidth() / 2.0);
+            directionY = this.game.player.yLocationOnScreen - (this.getLocationOnScreen().y +   image.getHeight() / 2.0);
         }
 
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
@@ -147,7 +166,9 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
 
     public void move(){
         if(!isShooting){
+            //Todo SHOULD FIX THIS
             Point destinationdirection = new Point(this.destination.x - this.getLocationOnScreen().x, this.destination.y - this.getLocationOnScreen().y);
+//            Point destinationdirection = new Point(playerX - this.getLocationOnScreen().x,playerY- this.getLocationOnScreen().y);
             double angle = Math.atan2(destinationdirection.y, destinationdirection.x);
             double dx = Math.cos(angle) * this.speed;
             double dy = Math.sin(angle) * this.speed;
