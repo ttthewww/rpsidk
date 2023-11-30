@@ -54,6 +54,7 @@ public class Boss extends Enemy implements Sound {
             directionY = this.game.player.y - (this.y);
         }
 
+
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
         at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
     }
