@@ -20,7 +20,7 @@ public class MaskHandler {
         return mask;
     }
 
-    public Area getMask(Entity entity) {
+    public Area getMask(Entity entity) f{
         try {
             for (Map.Entry<Entity, Area> entry : masks.entrySet()) {
                 if(entry.getKey() == entity){

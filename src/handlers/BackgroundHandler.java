@@ -31,7 +31,7 @@ public class BackgroundHandler {
 
 //        System.out.println(player.absoluteX + " " + player.absoluteY);
     }
-
+    /** BACKGROUND TO DO **/
     public void draw(Graphics2D g2){
 //        this.activeBackground = background1;
 //        if(player.absoluteY < 0){
@@ -50,4 +50,5 @@ public class BackgroundHandler {
 
 //        this.background3.draw(g2);
     }
+    /** BACKGROUND TO DO **/
 }

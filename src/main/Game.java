@@ -24,7 +24,7 @@ public class Game extends JPanel implements Runnable, Sound{
     public KeyHandler keyH;
     public MouseHandler mouseH;
     public MouseMotionHandler mouseMotionH;
-    public BackgroundHandler backgroundHandler;
+    public BackgroundHandler backgroundHandler; /** BACKGROUND TO DO **/
     // GameState variables
     public int mainMenuState = 0, mainGameState = 1, gameOverState = 2;
     public int gameState = mainMenuState;
@@ -37,7 +37,7 @@ public class Game extends JPanel implements Runnable, Sound{
     Thread gameThread;
     public Game(){
         setWindowDefaults();
-        this.setBackground(Color.black);
+        this.setBackground(Color.black); /** BACKGROUND TO DO **/
         this.setDoubleBuffered(true);
         this.setFocusable(true);
         this.setSize((int) window.windowWidth, (int)window.windowHeight);
@@ -58,7 +58,7 @@ public class Game extends JPanel implements Runnable, Sound{
         this.mouseH = new MouseHandler(this);
 
         this.cChecker = new CollisionChecker(this.player);
-        this.backgroundHandler = new BackgroundHandler(this);
+        this.backgroundHandler = new BackgroundHandler(this); /** BACKGROUND TO DO **/
 
         this.enemyHandler = new EnemyHandler(this);
 
@@ -92,7 +92,6 @@ public class Game extends JPanel implements Runnable, Sound{
         this.enemyHandler.reset();
         this.gameState = mainGameState;
     }
-
 
     public void run(){
         while(gameThread != null){
@@ -137,7 +136,7 @@ public class Game extends JPanel implements Runnable, Sound{
             }
 
             if(!this.paused){
-                this.backgroundHandler.update();
+                this.backgroundHandler.update(); /** BACKGROUND TO DO **/
 
                 if(this.player.health <= 0){
                     scoreBoard.addScore(String.valueOf(LocalDate.now()), player.score);
@@ -151,7 +150,7 @@ public class Game extends JPanel implements Runnable, Sound{
     }
 
     protected void paintComponent(Graphics g){
-        if(this.gameThread != null){
+        try {
          super.paintComponent(g);
          Graphics2D g2 = (Graphics2D)g;
 
@@ -160,7 +159,7 @@ public class Game extends JPanel implements Runnable, Sound{
          }
 
          if(this.gameState ==  mainGameState){
-             this.backgroundHandler.draw(g2);
+             this.backgroundHandler.draw(g2); /** BACKGROUND TO DO **/
              if(!this.paused){
                  this.enemyHandler.draw(g2);
              }
@@ -184,6 +183,8 @@ public class Game extends JPanel implements Runnable, Sound{
          }
 
          g2.dispose();
+        }catch (NullPointerException e) {
+            System.err.println(e.getMessage());
         }
     }
 }

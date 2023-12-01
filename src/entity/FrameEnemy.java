@@ -50,6 +50,7 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
         getImage();
         this.game = game;
         setWindowDefaults();
+        /** BACKGROUND TO DO **/
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
         this.setSize(window.getWidth(), window.getHeight());

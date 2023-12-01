@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Random;
 
 public class Background {
+    /** BACKGROUND TO DO **/
     public BufferedImage image;
     public double x;
     public double y;
@@ -32,10 +33,11 @@ public class Background {
             this.image = ImageHandler.background4;
         }
     }
+    /** BACKGROUND TO DO **/
     public void update() {
 
     }
-
+    /** BACKGROUND TO DO **/
     public void draw(Graphics2D g) {
         g.drawImage(this.image, (int)this.x, (int)this.y, 960, 540, null);
     }}
