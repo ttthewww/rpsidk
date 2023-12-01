@@ -200,7 +200,7 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
         AffineTransform at = AffineTransform.getTranslateInstance(this.enemyX - image.getWidth() / 2.0, this.enemyY - image.getHeight() / 2.0);
         rotate(image, at);
 
-        g2.setColor(Color.RED);
+        g2.setColor(Color.BLUE);
 
         if (this.isShooting) {
             if (isShootingTimer < isShootingDuration) {
@@ -213,7 +213,7 @@ public class FrameEnemy extends JPanel implements Runnable, Rotate{
                 g2.setStroke(new BasicStroke(strokeWidth));
                 isShootingTimer++;
                 if(isShootingTimer > 60){
-                    g2.setColor(Color.BLUE);
+                    g2.setColor(Color.RED);
                     strokeWidth = maxStrokeWidth;
                 }else{
                     strokeWidth = minStrokeWidth + ((maxStrokeWidth - minStrokeWidth) * isShootingTimer / isShootingDuration);

@@ -5,8 +5,8 @@ import javax.swing.JFrame;
 public class WindowContainer extends JFrame {
     public double windowHeight;
     public double windowWidth;
-    double windowPosX;
-    double windowPosY;
+    public double windowPosX;
+    public double windowPosY;
     public WindowContainer(double windowWidth, double windowHeight, int windowPosX, int windowPosY) {
         this.windowHeight = windowHeight;
         this.windowWidth = windowWidth;

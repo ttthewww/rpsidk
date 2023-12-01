@@ -154,6 +154,9 @@ public class Player extends Entity implements Rotate{
             this.speed_y_up = 0;
         }
 
+
+
+
         this.absoluteX += this.speed_x_right;
         this.absoluteX += this.speed_x_left;
         this.absoluteY += this.speed_y_up;
@@ -182,6 +185,19 @@ public class Player extends Entity implements Rotate{
 
         this.xLocationOnScreen = this.game.getLocationOnScreen().x + this.x;
         this.yLocationOnScreen = this.game.getLocationOnScreen().y + this.y;
+
+
+
+
+        //todo add this
+//        if(this.keyH.shiftPressed){
+//            this.game.window.windowPosX += (int) this.speed_x_right;
+//            this.game.window.windowPosX += (int) this.speed_x_left;
+//            this.game.window.windowPosY += (int) this.speed_y_up;
+//            this.game.window.windowPosY += (int) this.speed_y_down;
+//
+//            this.game.window.setLocation((int) this.game.window.windowPosX, (int) this.game.window.windowPosY);
+//        }
     }
 
     public void updatePlayerBullets(){

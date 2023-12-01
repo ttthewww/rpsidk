@@ -68,6 +68,10 @@ public class EnemyHandler{
             e.update();
         }
 
+        for(Boss b : boss){
+            b.update();
+        }
+
         collisionChecker.checkCollisions(this.enemies, player.bullets);
     }
     public void draw(Graphics2D g2){
@@ -87,6 +91,7 @@ public class EnemyHandler{
                 //should do this onclick event
                 frameEnemies.get(i).resume();
                 frameEnemies.get(i).update();
+
                 if(Math.random() < shootChance){
                     frameEnemies.get(i).isShooting = true;
                     boss.get(i).isShooting = true;

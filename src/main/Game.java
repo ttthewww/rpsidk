@@ -27,7 +27,7 @@ public class Game extends JPanel implements Runnable, Sound{
     public BackgroundHandler backgroundHandler;
     // GameState variables
     public int mainMenuState = 0, mainGameState = 1, gameOverState = 2;
-    public int gameState = mainGameState;
+    public int gameState = mainMenuState;
     public boolean paused;
     public MainMenu mainMenu;
     public PauseMenu pauseMenu;
@@ -96,30 +96,30 @@ public class Game extends JPanel implements Runnable, Sound{
 
     public void run(){
         while(gameThread != null){
-            this.absoluteMouseX =  MouseInfo.getPointerInfo().getLocation().x;
-            this.absoluteMouseY = MouseInfo.getPointerInfo().getLocation().y;
-            if(mouseMotionH.hasMouseMoved()){
-                this.mouseX = mouseMotionH.getMouseX();
-                this.mouseY = mouseMotionH.getMouseY();
-            }
+                this.absoluteMouseX =  MouseInfo.getPointerInfo().getLocation().x;
+                this.absoluteMouseY = MouseInfo.getPointerInfo().getLocation().y;
+                if(mouseMotionH.hasMouseMoved()){
+                    this.mouseX = mouseMotionH.getMouseX();
+                    this.mouseY = mouseMotionH.getMouseY();
+                }
 
-            fps.update();
-            fps.currentTime = System.nanoTime();
-            fps.delta += (fps.currentTime - fps.lastTime) / fps.drawInterval;
-            fps.timer += (fps.currentTime - fps.lastTime);
-            fps.lastTime = fps.currentTime;
+                fps.update();
+                fps.currentTime = System.nanoTime();
+                fps.delta += (fps.currentTime - fps.lastTime) / fps.drawInterval;
+                fps.timer += (fps.currentTime - fps.lastTime);
+                fps.lastTime = fps.currentTime;
 
-            if(fps.delta >= 1){
-                update();
-                repaint();
-                fps.delta--;
-                fps.drawCount++;
-            }
-            if(fps.timer>= 1000000000){
-                fps.currentFPS = fps.drawCount;
-                fps.drawCount = 0;
-                fps.timer = 0;
-            }
+                if(fps.delta >= 1){
+                    update();
+                    repaint();
+                    fps.delta--;
+                    fps.drawCount++;
+                }
+                if(fps.timer>= 1000000000){
+                    fps.currentFPS = fps.drawCount;
+                    fps.drawCount = 0;
+                    fps.timer = 0;
+                }
         }
     }
     public void update(){
@@ -150,12 +150,13 @@ public class Game extends JPanel implements Runnable, Sound{
         }
     }
 
-    public void paintComponent(Graphics g){
+    protected void paintComponent(Graphics g){
+        if(this.gameThread != null){
          super.paintComponent(g);
          Graphics2D g2 = (Graphics2D)g;
 
-         if(this.gameState == 0){
-             mainMenu.draw(g2);
+         if(this.gameState == mainMenuState){
+             this.mainMenu.draw(g2);
          }
 
          if(this.gameState ==  mainGameState){
@@ -183,5 +184,6 @@ public class Game extends JPanel implements Runnable, Sound{
          }
 
          g2.dispose();
+        }
     }
 }

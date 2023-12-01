@@ -38,22 +38,31 @@ public class Boss extends Enemy implements Sound {
         this.mask = new Area(this.game.maskCreationThread.addMask(this));
     }
 
-//    public void rotate(BufferedImage image, AffineTransform at){
-//        if(!this.isShooting){
-//            directionX = this.game.player.xLocationOnScreen - (this.xLocationOnScreen + (double) image.getWidth() / 2);
-//            directionY = this.game.player.yLocationOnScreen - (this.yLocationOnScreen + (double) image.getHeight() / 2);
-//        }
-//
-//        double rotationAngleInRadians = Math.atan2(directionY, directionX);
-//        at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
-//    }
+    public void update(){
+        if (this.game.maskCreationThread.getMask(this) != null) {
+            Area newMask = this.game.maskCreationThread.getMask(this);
+            AffineTransform at = AffineTransform.getTranslateInstance(this.originX, this.originY);
+
+            if(this.frameEnemy.isShootingTimer < 30){
+                directionX = this.game.player.x - (this.x);
+                directionY = this.game.player.y - (this.y);
+            }
+
+            double rotationAngleInRadians = Math.atan2(directionY, directionX);
+            at.rotate(rotationAngleInRadians);
+
+            this.mask.reset();
+            this.mask.add(newMask);
+            this.mask.transform(at);
+        }
+    }
+
 
     public void rotate(BufferedImage image, AffineTransform at){
         if(this.frameEnemy.isShootingTimer < 30){
             directionX = this.game.player.x - (this.x);
             directionY = this.game.player.y - (this.y);
         }
-
 
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
         at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
@@ -69,7 +78,7 @@ public class Boss extends Enemy implements Sound {
         AffineTransform at = AffineTransform.getTranslateInstance(originX - image.getWidth() / 2.0, originY - image.getHeight() / 2.0);
         rotate(image, at);
 
-        g2.setColor(Color.RED);
+        g2.setColor(Color.BLUE);
 
         if (this.isShooting) {
             if (isShootingTimer < isShootingDuration) {
@@ -88,7 +97,7 @@ public class Boss extends Enemy implements Sound {
                 isShootingTimer++;
 
                 if(isShootingTimer > 60){
-                    g2.setColor(Color.BLUE);
+                    g2.setColor(Color.RED);
                     strokeWidth = maxStrokeWidth;
                     if(laserShotSoundCount < 1){
                         playSE(4);

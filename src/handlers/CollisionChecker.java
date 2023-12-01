@@ -29,6 +29,7 @@ public class CollisionChecker implements Sound{
             }
         }
 
+
         // check for player bullet collision
         for (Bullet bullet : playerBullets) {
             if (!bullet.isActive) continue;
@@ -61,6 +62,7 @@ public class CollisionChecker implements Sound{
                     if(enemyType == 2){
                         playSE(2);
                         deactivate(bullet);
+                        enemy.speed+= 0.5;
                         return;
                     }
                     break;
@@ -74,6 +76,7 @@ public class CollisionChecker implements Sound{
                     if(enemyType == 3){
                         playSE(3);
                         deactivate(bullet);
+                        enemy.speed+= 0.5;
                         return;
                     }
                     break;
@@ -87,6 +90,7 @@ public class CollisionChecker implements Sound{
                     if(enemyType == 1){
                         playSE(1);
                         deactivate(bullet);
+                        enemy.speed+= 0.5;
                         return;
                     }
                     break;
