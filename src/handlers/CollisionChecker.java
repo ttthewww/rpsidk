@@ -1,7 +1,6 @@
 package handlers;
 
 import entity.Player;
-import entity.Twin;
 import entity.Twins;
 import entity.Boss;
 import entity.Bullet;

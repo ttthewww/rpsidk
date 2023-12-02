@@ -1,13 +1,12 @@
 package handlers;
 
-import entity.Player;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener {
-    public boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed, shiftPressed;
-    public boolean escToggled;
+    public static boolean upPressed, downPressed, leftPressed, rightPressed, spacePressed, shiftPressed;
+    public static boolean escToggled;
 
     @Override
     public void keyTyped(KeyEvent e) {

@@ -1,7 +1,6 @@
 package handlers;
 
 import entity.*;
-import main.FPS;
 import main.Game;
 
 import java.awt.*;
@@ -14,7 +13,6 @@ public class EnemyHandler{
     Player player;
     public CopyOnWriteArrayList<Enemy> enemies;
     public CopyOnWriteArrayList<Boss> boss;
-    public double shootChance = 0.005;
 
     public EnemyHandler(Game game){
         this.game = game;

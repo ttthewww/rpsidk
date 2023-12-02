@@ -39,6 +39,8 @@ public class FrameEnemy extends JPanel implements Rotate{
     public boolean isRunning = true;
     Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
+    Point mainWindowPos;
+
     public FrameEnemy(Game game){
         getImage();
         this.game = game;
@@ -50,6 +52,7 @@ public class FrameEnemy extends JPanel implements Rotate{
         this.setFocusTraversalKeysEnabled(false);
         this.enemyX = this.window.getWidth() / 2;
         this.enemyY = this.window.getHeight() / 2;
+        this.mainWindowPos = this.game.getLocationOnScreen();
     }
 
     public void getImage(){
@@ -139,9 +142,17 @@ public class FrameEnemy extends JPanel implements Rotate{
                 playerY = (int) (-this.getLocationOnScreen().y + this.game.player.yLocationOnScreen);
             }
 
+            // if(mainWindowPos.x != game.getLocationOnScreen().x && mainWindowPos.y != game.getLocationOnScreen().y){
+            //     playerX = (int) (-this.getLocationOnScreen().x + this.game.player.xLocationOnScreen);
+            //     playerY = (int) (-this.getLocationOnScreen().x + this.game.player.yLocationOnScreen);
+            // }
+
             this.line = new Line2D.Double(this.enemyX, this.enemyY, playerX, playerY);
             g2.setStroke(new BasicStroke(strokeWidth));
             isShootingTimer++;
+
+            mainWindowPos = game.getLocationOnScreen();
+
             if(isShootingTimer > 60){
                 g2.setColor(Color.RED);
                 strokeWidth = maxStrokeWidth;
@@ -159,7 +170,7 @@ public class FrameEnemy extends JPanel implements Rotate{
     public void update(){
         this.enemyXLocationOnScreen = this.enemyX + this.window.getLocationOnScreen().x;
         this.enemyYLocationOnScreen = this.enemyY + this.window.getLocationOnScreen().y;
-        move();
+        // move();
     }
 
     public void paintComponent(Graphics g){

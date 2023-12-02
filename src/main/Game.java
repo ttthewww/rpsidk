@@ -9,11 +9,12 @@ import java.awt.*;
 import java.time.LocalDate;
 
 public class Game extends JPanel implements Runnable, Sound{
-    public WindowContainer window;
-    public int windowPosX = 500;
-    public int windowPosY = 250;
-    public int screenWidth = 576;
-    public int screenHeight = 576;
+    public JFrame window;
+    public int windowPosX;
+    public int windowPosY;
+
+    public int windowWidth = 576;
+    public int windowHeight = 576;
     public int mouseX;
     public int mouseY;
     public int absoluteMouseX;
@@ -43,7 +44,7 @@ public class Game extends JPanel implements Runnable, Sound{
         this.setBackground(Color.black); /** BACKGROUND TO DO **/
         this.setDoubleBuffered(true);
         this.setFocusable(true);
-        this.setSize((int) window.windowWidth, (int)window.windowHeight);
+        this.setSize(this.window.getWidth(), this.window.getHeight());
         this.setFocusTraversalKeysEnabled(false);
 
         this.maskCreationThread = new MaskHandler();
@@ -74,13 +75,20 @@ public class Game extends JPanel implements Runnable, Sound{
     }
 
     public void setWindowDefaults(){
-        this.window =  new WindowContainer(screenWidth, screenHeight,0, 0);
+        this.window =  new JFrame();
+        this.window.setSize(windowWidth, windowHeight);
+
         window.setFocusTraversalKeysEnabled(false);
         window.setResizable(false);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setTitle("Game");
+
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        window.setLocation(dim.width / 2 - windowPosX / 2, dim.height / 2 - windowPosY - 50);
+        this.windowPosX = dim.width / 2 - this.window.getWidth() / 2;
+        this.windowPosY = dim.height / 2 - this.window.getHeight() / 2;
+
+        window.setLocation(windowPosX, windowPosY);
+
         window.setVisible(true);
         this.window.setAlwaysOnTop(true);
     }
@@ -118,17 +126,18 @@ public class Game extends JPanel implements Runnable, Sound{
                 
         }
     }
+
     public void update(){
         if(this.gameState == this.mainMenuState){
             this.enemyHandler.reset();
         }
 
         if(this.gameState == this.mainGameState){
-            if(this.keyH.escToggled){
+            if(KeyHandler.escToggled){
                 this.paused = true;
             }
 
-            if(!this.keyH.escToggled){
+            if(!KeyHandler.escToggled){
                 this.paused = false;
             }
 

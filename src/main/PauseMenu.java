@@ -9,8 +9,8 @@ public class  PauseMenu extends Menu{
     public boolean resumeHovered;
     public boolean quitHovered;
 
-    public PauseMenu(Game gp){
-        super(gp);
+    public PauseMenu(Game game){
+        super(game);
     }
 
     @Override
@@ -21,30 +21,30 @@ public class  PauseMenu extends Menu{
 
         int mainMenuStringLength = getTextWidth(g2, "Main Menu");
         int mainMenuStringHeight = getTextHeight(g2);
-        if(gp.mouseX > points.get(1).x &&
-                gp.mouseX < points.get(0).x + mainMenuStringLength &&
-                gp.mouseY > points.get(0).y - mainMenuStringHeight + 12 &&
-                gp.mouseY < points.get(0).y)
+        if(game.mouseX > points.get(1).x &&
+                game.mouseX < points.get(0).x + mainMenuStringLength &&
+                game.mouseY > points.get(0).y - mainMenuStringHeight + 12 &&
+                game.mouseY < points.get(0).y)
         {
             mainMenuHovered = true;
         }
 
         int resumeStringLength = getTextWidth(g2, "Resume");
         int resumeStringHeight = getTextHeight(g2);
-        if(gp.mouseX > points.get(1).x &&
-                gp.mouseX < points.get(1).x + resumeStringLength &&
-                gp.mouseY > points.get(1).y - resumeStringHeight + 12 &&
-                gp.mouseY < points.get(1).y)
+        if(game.mouseX > points.get(1).x &&
+                game.mouseX < points.get(1).x + resumeStringLength &&
+                game.mouseY > points.get(1).y - resumeStringHeight + 12 &&
+                game.mouseY < points.get(1).y)
         {
             resumeHovered = true;
         }
 
         int quitStringLength = getTextWidth(g2, "Quit");
         int quitStringHeight = getTextHeight(g2);
-        if(gp.mouseX > points.get(1).x &&
-                gp.mouseX < points.get(2).x + quitStringLength &&
-                gp.mouseY > points.get(2).y - quitStringHeight + 12 &&
-                gp.mouseY < points.get(2).y)
+        if(game.mouseX > points.get(1).x &&
+                game.mouseX < points.get(2).x + quitStringLength &&
+                game.mouseY > points.get(2).y - quitStringHeight + 12 &&
+                game.mouseY < points.get(2).y)
         {
             quitHovered = true;
         }
@@ -53,7 +53,7 @@ public class  PauseMenu extends Menu{
     public void draw(Graphics2D g2){
         ArrayList<Point> points = new ArrayList<>();
         g2.setColor(new Color(0, 0, 0, 0.7F));
-        g2.fillRect(0, 0, gp.getWidth(), gp.getHeight());
+        g2.fillRect(0, 0, game.getWidth(), game.getHeight());
 
         g2.setFont(g2.getFont().deriveFont(Font.BOLD, 28F));
         g2.setColor(Color.GREEN);

@@ -108,8 +108,8 @@ public class Twin extends Enemy implements Sound {
                     g2.setColor(Color.RED);
                     strokeWidth = maxStrokeWidth;
                     if(laserShotSoundCount < 1){
-                        playSE(4);
-                        laserShotSoundCount++;
+                        // playSE(4);
+                        // laserShotSoundCount++;
                     }
                     //setup collision
                     BasicStroke stroke = new BasicStroke(strokeWidth);

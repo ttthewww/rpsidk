@@ -15,8 +15,8 @@ public class MainMenu extends Menu{
     public boolean quitHovered;
     public boolean backHovered;
 
-    public MainMenu(Game gp){
-        super(gp);
+    public MainMenu(Game game){
+        super(game);
         scores = new ScoreBoard();
     }
 
@@ -29,20 +29,20 @@ public class MainMenu extends Menu{
         if(this.state == 0){
             int playStringLength = getTextWidth(g2, "PLAY");
             int playStringHeight = getTextHeight(g2);
-            if(gp.mouseX > points.get(1).x &&
-                    gp.mouseX < points.get(1).x + playStringLength &&
-                    gp.mouseY > points.get(1).y - playStringHeight + 12 &&
-                    gp.mouseY < points.get(1).y)
+            if(game.mouseX > points.get(1).x &&
+                    game.mouseX < points.get(1).x + playStringLength &&
+                    game.mouseY > points.get(1).y - playStringHeight + 12 &&
+                    game.mouseY < points.get(1).y)
             {
                 playHovered = true;
             }
 
             int highScoresStringLength = getTextWidth(g2, "High Scores");
             int highScoresStringHeight= getTextHeight(g2);
-            if(gp.mouseX > points.get(1).x &&
-                    gp.mouseX < points.get(2).x + highScoresStringLength &&
-                    gp.mouseY > points.get(2).y - highScoresStringHeight + 12 &&
-                    gp.mouseY < points.get(2).y)
+            if(game.mouseX > points.get(1).x &&
+                    game.mouseX < points.get(2).x + highScoresStringLength &&
+                    game.mouseY > points.get(2).y - highScoresStringHeight + 12 &&
+                    game.mouseY < points.get(2).y)
             {
                 highScoresHovered = true;
             }
@@ -50,10 +50,10 @@ public class MainMenu extends Menu{
 
             int quitStringLength = getTextWidth(g2, "QUIT");
             int quitStringHeight = getTextHeight(g2);
-            if(gp.mouseX > points.get(1).x &&
-                    gp.mouseX < points.get(3).x + quitStringLength&&
-                    gp.mouseY > points.get(3).y - quitStringHeight + 12 &&
-                    gp.mouseY < points.get(3).y)
+            if(game.mouseX > points.get(1).x &&
+                    game.mouseX < points.get(3).x + quitStringLength&&
+                    game.mouseY > points.get(3).y - quitStringHeight + 12 &&
+                    game.mouseY < points.get(3).y)
             {
                 quitHovered = true;
             }
@@ -62,10 +62,10 @@ public class MainMenu extends Menu{
         if(this.state == 1){
             int backStringLength = getTextWidth(g2, "BACK");
             int backStringHeight = getTextHeight(g2);
-            if(gp.mouseX > points.get(1).x &&
-                    gp.mouseX < points.get(1).x + backStringLength &&
-                    gp.mouseY > points.get(1).y - backStringHeight + 12 &&
-                    gp.mouseY < points.get(1).y)
+            if(game.mouseX > points.get(1).x &&
+                    game.mouseX < points.get(1).x + backStringLength &&
+                    game.mouseY > points.get(1).y - backStringHeight + 12 &&
+                    game.mouseY < points.get(1).y)
             {
                 backHovered = true;
             }
