@@ -1,2 +1,5 @@
-package object;public interface CloneableImageObject {
+package object;
+
+public interface CloneableImageObject extends Cloneable {
+    CloneableImageObject cloneObject();
 }

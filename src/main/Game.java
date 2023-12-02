@@ -2,6 +2,7 @@ package main;
 
 import entity.*;
 import handlers.*;
+import object.ObjectDrawerThread;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,6 +36,7 @@ public class Game extends JPanel implements Runnable, Sound{
     public FPS fps = new FPS();
     public ScoreBoard scoreBoard;
     Thread gameThread;
+    ObjectDrawerThread objectDrawerThread;
     public Game(){
         setWindowDefaults();
         this.setBackground(Color.black); /** BACKGROUND TO DO **/
@@ -44,6 +46,8 @@ public class Game extends JPanel implements Runnable, Sound{
         this.setFocusTraversalKeysEnabled(false);
 
         this.maskCreationThread = new MaskHandler();
+
+        objectDrawerThread = new ObjectDrawerThread(this);
 
         new ImageHandler();
         this.player = new Player(this);
@@ -67,6 +71,7 @@ public class Game extends JPanel implements Runnable, Sound{
         player.setHandlers(keyH, mouseH);
         this.scoreBoard = new ScoreBoard();
         this.requestFocusInWindow();
+        objectDrawerThread.start();
     }
 
     public void setWindowDefaults(){
@@ -84,7 +89,7 @@ public class Game extends JPanel implements Runnable, Sound{
     public void startGameThread(){
         gameThread = new Thread(this);
         gameThread.start();
-//        playMusic(0);
+        playMusic(0);
     }
 
     public void reset(){
@@ -137,7 +142,6 @@ public class Game extends JPanel implements Runnable, Sound{
 
             if(!this.paused){
                 this.backgroundHandler.update(); /** BACKGROUND TO DO **/
-
                 if(this.player.health <= 0){
                     scoreBoard.addScore(String.valueOf(LocalDate.now()), player.score);
                     this.gameState = gameOverState;
@@ -159,10 +163,14 @@ public class Game extends JPanel implements Runnable, Sound{
          }
 
          if(this.gameState ==  mainGameState){
+
              this.backgroundHandler.draw(g2); /** BACKGROUND TO DO **/
+             objectDrawerThread.drawObjects(g2);
+
              if(!this.paused){
                  this.enemyHandler.draw(g2);
              }
+
              for (Bullet bullet : player.bullets) {
                  bullet.draw(g2);
              }

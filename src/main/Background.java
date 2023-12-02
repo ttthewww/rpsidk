@@ -39,5 +39,5 @@ public class Background {
     }
     /** BACKGROUND TO DO **/
     public void draw(Graphics2D g) {
-        g.drawImage(this.image, (int)this.x, (int)this.y, 960, 540, null);
+        g.drawImage(this.image, (int)this.x, (int)this.y, 1920, 1080, null);
     }}

@@ -45,10 +45,10 @@ public class ImageHandler {
             this.mainMenuBackgroundImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac1.png")));
 
             /** BACKGROUND TO DO **/
-            this.background1 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac1.png")));
-            this.background2 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac2.png")));
-            this.background3 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac3.png")));
-            this.background4 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac4.png")));
+            this.background1 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/Background.png")));
+            this.background2 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/Background.png")));
+            this.background3 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/Background.png")));
+            this.background4 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/Background.png")));
             /** BACKGROUND TO DO **/
             this.boss1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/boss1.png")));
 
