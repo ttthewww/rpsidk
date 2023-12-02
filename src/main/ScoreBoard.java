@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 
 public class ScoreBoard {
-    private static final String SCORE_FILE = "src/resource/Scores.txt";
+    private static final String SCORE_FILE = "./src/resource/Scores.txt";
     void addScore(String date, int score) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SCORE_FILE, true))) {
             writer.write(score + " | " + date);

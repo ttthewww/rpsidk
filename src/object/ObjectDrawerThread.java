@@ -1,7 +1,6 @@
 package object;
 
 import main.Game;
-import object.SuperObject;
 
 import javax.swing.*;
 import java.awt.*;

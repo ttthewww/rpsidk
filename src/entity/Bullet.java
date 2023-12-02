@@ -65,7 +65,6 @@ public class Bullet extends Entity{
         this.x +=  this.dx;
         this.y +=  this.dy;
 
-        //todo should hit frame enemies
         if(this.x > game.getWidth() || this.x < 0 || this.y > game.getHeight() || this.y < 0){
             this.isActive = false;
         }

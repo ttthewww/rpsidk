@@ -6,6 +6,8 @@ import handlers.MouseHandler;
 import main.*;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -17,11 +19,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class Player extends Entity implements Rotate{
-    public int health;
+    private int health;
     public int score;
     public int fireCooldown = 0;
     public int reloadTime = 30;
     public int bulletType = 1;
+
+    private int invunerableTime = 0;
+    private int maxInvulnerableTime = 100;
 
     public double absoluteX;
     public double absoluteY;
@@ -46,7 +51,6 @@ public class Player extends Entity implements Rotate{
         this.game = game;
         getImage();
         reset();
-        this.colRect = this.mask.getBounds();
     }
 
     public void reset() {
@@ -55,7 +59,7 @@ public class Player extends Entity implements Rotate{
         this.mask = new Area(this.game.maskCreationThread.addMask(this));
         this.x = this.game.window.getWidth() / 2;
         this.y = this.game.window.getHeight() / 2;
-        this.health = 999;
+        this.health = 99999;
         this.score = 0;
     }
 
@@ -80,6 +84,17 @@ public class Player extends Entity implements Rotate{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void takeDamage(){
+        if(invunerableTime <= 0){
+            this.health--;
+            invunerableTime = maxInvulnerableTime;
+        }
+    }
+
+    public int getHealth() {
+        return this.health;
     }
 
     public void toggleBulletType() {
@@ -154,18 +169,16 @@ public class Player extends Entity implements Rotate{
             this.speed_y_up = 0;
         }
 
-
-
-
         this.absoluteX += this.speed_x_right;
         this.absoluteX += this.speed_x_left;
         this.absoluteY += this.speed_y_up;
         this.absoluteY += this.speed_y_down;
-
-        this.x += (int) this.speed_x_right;
-        this.x += (int) this.speed_x_left;
-        this.y += (int) this.speed_y_up;
-        this.y += (int) this.speed_y_down;
+        if(!this.keyH.shiftPressed){
+            this.x += (int) this.speed_x_right;
+            this.x += (int) this.speed_x_left;
+            this.y += (int) this.speed_y_up;
+            this.y += (int) this.speed_y_down;
+        }
 
         if (this.x - 15 <= 0) {
             this.x = 15;
@@ -186,18 +199,15 @@ public class Player extends Entity implements Rotate{
         this.xLocationOnScreen = this.game.getLocationOnScreen().x + this.x;
         this.yLocationOnScreen = this.game.getLocationOnScreen().y + this.y;
 
-
-
-
         //todo add this
-//        if(this.keyH.shiftPressed){
-//            this.game.window.windowPosX += (int) this.speed_x_right;
-//            this.game.window.windowPosX += (int) this.speed_x_left;
-//            this.game.window.windowPosY += (int) this.speed_y_up;
-//            this.game.window.windowPosY += (int) this.speed_y_down;
-//
-//            this.game.window.setLocation((int) this.game.window.windowPosX, (int) this.game.window.windowPosY);
-//        }
+       if(this.keyH.shiftPressed){
+           this.game.window.windowPosX += (int) this.speed_x_right;
+           this.game.window.windowPosX += (int) this.speed_x_left;
+           this.game.window.windowPosY += (int) this.speed_y_up;
+           this.game.window.windowPosY += (int) this.speed_y_down;
+
+           this.game.window.setLocation((int) this.game.window.windowPosX, (int) this.game.window.windowPosY);
+       }
     }
 
     public void updatePlayerBullets(){
@@ -208,8 +218,9 @@ public class Player extends Entity implements Rotate{
         }
     }
 
-    public void update(Game game, WindowContainer window){
+    public void update(Game game, JFrame window){
         move();
+        invunerableTime--;
         //Shooting
         fireCooldown++;
         if (fireCooldown >= reloadTime) fireCooldown = reloadTime;
@@ -217,17 +228,9 @@ public class Player extends Entity implements Rotate{
             shoot();
         }
         updatePlayerBullets();
-
-        //Updating collision box
-        this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2), (int) (this.y - this.image.getHeight() / 2));
     }
 
-
-    @Override
     public void rotate(BufferedImage image, AffineTransform at) {
-        rotate(image, null, at);
-    }
-    public void rotate(BufferedImage image, Game gamePanel, AffineTransform at) {
         double directionX = this.game.absoluteMouseX - ((game.getLocationOnScreen().x + this.x));
         double directionY = this.game.absoluteMouseY - ((game.getLocationOnScreen().y + this.y));
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
@@ -256,13 +259,14 @@ public class Player extends Entity implements Rotate{
         }
 
         AffineTransform at = AffineTransform.getTranslateInstance(this.x - image.getWidth() / 2.0, this.y - image.getHeight() / 2.0);
-        rotate(image, this.game, at);
+        rotate(image, at);
         g2.drawImage(image, at, null);
         g2.drawImage(this.bulletTypeImage, AffineTransform.getTranslateInstance(this.game.getWidth() / 2.0 - this.bulletTypeImage.getWidth() / 2.0,  10), null);
 
         g2.setColor(Color.RED);
-//        g2.draw(this.colRect);
-//        g2.draw(this.mask);
+
+        // g2.draw(this.mask);
+
         g2.setColor(Color.BLUE);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }

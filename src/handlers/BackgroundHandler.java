@@ -29,7 +29,6 @@ public class BackgroundHandler {
 //        this.background2.x = -player.absoluteX * backgroundSpeed;
 //        this.background2.y = -player.absoluteY * backgroundSpeed;
 
-        System.out.println(player.absoluteX + " " + player.absoluteY);
     }
     /** BACKGROUND TO DO **/
     public void draw(Graphics2D g2){
