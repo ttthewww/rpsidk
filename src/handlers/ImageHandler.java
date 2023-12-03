@@ -25,6 +25,9 @@ public class ImageHandler implements UtilityTool{
 
     public static BufferedImage[] orbImages = new BufferedImage[96];
 
+    public static BufferedImage snakeHead;
+    public static BufferedImage apple;
+
     public ImageHandler(){
         try{
             for (int i = 0; i < playerFrames.length; i++) {
@@ -52,7 +55,8 @@ public class ImageHandler implements UtilityTool{
                 orbImages[i] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/orbBuff/" + (i + 1) + ".png")));
             }
 
-            
+            snakeHead =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/snake/head.png")));
+            apple =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/snake/apple.png")));
 
         }catch(IOException e){
             e.printStackTrace();

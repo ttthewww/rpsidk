@@ -1,16 +1,21 @@
 package entity;
 
-import handlers.*;
-import main.*;
+import main.FPS;
+import main.Game;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ImageIcon;
+
+import handlers.ImageHandler;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowStateListener;
 
 
 public class TwinFrame extends EnemyFrame implements Rotate{
@@ -50,46 +55,16 @@ public class TwinFrame extends EnemyFrame implements Rotate{
     }
 
     public void setWindowDefaults(){
-        this.window = new JFrame();
-        this.window.setSize(windowWidth, windowHeight);
+        super.setWindowDefaults();
         Point spawn = setValidSpawnPoint();
         this.destination = spawn;
         this.windowPosX = spawn.x;
         this.windowPosY = spawn.y;
 
         this.window.setLocation(spawn.x, spawn.y);
+
         ImageIcon img = new ImageIcon("src/resource/pepe.png");
         window.setIconImage(img.getImage());
-
-        this.window.setFocusTraversalKeysEnabled(false);
-        this.window.setFocusableWindowState(false);
-        this.window.setResizable(false);
-        this.window.setDefaultCloseOperation(0);
-        this.window.add(this);
-        this.window.setVisible(true);
-
-        this.window.addWindowStateListener(new WindowStateListener() {
-            @Override
-            public void windowStateChanged(WindowEvent e) {
-                window.setExtendedState(Frame.NORMAL);
-            }
-        });
-    }
-
-    public Point setValidSpawnPoint(){
-        Random random = new Random();
-        int posX;
-        int posY;
-
-        posY = random.nextInt(dim.height - this.window.getHeight());
-
-        if(random.nextInt(2) == 1){
-            posX = random.nextInt(Math.abs(this.game.getLocationOnScreen().x - this.window.getWidth()));
-        }else{
-            int pos = Math.abs(dim.width - (this.game.getLocationOnScreen().x + this.game.getWidth()));
-            posX = random.nextInt(pos) + this.game.getLocationOnScreen().x + this.game.getWidth();
-        }
-        return new Point(posX, posY);
     }
 
     public void getNewDestination(){
@@ -185,5 +160,21 @@ public class TwinFrame extends EnemyFrame implements Rotate{
         g2.drawImage(this.image, at, null);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.dispose();
+    }
+
+    public Point setValidSpawnPoint(){
+        Random random = new Random();
+        int posX;
+        int posY;
+
+        posY = random.nextInt(dim.height - this.window.getHeight());
+
+        if(random.nextInt(2) == 1){
+            posX = random.nextInt(Math.abs(this.game.getLocationOnScreen().x - this.window.getWidth()));
+        }else{
+            int pos = Math.abs(dim.width - (this.game.getLocationOnScreen().x + this.game.getWidth()));
+            posX = random.nextInt(pos) + this.game.getLocationOnScreen().x + this.game.getWidth();
+        }
+        return new Point(posX, posY);
     }
 }

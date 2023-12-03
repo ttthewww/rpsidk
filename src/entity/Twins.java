@@ -24,7 +24,7 @@ public class Twins implements Boss{
         twin1 = new Twin(game, twin1Frame, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
         twin2 = new Twin(game, twin2Frame, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
 
-        this.health = 1;
+        this.health = 10;
     }
 
     public void update(){

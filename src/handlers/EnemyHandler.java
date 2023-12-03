@@ -20,7 +20,6 @@ public class EnemyHandler{
         this.player = game.player;
         this.collisionChecker = new CollisionChecker(game.player);
         this.enemies = new CopyOnWriteArrayList<>();
-
         this.boss = new CopyOnWriteArrayList<>();
     }
 
@@ -38,6 +37,7 @@ public class EnemyHandler{
     public void summonEnemy(){
         if (boss.isEmpty()) {
             boss.add(new Twins(game));
+            boss.add(new Snake(game));
         }
 
         if(Math.random() < spawnChance){
@@ -56,10 +56,12 @@ public class EnemyHandler{
         }
 
         for (Boss b : boss) {
-            if (!((Twins) b).isActive) {
-                boss.remove(b);
-                //todo fix lag upon removing 
-                continue;
+            if(b instanceof Twins){
+                if (!((Twins) b).isActive) {
+                    boss.remove(b);
+                    //todo fix lag upon removing 
+                    continue;
+                }
             }
             b.update();
         }

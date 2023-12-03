@@ -74,10 +74,8 @@ public class MainMenu extends Menu{
 
     public void draw(Graphics2D g2) {
         ArrayList<Point> points = new ArrayList<>();
-        /** BACKGROUND TO DO **/
         BufferedImage backgroundImage = ImageHandler.mainMenuBackgroundImage;
         g2.drawImage(backgroundImage, 0, 0, backgroundImage.getWidth(), backgroundImage.getHeight(), null);
-        /** BACKGROUND TO DO **/
         Font font = g2.getFont().deriveFont(Font.BOLD, 28F);
         g2.setFont(font);
         g2.setColor(Color.GREEN);

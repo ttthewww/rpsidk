@@ -28,9 +28,9 @@ public class CollisionChecker implements Sound{
             Area intersection = new Area(player.mask);
             intersection.intersect(enemy.mask);
             
-            
             if (!intersection.isEmpty()) {
                 player.takeDamage();
+                deactivate(enemy);
             }
         }
 

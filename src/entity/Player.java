@@ -156,16 +156,17 @@ public class Player extends Entity implements Rotate{
         }
 
         if(!this.keyH.shiftPressed){
-            this.absoluteX += this.speed_x_right;
-            this.absoluteX += this.speed_x_left;
-            this.absoluteY += this.speed_y_up;
-            this.absoluteY += this.speed_y_down;
-
             this.x += (int) this.speed_x_right;
             this.x += (int) this.speed_x_left;
             this.y += (int) this.speed_y_up;
             this.y += (int) this.speed_y_down;
         }
+
+        this.absoluteX += this.speed_x_right;
+        this.absoluteX += this.speed_x_left;
+        this.absoluteY += this.speed_y_up;
+        this.absoluteY += this.speed_y_down;
+
 
         if (this.x - 15 <= 0) {
             this.x = 15;

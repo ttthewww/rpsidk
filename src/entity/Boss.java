@@ -9,4 +9,6 @@ public interface Boss {
     public void draw(Graphics2D g2);
 
     public void dispose();
+
+    public void takeDamage();
 }

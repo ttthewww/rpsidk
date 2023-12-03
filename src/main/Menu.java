@@ -13,6 +13,7 @@ public abstract class Menu {
 
     public abstract void update(ArrayList<Point> points, Graphics2D g2);
     public abstract void draw(Graphics2D g2);
+
     public Point getCenteredTextPoint(Graphics2D g2, String text, int yOffset) {
         int screenWidth = this.game.windowWidth;
         int textWidth = getTextWidth(g2, text);

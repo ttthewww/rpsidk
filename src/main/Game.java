@@ -28,7 +28,7 @@ public class Game extends JPanel implements Runnable, Sound{
 
     // GameState variables
     public int mainMenuState = 0, mainGameState = 1, gameOverState = 2;
-    public int gameState = mainMenuState;
+    public int gameState = mainGameState;
     public boolean paused;
     public MainMenu mainMenu;
     public PauseMenu pauseMenu;
