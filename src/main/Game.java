@@ -7,6 +7,8 @@ import object.ObjectDrawerThread;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Game extends JPanel implements Runnable, Sound{
     public JFrame window;
@@ -25,7 +27,7 @@ public class Game extends JPanel implements Runnable, Sound{
     public KeyHandler keyH;
     public MouseHandler mouseH;
     public MouseMotionHandler mouseMotionH;
-    public BackgroundHandler backgroundHandler; /** BACKGROUND TO DO **/
+//    public BackgroundHandler backgroundHandler; /** BACKGROUND TO DO **/
 
     // GameState variables
     public int mainMenuState = 0, mainGameState = 1, gameOverState = 2;
@@ -38,7 +40,9 @@ public class Game extends JPanel implements Runnable, Sound{
     public ScoreBoard scoreBoard;
     Thread gameThread;
     ObjectDrawerThread objectDrawerThread = new ObjectDrawerThread(this);
+    AssetSetter  assetSetter;
     public Graphics2D g2;
+    private ExecutorService executorService = Executors.newFixedThreadPool(1);
     public Game(){
         setWindowDefaults();
         this.setBackground(Color.black); /** BACKGROUND TO DO **/
@@ -49,6 +53,8 @@ public class Game extends JPanel implements Runnable, Sound{
 
         this.maskCreationThread = new MaskHandler();
 
+        assetSetter = new AssetSetter(this, objectDrawerThread);
+        assetSetter.setObject();
 
         new ImageHandler();
         this.player = new Player(this);
@@ -62,7 +68,7 @@ public class Game extends JPanel implements Runnable, Sound{
 
         this.mouseH = new MouseHandler(this);
 
-        this.backgroundHandler = new BackgroundHandler(this); /** BACKGROUND TO DO **/
+//        this.backgroundHandler = new BackgroundHandler(this); /** BACKGROUND TO DO **/
 
         this.enemyHandler = new EnemyHandler(this);
 
@@ -91,11 +97,12 @@ public class Game extends JPanel implements Runnable, Sound{
 
         window.setVisible(true);
         this.window.setAlwaysOnTop(true);
+        objectDrawerThread.start();
+        executorService.submit(objectDrawerThread);
     }
 
     public void startGameThread(){
         gameThread = new Thread(this);
-        objectDrawerThread.start();
         gameThread.start();
         playMusic(0);
     }
@@ -142,7 +149,7 @@ public class Game extends JPanel implements Runnable, Sound{
             }
 
             if(!this.paused){
-                this.backgroundHandler.update(); /** BACKGROUND TO DO **/
+//                this.backgroundHandler.update(); /** BACKGROUND TO DO **/
                 if(this.player.getHealth() <= 0){
                     scoreBoard.addScore(String.valueOf(LocalDate.now()), player.score);
                     this.gameState = gameOverState;
@@ -164,7 +171,7 @@ public class Game extends JPanel implements Runnable, Sound{
             }
 
             if(this.gameState ==  mainGameState){
-                this.backgroundHandler.draw(g2); /** BACKGROUND TO DO **/
+//                this.backgroundHandler.draw(g2); /** BACKGROUND TO DO **/
                 objectDrawerThread.drawObjects(g2);
 
                 if(!this.paused){

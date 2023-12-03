@@ -8,7 +8,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
-public class Enemy extends Entity implements Rotate{
+public class Enemy extends Entity implements Rotate, SpawnPoints{
     public double x;
     public double y;
     public int enemyType;
@@ -19,7 +19,7 @@ public class Enemy extends Entity implements Rotate{
         this.speed = 1;
         this.enemyType = enemyType;
         this.game = game;
-        Point spawn = validSpawnPoint();
+        Point spawn = validSpawnPoint(game);
         this.x = spawn.x;
         this.y = spawn.y;
         getImage();
@@ -39,28 +39,6 @@ public class Enemy extends Entity implements Rotate{
             this.aura = ImageHandler.enemyScissorsAura;
         }
         this.mask = new Area(this.game.maskCreationThread.addMask(this));
-    }
-
-    public Point validSpawnPoint() {
-        int maxAttempts = 100;
-        int x;
-        int y;
-        for (int attempt = 0; attempt < maxAttempts; attempt++) {
-            if (Math.random() < 0.5) {
-                x = (int) (Math.random() * -200);
-            } else {
-                x = (int) (Math.random() * game.getWidth() + 200) + game.getWidth();
-            }
-
-            if (Math.random() < 0.5) {
-                y = (int) (Math.random() * game.getHeight() - 200);
-            } else {
-                y = (int) (Math.random() * game.getHeight() + 200) + game.getHeight();
-            }
-
-            return new Point(x, y);
-        }
-        return null;
     }
     public void update() {
         double directionX = this.game.player.x - ((this.x));

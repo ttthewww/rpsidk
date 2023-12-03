@@ -6,8 +6,8 @@ import main.Game;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public abstract class SuperObject implements CloneableImageObject {
-    private static final int FRAME_DELAY_MILLIS = 100; // Delay between frames in milliseconds
+public abstract class SuperObject implements CloneableImageObject{
+    private static int FRAME_DELAY_MILLIS = 100; // Delay between frames in milliseconds
     private static final int DEFAULT_SOLID_AREA_WIDTH = 48;
     private static final int DEFAULT_SOLID_AREA_HEIGHT = 48;
     public BufferedImage[] images; // Modified to use an array of images
@@ -19,6 +19,7 @@ public abstract class SuperObject implements CloneableImageObject {
     public int solidAreaDefaultY = 0;
     private int currentFrame = 0;
     private long lastFrameTime = 0;
+    private final Object imagesLock = new Object();
     public void draw(Graphics2D g2) {
         try {
             draw(g2, null);
@@ -28,32 +29,30 @@ public abstract class SuperObject implements CloneableImageObject {
         }
     }
     public void draw(Graphics2D g2, Game gp) {
-//        System.out.println("Drawing frame: " + currentFrame);
         try {
             if (gp == null) {
-                // Handle the case when no GamePanel is provided
             } else {
-//                // Existing logic that uses gp
-////                System.out.println("Drawing frame: " + currentFrame);
-//                int screenX = worldX - gp.player.worldX + gp.player.screenX;
-//                int screenY = worldY - gp.player.worldY + gp.player.screenY;
-
-//                if (isVisible(worldX, worldY, gp)) {
-                    // Draw the current frame
-                    g2.drawImage(getImages()[currentFrame], 0, 0, null);
-//                }
+//                double screenX = worldX - gp.player.x + gp.player.xLocationOnScreen;
+//                double screenY = worldY - gp.player.y + gp.player.yLocationOnScreen;
+                // Use synchronized block to ensure atomic access to the images array
+                synchronized (imagesLock) {
+                    g2.drawImage(getImages()[currentFrame], worldX, worldY, null);
+                }
             }
         } catch (Exception e) {
-            // Handle the exception
-            e.printStackTrace(); // or log the exception
+            e.printStackTrace();
         }
     }
     public void updateAnimation() {
         long currentTime = System.currentTimeMillis();
-
+        if(images.length == 4) /** NOOB MANIPULATION, TO BE REVISED **/
+            FRAME_DELAY_MILLIS = 2000;
+        else  FRAME_DELAY_MILLIS = 100;
         if (currentTime - lastFrameTime > FRAME_DELAY_MILLIS) {
-            currentFrame = (currentFrame + 1) % images.length;
-            lastFrameTime = currentTime;
+            synchronized (imagesLock) {
+                currentFrame = (currentFrame + 1) % images.length;
+                lastFrameTime = currentTime;
+            }
         }
     }
 

@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ObjectDrawerThread extends Thread {
-    private static final int UPDATE_INTERVAL_MS = 16;
+    private static final int UPDATE_INTERVAL_MS = 10;
     private volatile boolean isRunning = true;
     private Game gamePanel;
     public SuperObject[] obj;
@@ -39,16 +39,16 @@ public class ObjectDrawerThread extends Thread {
     public boolean isRunning() {
         return isRunning;
     }
-    private void updateAnimations() {
+    private synchronized void updateAnimations() {
         for (SuperObject o : obj) {
             if (o != null) {
                 o.updateAnimation();
             }
         }
     }
-    public void drawObjects(Graphics2D g2) {
-        for (SuperObject o : obj){
-            if(o != null){
+    public synchronized void drawObjects(Graphics2D g2) {
+        for (SuperObject o : obj) {
+            if (o != null) {
                 o.draw(g2, gamePanel);
             }
         }
@@ -60,7 +60,7 @@ public class ObjectDrawerThread extends Thread {
      * @return the SuperObject at the specified index
      * @throws IndexOutOfBoundsException if the index is out of bounds
      */
-    public SuperObject getObject(int index) {
+    public synchronized SuperObject getObject(int index) {
         if (index >= 0 && index < obj.length) {
             return obj[index];
         } else {
@@ -74,7 +74,7 @@ public class ObjectDrawerThread extends Thread {
      * @param sObject the SuperObject to set
      * @throws IndexOutOfBoundsException if the index is out of bounds
      */
-    public void setObject(int index, SuperObject sObject) {
+    public synchronized void setObject(int index, SuperObject sObject) {
         if (index >= 0 && index < obj.length) {
             obj[index] = sObject;
         } else {
