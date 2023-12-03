@@ -43,6 +43,7 @@ public class Game extends JPanel implements Runnable, Sound{
     AssetSetter  assetSetter;
     public Graphics2D g2;
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
+    private final Object lock = new Object();
     public Game(){
         setWindowDefaults();
         this.setBackground(Color.black); /** BACKGROUND TO DO **/
@@ -98,7 +99,7 @@ public class Game extends JPanel implements Runnable, Sound{
         window.setVisible(true);
         this.window.setAlwaysOnTop(true);
         objectDrawerThread.start();
-        executorService.submit(objectDrawerThread);
+//        executorService.submit(objectDrawerThread); // NECESSARY? DUNNO
     }
 
     public void startGameThread(){
@@ -130,74 +131,78 @@ public class Game extends JPanel implements Runnable, Sound{
                     fps.drawCount++;
                 }
 
-                
+
         }
     }
 
     public void update(){
-        if(this.gameState == this.mainMenuState){
-            this.enemyHandler.reset();
-        }
-
-        if(this.gameState == this.mainGameState){
-            if(KeyHandler.escToggled){
-                this.paused = true;
+        synchronized (lock) {
+            if(this.gameState == this.mainMenuState){
+                this.enemyHandler.reset();
             }
 
-            if(!KeyHandler.escToggled){
-                this.paused = false;
-            }
-
-            if(!this.paused){
-//                this.backgroundHandler.update(); /** BACKGROUND TO DO **/
-                if(this.player.getHealth() <= 0){
-                    scoreBoard.addScore(String.valueOf(LocalDate.now()), player.score);
-                    this.gameState = gameOverState;
+            if(this.gameState == this.mainGameState){
+                if(KeyHandler.escToggled){
+                    this.paused = true;
                 }
 
-                player.update(this, this.window);
-                enemyHandler.update();
+                if(!KeyHandler.escToggled){
+                    this.paused = false;
+                }
+
+                if(!this.paused){
+    //                this.backgroundHandler.update(); /** BACKGROUND TO DO **/
+                    if(this.player.getHealth() <= 0){
+                        scoreBoard.addScore(String.valueOf(LocalDate.now()), player.score);
+                        this.gameState = gameOverState;
+                    }
+
+                    player.update(this, this.window);
+                    enemyHandler.update();
+                }
             }
         }
     }
 
     protected void paintComponent(Graphics g){
-        if(this.gameThread != null){
-            super.paintComponent(g);
-            this.g2 = (Graphics2D)g;
+        synchronized (lock) {
+            if(this.gameThread != null){
+                super.paintComponent(g);
+                this.g2 = (Graphics2D)g;
 
-            if(this.gameState == mainMenuState){
-                this.mainMenu.draw(g2);
-            }
-
-            if(this.gameState ==  mainGameState){
-//                this.backgroundHandler.draw(g2); /** BACKGROUND TO DO **/
-                objectDrawerThread.drawObjects(g2);
-
-                if(!this.paused){
-                    this.enemyHandler.draw(g2);
+                if(this.gameState == mainMenuState){
+                    this.mainMenu.draw(g2);
                 }
 
-                for (Bullet bullet : player.bullets) {
-                    bullet.draw(g2);
+                if(this.gameState ==  mainGameState){
+    //                this.backgroundHandler.draw(g2); /** BACKGROUND TO DO **/
+                    objectDrawerThread.drawObjects(g2);
+
+
+                    for (Bullet bullet : player.bullets) {
+                        bullet.draw(g2);
+                    }
+                    if(!this.paused){
+                        this.enemyHandler.draw(g2);
+                    }
+
+                    g2.setColor(Color.GREEN);
+                    g2.drawString("Score: " + player.score, 5, 10);
+                    g2.drawString("Health: " + player.getHealth() ,400, 10);
+
+                    player.draw(g2);
+
+                    if(this.paused){
+                        this.pauseMenu.draw(g2);
+                    }
                 }
 
-                g2.setColor(Color.GREEN);
-                g2.drawString("Score: " + player.score, 5, 10);
-                g2.drawString("Health: " + player.getHealth() ,400, 10);
-
-                player.draw(g2);
-
-                if(this.paused){
-                    this.pauseMenu.draw(g2);
+                if(this.gameState == gameOverState){
+                    this.gameOverMenu.draw(g2);
                 }
-            }
 
-            if(this.gameState == gameOverState){
-                this.gameOverMenu.draw(g2);
+                g2.dispose();
             }
-
-            g2.dispose();
         }
     }
 }

@@ -15,6 +15,7 @@ public class Enemy extends Entity implements Rotate, SpawnPoints{
     public int attackTimer = 150;
     public int attackCooldown = 0;
     private BufferedImage aura;
+    private final Object lock = new Object();
     public Enemy(Game game, int enemyType){
         this.speed = 1;
         this.enemyType = enemyType;
@@ -55,20 +56,21 @@ public class Enemy extends Entity implements Rotate, SpawnPoints{
         this.x -= this.game.player.speed_x_left * 0.5;
         this.y -= this.game.player.speed_y_up * 0.5;
         this.y -= this.game.player.speed_y_down * 0.5;
+        synchronized (lock) {
+            if (this.game.maskCreationThread.getMask(this) != null) {
+                Area newMask = this.game.maskCreationThread.getMask(this);
+                AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
+                directionX = this.game.player.x - (this.x + (double) this.image.getWidth() / 2);
+                directionY = this.game.player.y - (this.y + (double) this.image.getHeight() / 2);
+                double rotationAngleInRadians = Math.atan2(directionY, directionX);
 
-        if (this.game.maskCreationThread.getMask(this) != null) {
-            Area newMask = this.game.maskCreationThread.getMask(this);
-            AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
-            directionX = this.game.player.x - (this.x + (double) this.image.getWidth() / 2);
-            directionY = this.game.player.y - (this.y + (double) this.image.getHeight() / 2);
-            double rotationAngleInRadians = Math.atan2(directionY, directionX);
-
-            at.rotate(rotationAngleInRadians);
-            this.mask.reset();
-            this.mask.add(newMask);
-            this.mask.transform(at);
+                at.rotate(rotationAngleInRadians);
+                this.mask.reset();
+                this.mask.add(newMask);
+                this.mask.transform(at);
+            }
+            this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2.0), (int) (this.y - this.image.getHeight() / 2.0));
         }
-        this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2.0), (int) (this.y - this.image.getHeight() / 2.0));
         this.attackCooldown++;
         if(attackCooldown >= attackTimer){
             attackCooldown = attackTimer;

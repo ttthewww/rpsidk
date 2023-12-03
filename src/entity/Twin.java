@@ -27,6 +27,7 @@ public class Twin extends Enemy implements Sound {
     double originY;
     double directionX;
     double directionY;
+    private final Object lock = new Object();
 
     public Twin(Game game, FrameEnemy frameEnemy) {
         super(game, 4);
@@ -48,22 +49,24 @@ public class Twin extends Enemy implements Sound {
     }
 
     public void update(){
-        shoot();
-        if (this.game.maskCreationThread.getMask(this) != null) {
-            Area newMask = this.game.maskCreationThread.getMask(this);
-            AffineTransform at = AffineTransform.getTranslateInstance(this.originX, this.originY);
+        synchronized (lock) {
+            shoot();
+            if (this.game.maskCreationThread.getMask(this) != null) {
+                Area newMask = this.game.maskCreationThread.getMask(this);
+                AffineTransform at = AffineTransform.getTranslateInstance(this.originX, this.originY);
 
-            if(this.frameEnemy.isShootingTimer < 30){
-                directionX = this.game.player.x - (this.x);
-                directionY = this.game.player.y - (this.y);
+                if(this.frameEnemy.isShootingTimer < 30){
+                    directionX = this.game.player.x - (this.x);
+                    directionY = this.game.player.y - (this.y);
+                }
+
+                double rotationAngleInRadians = Math.atan2(directionY, directionX);
+                at.rotate(rotationAngleInRadians);
+
+                this.mask.reset();
+                this.mask.add(newMask);
+                this.mask.transform(at);
             }
-
-            double rotationAngleInRadians = Math.atan2(directionY, directionX);
-            at.rotate(rotationAngleInRadians);
-
-            this.mask.reset();
-            this.mask.add(newMask);
-            this.mask.transform(at);
         }
     }
 
@@ -79,58 +82,60 @@ public class Twin extends Enemy implements Sound {
     }
 
     public void draw(Graphics2D g2){
-        this.x = -this.game.window.getLocationOnScreen().x + this.frameEnemy.enemyXLocationOnScreen;
-        this.y = -this.game.window.getLocationOnScreen().y + this.frameEnemy.enemyYLocationOnScreen;
+        synchronized (lock) {
+            this.x = -this.game.window.getLocationOnScreen().x + this.frameEnemy.enemyXLocationOnScreen;
+            this.y = -this.game.window.getLocationOnScreen().y + this.frameEnemy.enemyYLocationOnScreen;
 
-        originX = -this.game.window.getLocationOnScreen().x + this.frameEnemy.enemyXLocationOnScreen;
-        originY = -this.game.window.getLocationOnScreen().y + this.frameEnemy.enemyYLocationOnScreen;
+            originX = -this.game.window.getLocationOnScreen().x + this.frameEnemy.enemyXLocationOnScreen;
+            originY = -this.game.window.getLocationOnScreen().y + this.frameEnemy.enemyYLocationOnScreen;
 
-        AffineTransform at = AffineTransform.getTranslateInstance(originX - image.getWidth() / 2.0, originY - image.getHeight() / 2.0);
-        rotate(image, at);
+            AffineTransform at = AffineTransform.getTranslateInstance(originX - image.getWidth() / 2.0, originY - image.getHeight() / 2.0);
+            rotate(image, at);
 
-        g2.setColor(Color.BLUE);
+            g2.setColor(Color.BLUE);
 
-        if (this.isShooting) {
-            if (isShootingTimer < isShootingDuration) {
-                if(isShootingTimer < 30){
-                    playerX = this.game.player.x;
-                    playerY = this.game.player.y;
-                }
-
-                double rise = playerY - originY;
-                double run = playerX - originX;
-
-                this.line = new Line2D.Double(playerX + (run * 10), playerY + (rise * 10), originX, originY);
-                g2.setStroke(new BasicStroke(strokeWidth));
-                isShootingTimer++;
-
-                if(isShootingTimer > 60){
-                    g2.setColor(Color.RED);
-                    strokeWidth = maxStrokeWidth;
-                    if(laserShotSoundCount < 1){
-                        // playSE(4);
-                        // laserShotSoundCount++;
+            if (this.isShooting) {
+                if (isShootingTimer < isShootingDuration) {
+                    if(isShootingTimer < 30){
+                        playerX = this.game.player.x;
+                        playerY = this.game.player.y;
                     }
-                    //setup collision
-                    BasicStroke stroke = new BasicStroke(strokeWidth);
-                    Shape lineShape = stroke.createStrokedShape(line);
-                    Area lineArea = new Area(lineShape);
-                    lineArea.intersect(this.game.player.mask);
-                    if(!lineArea.isEmpty()){
-                        this.game.player.takeDamage();
+
+                    double rise = playerY - originY;
+                    double run = playerX - originX;
+
+                    this.line = new Line2D.Double(playerX + (run * 10), playerY + (rise * 10), originX, originY);
+                    g2.setStroke(new BasicStroke(strokeWidth));
+                    isShootingTimer++;
+
+                    if(isShootingTimer > 60){
+                        g2.setColor(Color.RED);
+                        strokeWidth = maxStrokeWidth;
+                        if(laserShotSoundCount < 1){
+                            // playSE(4);
+                            // laserShotSoundCount++;
+                        }
+                        //setup collision
+                        BasicStroke stroke = new BasicStroke(strokeWidth);
+                        Shape lineShape = stroke.createStrokedShape(line);
+                        Area lineArea = new Area(lineShape);
+                        lineArea.intersect(this.game.player.mask);
+                        if(!lineArea.isEmpty()){
+                            this.game.player.takeDamage();
+                        }
+                    }else{
+                        strokeWidth = minStrokeWidth + ((maxStrokeWidth - minStrokeWidth) * isShootingTimer / isShootingDuration);
                     }
-                }else{
-                    strokeWidth = minStrokeWidth + ((maxStrokeWidth - minStrokeWidth) * isShootingTimer / isShootingDuration);
+                    g2.draw(this.line);
+                } else {
+                    this.isShooting = false;
+                    isShootingTimer = 0;
+                    strokeWidth = minStrokeWidth;
+                    laserShotSoundCount = 0;
                 }
-                g2.draw(this.line);
-            } else {
-                this.isShooting = false;
-                isShootingTimer = 0;
-                strokeWidth = minStrokeWidth;
-                laserShotSoundCount = 0;
             }
+            g2.drawImage(this.image, at, null);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         }
-        g2.drawImage(this.image, at, null);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 };

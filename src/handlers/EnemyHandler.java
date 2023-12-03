@@ -10,6 +10,7 @@ public class EnemyHandler{
     Game game;
     double spawnChance =  0.005;
     CollisionChecker collisionChecker;
+    private final Object lock = new Object();
     Player player;
     public CopyOnWriteArrayList<Enemy> enemies;
     public CopyOnWriteArrayList<Boss> boss;
@@ -24,19 +25,23 @@ public class EnemyHandler{
     }
 
     public void reset(){
-        this.enemies = new CopyOnWriteArrayList<>();
-        if(!boss.isEmpty()){
-            for(Boss b : boss){
-                b.dispose();
+        synchronized (lock) {
+            this.enemies = new CopyOnWriteArrayList<>();
+
+            if (!boss.isEmpty()) {
+                for (Boss b : boss) {
+                    b.dispose();
+                }
             }
+            this.boss = new CopyOnWriteArrayList<>();
         }
-        this.boss = new CopyOnWriteArrayList<>();
     }
 
     public void summonEnemy(){
-        if(boss.isEmpty()) {
-            boss.add(new Twins(game));
-        }
+        synchronized (lock) {
+            if (boss.isEmpty()) {
+                boss.add(new Twins(game));
+            }
 
         // if(Math.random() < spawnChance){
         //     Random rand = new Random();
@@ -45,32 +50,38 @@ public class EnemyHandler{
         //     if(n == 1)enemies.add(new PaperEnemy(game));
         //     if(n == 2)enemies.add(new ScissorEnemy(game));
         // }
+
+        }
     }
 
     public void update(){
-        summonEnemy();
-        for(Enemy e : enemies) {
-            e.update();
-        }
-
-        for(Boss b : boss){
-            if(!((Twins)b).isActive){
-                boss.remove(b);
-                continue;
+        synchronized (lock) {
+            summonEnemy();
+            for (Enemy e : enemies) {
+                e.update();
             }
-            b.update();
-        } 
 
-        collisionChecker.checkCollisions(this.enemies, this.boss, player.bullets);
+            for (Boss b : boss) {
+                if (!((Twins) b).isActive) {
+                    boss.remove(b);
+                    continue;
+                }
+                b.update();
+            }
+            collisionChecker.checkCollisions(this.enemies, this.boss, player.bullets);
+        }
     }
 
     public void draw(Graphics2D g2){
-        for(Enemy e : enemies){
-            e.draw(g2);
-        }
+        // Synchronize the critical section
+        synchronized (lock) {
+            for (Enemy e : enemies) {
+                e.draw(g2);
+            }
 
-        for(Boss b : boss){
-            b.draw(g2);
-        } 
+            for (Boss b : boss) {
+                b.draw(g2);
+            }
+        }
     }
 }
