@@ -69,21 +69,7 @@ public class Player extends Entity implements Rotate{
     }
 
     public void getImage() {
-        try {
-            playerFrames = new BufferedImage[5];
-
-            for (int i = 0; i < 5; i++) {
-                BufferedImage frame = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/player/idle" + (i + 1) + ".png")));
-                if (frame != null) {
-                    playerFrames[i] = frame;
-                } else {
-                    System.err.println("Error loading image for frame " + i);
-                }
-            }
-            this.image = playerFrames[0];
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.image = ImageHandler.playerFrames[0];
     }
 
     public void takeDamage(){
@@ -252,10 +238,9 @@ public class Player extends Entity implements Rotate{
     }
 
     public void draw(Graphics2D g2) {
-        BufferedImage image = playerFrames[0];
-        if (playerFrames != null && playerFrames.length > 0) {
-            int frameIndex = (int) ((System.currentTimeMillis() / 100) % playerFrames.length);
-            image = playerFrames[frameIndex];
+        if (ImageHandler.playerFrames != null && ImageHandler.playerFrames.length > 0) {
+            int frameIndex = (int) ((System.currentTimeMillis() / 100) % ImageHandler.playerFrames.length);
+            image = ImageHandler.playerFrames[frameIndex];
         }
 
         AffineTransform at = AffineTransform.getTranslateInstance(this.x - image.getWidth() / 2.0, this.y - image.getHeight() / 2.0);

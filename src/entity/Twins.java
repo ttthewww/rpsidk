@@ -1,7 +1,5 @@
 package entity;
-
 import java.awt.Graphics2D;
-
 import main.Game;
 
 public class Twins implements Boss{
@@ -26,7 +24,7 @@ public class Twins implements Boss{
         twin1 = new Twin(game, twin1Frame, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
         twin2 = new Twin(game, twin2Frame, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
 
-        this.health = 10;
+        this.health = 1;
     }
 
     public void update(){

@@ -32,5 +32,25 @@ public interface UtilityTool {
         // Return the scaled image.
         return scaledImage;
     }
+
+    public default BufferedImage applyOpacity(BufferedImage image, float opacity) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = result.createGraphics();
+
+        // Apply opacity to each pixel
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                Color color = new Color(image.getRGB(x, y), true);
+                color = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (opacity * color.getAlpha()));
+                result.setRGB(x, y, color.getRGB());
+            }
+        }
+
+        g.dispose();
+        return result;
+    }
 }
 

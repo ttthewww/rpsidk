@@ -1,16 +1,14 @@
 package handlers;
 
-import main.Background;
+import main.UtilityTool;
 
 import javax.imageio.ImageIO;
-import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
 
-public class ImageHandler {
-    public BufferedImage playerImage;
-    public BufferedImage[] playerFrames;
+public class ImageHandler implements UtilityTool{
+    public static BufferedImage[] playerFrames = new BufferedImage[5];
     public static BufferedImage enemyScissorImage;
     public static BufferedImage enemyRockImage;
     public static BufferedImage enemyPaperImage;
@@ -22,36 +20,40 @@ public class ImageHandler {
     public static BufferedImage enemyScissorsAura;
     public static BufferedImage mainMenuBackgroundImage;
 
-    public static BufferedImage background1;
-    public static BufferedImage background2;
-    public static BufferedImage background3;
-    public static BufferedImage background4;
+    public static BufferedImage background;
     public static BufferedImage boss1;
+
+    public static BufferedImage[] orbImages = new BufferedImage[96];
 
     public ImageHandler(){
         try{
-            this.paperBulletImage =  ImageIO.read(getClass().getResourceAsStream("../resource/bullets/paper.png"));
-            this.scissorBulletImage =  ImageIO.read(getClass().getResourceAsStream("../resource/bullets/scissors.png"));
-            this.rockBulletImage =  ImageIO.read(getClass().getResourceAsStream("../resource/bullets/rock.png"));
+            for (int i = 0; i < playerFrames.length; i++) {
+                playerFrames[i]= ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/player/idle" + (i + 1) + ".png")));
+            }
 
-            this.enemyRockImage =  ImageIO.read(getClass().getResourceAsStream("../resource/enemies/rock.png"));
-            this.enemyPaperImage =  ImageIO.read(getClass().getResourceAsStream("../resource/enemies/paper.png"));
-            this.enemyScissorImage =  ImageIO.read(getClass().getResourceAsStream("../resource/enemies/scissors.png"));
+            paperBulletImage =  ImageIO.read(getClass().getResourceAsStream("../resource/bullets/paper.png"));
+            scissorBulletImage =  ImageIO.read(getClass().getResourceAsStream("../resource/bullets/scissors.png"));
+            rockBulletImage =  ImageIO.read(getClass().getResourceAsStream("../resource/bullets/rock.png"));
 
-            this.enemyRockAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/rockaura.png")));
-            this.enemyPaperAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/paperaura.png")));
-            this.enemyScissorsAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/scissorsaura.png")));
+            enemyRockImage =  ImageIO.read(getClass().getResourceAsStream("../resource/enemies/rock.png"));
+            enemyPaperImage =  ImageIO.read(getClass().getResourceAsStream("../resource/enemies/paper.png"));
+            enemyScissorImage =  ImageIO.read(getClass().getResourceAsStream("../resource/enemies/scissors.png"));
 
-            this.mainMenuBackgroundImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac1.png")));
+            enemyRockAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/rockaura.png")));
+            enemyPaperAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/paperaura.png")));
+            enemyScissorsAura = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/scissorsaura.png")));
 
-            /** BACKGROUND TO DO **/
-            this.background1 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/Background.png")));
-            this.background2 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/Background.png")));
-            this.background3 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/Background.png")));
-            this.background4 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/Background.png")));
-            /** BACKGROUND TO DO **/
-            this.boss1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/boss1.png")));
+            mainMenuBackgroundImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/bac1.png")));
+
+            background =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/Background.png")));
+            boss1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/boss1.png")));
             
+            for (int i = 0; i < orbImages.length; i++) {
+                orbImages[i] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/orbBuff/" + (i + 1) + ".png")));
+            }
+
+            
+
         }catch(IOException e){
             e.printStackTrace();
         }

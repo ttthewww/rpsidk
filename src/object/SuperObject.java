@@ -1,6 +1,5 @@
 package object;
 
-import entity.Entity;
 import main.Game;
 
 import java.awt.*;
@@ -20,29 +19,36 @@ public abstract class SuperObject implements CloneableImageObject{
     private int currentFrame = 0;
     private long lastFrameTime = 0;
     private final Object imagesLock = new Object();
+    Game game;
+
+    public SuperObject(Game game) {
+        this.game = game;
+    }
+
     public void draw(Graphics2D g2) {
         try {
             draw(g2, null);
         } catch (Exception e) {
-            // Handle the exception
             e.printStackTrace(); // or log the exception
         }
     }
-    public void draw(Graphics2D g2, Game gp) {
+
+    public void draw(Graphics2D g2, Game game) {
         try {
-            if (gp == null) {
+            if (game == null) {
             } else {
-//                double screenX = worldX - gp.player.x + gp.player.xLocationOnScreen;
-//                double screenY = worldY - gp.player.y + gp.player.yLocationOnScreen;
+//                double screenX = worldX - game.player.x + gp.player.xLocationOnScreen;
+//                double screenY = worldY - game.player.y + gp.player.yLocationOnScreen;
                 // Use synchronized block to ensure atomic access to the images array
-                synchronized (imagesLock) {
-                    g2.drawImage(getImages()[currentFrame], worldX, worldY, null);
-                }
+                g2.setColor(Color.RED);
+
+                g2.drawImage(getImages()[currentFrame],worldX,worldY, null);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     public void updateAnimation() {
         long currentTime = System.currentTimeMillis();
         if(images.length == 4) /** NOOB MANIPULATION, TO BE REVISED **/
@@ -79,5 +85,4 @@ public abstract class SuperObject implements CloneableImageObject{
             throw new InternalError(e);
         }
     }
-
 }

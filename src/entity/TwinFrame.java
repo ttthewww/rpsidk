@@ -9,6 +9,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
+
 
 public class TwinFrame extends EnemyFrame implements Rotate{
     public boolean isShooting;
@@ -61,9 +64,16 @@ public class TwinFrame extends EnemyFrame implements Rotate{
         this.window.setFocusTraversalKeysEnabled(false);
         this.window.setFocusableWindowState(false);
         this.window.setResizable(false);
-        this.window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.window.setDefaultCloseOperation(0);
         this.window.add(this);
         this.window.setVisible(true);
+
+        this.window.addWindowStateListener(new WindowStateListener() {
+            @Override
+            public void windowStateChanged(WindowEvent e) {
+                window.setExtendedState(Frame.NORMAL);
+            }
+        });
     }
 
     public Point setValidSpawnPoint(){
@@ -157,7 +167,7 @@ public class TwinFrame extends EnemyFrame implements Rotate{
     public void update(){
         this.enemyXLocationOnScreen = this.enemyX + this.window.getLocationOnScreen().x;
         this.enemyYLocationOnScreen = this.enemyY + this.window.getLocationOnScreen().y;
-        // move();
+        move();
     }
 
     public void paintComponent(Graphics g){
