@@ -12,14 +12,16 @@ import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 
 public class Twin extends Enemy implements Sound {
-    FrameEnemy frameEnemy;
+    TwinFrame enemyFrame;
     public boolean isShooting;
-    private int isShootingDuration = 100;
-    private int isShootingTimer = 0;
-    private int maxStrokeWidth = 20;
-    private int minStrokeWidth = 1;
+
+    private int isShootingDuration;
+    private int isShootingTimer;
+    private int maxStrokeWidth;
+    private int minStrokeWidth;
+    private int strokeWidth;
+
     private int laserShotSoundCount = 0;
-    private int strokeWidth = minStrokeWidth;
     Line2D line;
     public double playerX;
     public double playerY;
@@ -29,9 +31,15 @@ public class Twin extends Enemy implements Sound {
     double directionY;
     private final Object lock = new Object();
 
-    public Twin(Game game, FrameEnemy frameEnemy) {
+    public Twin(Game game, TwinFrame enemyFrame, int isShootingDuration, int isShootingTimer, int maxStrokeWidth, int minStrokeWidth) {
         super(game, 4);
-        this.frameEnemy = frameEnemy;
+        this.enemyFrame = enemyFrame;
+
+        this.isShootingDuration = isShootingDuration;
+        this.isShootingTimer = isShootingTimer;
+        this.maxStrokeWidth = maxStrokeWidth;
+        this.minStrokeWidth = minStrokeWidth;
+        this.strokeWidth = this.minStrokeWidth;
     }
 
     public void getImage(){
@@ -43,7 +51,7 @@ public class Twin extends Enemy implements Sound {
         if(FPS.timer > 950000000 && !isShooting){
             if(Math.random() < 0.2){
                 this.isShooting = true;
-                this.frameEnemy.isShooting = true;
+                this.enemyFrame.isShooting = true;
             }
         }
     }
@@ -55,7 +63,7 @@ public class Twin extends Enemy implements Sound {
                 Area newMask = this.game.maskCreationThread.getMask(this);
                 AffineTransform at = AffineTransform.getTranslateInstance(this.originX, this.originY);
 
-                if(this.frameEnemy.isShootingTimer < 30){
+                if(this.isShootingTimer < 30){
                     directionX = this.game.player.x - (this.x);
                     directionY = this.game.player.y - (this.y);
                 }
@@ -72,7 +80,7 @@ public class Twin extends Enemy implements Sound {
 
 
     public void rotate(BufferedImage image, AffineTransform at){
-        if(this.frameEnemy.isShootingTimer < 30){
+        if(this.isShootingTimer < 30){
             directionX = this.game.player.x - (this.x);
             directionY = this.game.player.y - (this.y);
         }
@@ -83,11 +91,11 @@ public class Twin extends Enemy implements Sound {
 
     public void draw(Graphics2D g2){
         synchronized (lock) {
-            this.x = -this.game.window.getLocationOnScreen().x + this.frameEnemy.enemyXLocationOnScreen;
-            this.y = -this.game.window.getLocationOnScreen().y + this.frameEnemy.enemyYLocationOnScreen;
+            this.x = -this.game.window.getLocationOnScreen().x + this.enemyFrame.enemyXLocationOnScreen;
+            this.y = -this.game.window.getLocationOnScreen().y + this.enemyFrame.enemyYLocationOnScreen;
 
-            originX = -this.game.window.getLocationOnScreen().x + this.frameEnemy.enemyXLocationOnScreen;
-            originY = -this.game.window.getLocationOnScreen().y + this.frameEnemy.enemyYLocationOnScreen;
+            originX = -this.game.window.getLocationOnScreen().x + this.enemyFrame.enemyXLocationOnScreen;
+            originY = -this.game.window.getLocationOnScreen().y + this.enemyFrame.enemyYLocationOnScreen;
 
             AffineTransform at = AffineTransform.getTranslateInstance(originX - image.getWidth() / 2.0, originY - image.getHeight() / 2.0);
             rotate(image, at);

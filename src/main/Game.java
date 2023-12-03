@@ -31,7 +31,7 @@ public class Game extends JPanel implements Runnable, Sound{
 
     // GameState variables
     public int mainMenuState = 0, mainGameState = 1, gameOverState = 2;
-    public int gameState = mainGameState;
+    public int gameState = mainMenuState;
     public boolean paused;
     public MainMenu mainMenu;
     public PauseMenu pauseMenu;
@@ -42,8 +42,6 @@ public class Game extends JPanel implements Runnable, Sound{
     ObjectDrawerThread objectDrawerThread = new ObjectDrawerThread(this);
     AssetSetter  assetSetter;
     public Graphics2D g2;
-    private ExecutorService executorService = Executors.newFixedThreadPool(1);
-    private final Object lock = new Object();
     public Game(){
         setWindowDefaults();
         this.setBackground(Color.black); /** BACKGROUND TO DO **/
@@ -130,13 +128,10 @@ public class Game extends JPanel implements Runnable, Sound{
                     fps.delta--;
                     fps.drawCount++;
                 }
-
-
         }
     }
 
     public void update(){
-        synchronized (lock) {
             if(this.gameState == this.mainMenuState){
                 this.enemyHandler.reset();
             }
@@ -161,11 +156,9 @@ public class Game extends JPanel implements Runnable, Sound{
                     enemyHandler.update();
                 }
             }
-        }
     }
 
     protected void paintComponent(Graphics g){
-        synchronized (lock) {
             if(this.gameThread != null){
                 super.paintComponent(g);
                 this.g2 = (Graphics2D)g;
@@ -204,5 +197,4 @@ public class Game extends JPanel implements Runnable, Sound{
                 g2.dispose();
             }
         }
-    }
 }

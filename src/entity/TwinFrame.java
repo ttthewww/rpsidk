@@ -10,48 +10,35 @@ import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-public class FrameEnemy extends JPanel implements Rotate{
-    public JFrame window;
-    public int windowPosX, windowPosY;
-    public int enemyX, enemyY;
-    public int enemyXLocationOnScreen, enemyYLocationOnScreen;
-    public FPS fps = new FPS();
-    public Thread frameEnemyThread;
-    Game game;
-    BufferedImage image;
-    private int windowWidth = 200;
-    private int windowHeight = 200;
-
+public class TwinFrame extends EnemyFrame implements Rotate{
     public boolean isShooting;
-    public int isShootingDuration = 100;
-    public int isShootingTimer = 0;
-    private int maxStrokeWidth = 20;
-    private int minStrokeWidth = 1;
-    private int strokeWidth = minStrokeWidth;
+    private int isShootingDuration;
+    private int isShootingTimer;
+    private int maxStrokeWidth;
+    private int minStrokeWidth;
+    private int strokeWidth;
 
-    private int playerX;
-    private int playerY;
-    public Point destination;
-    public int speed = 2;
-    double directionX;
-    double directionY;
+    private double directionX;
+    private double directionY;
+
     Line2D line;
-    public boolean isRunning = true;
-    Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
     Point mainWindowPos;
 
-    public FrameEnemy(Game game){
-        getImage();
-        this.game = game;
-        setWindowDefaults();
+    public TwinFrame(Game game, int isShootingDuration, int isShootingTimer, int maxStrokeWidth, int minStrokeWidth){
+        super(game, 200, 200);
+
         /** BACKGROUND TO DO **/
         this.setBackground(Color.black);
-        this.setDoubleBuffered(true);
-        this.setSize(window.getWidth(), window.getHeight());
-        this.setFocusTraversalKeysEnabled(false);
+
         this.enemyX = this.window.getWidth() / 2;
         this.enemyY = this.window.getHeight() / 2;
+
+        this.isShootingDuration = isShootingDuration;
+        this.isShootingTimer = isShootingTimer;
+        this.maxStrokeWidth = maxStrokeWidth;
+        this.minStrokeWidth = minStrokeWidth;
+        this.strokeWidth = this.minStrokeWidth;
         this.mainWindowPos = this.game.getLocationOnScreen();
     }
 
@@ -79,7 +66,7 @@ public class FrameEnemy extends JPanel implements Rotate{
         this.window.setVisible(true);
     }
 
-    private Point setValidSpawnPoint(){
+    public Point setValidSpawnPoint(){
         Random random = new Random();
         int posX;
         int posY;
@@ -176,7 +163,7 @@ public class FrameEnemy extends JPanel implements Rotate{
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
-        
+
         this.enemyX = this.getWidth() / 2;
         this.enemyY = this.getHeight() / 2;
 

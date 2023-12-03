@@ -4,13 +4,13 @@ import entity.*;
 import main.Game;
 
 import java.awt.*;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EnemyHandler{
     Game game;
     double spawnChance =  0.005;
     CollisionChecker collisionChecker;
-    private final Object lock = new Object();
     Player player;
     public CopyOnWriteArrayList<Enemy> enemies;
     public CopyOnWriteArrayList<Boss> boss;
@@ -25,7 +25,6 @@ public class EnemyHandler{
     }
 
     public void reset(){
-        synchronized (lock) {
             this.enemies = new CopyOnWriteArrayList<>();
 
             if (!boss.isEmpty()) {
@@ -34,28 +33,23 @@ public class EnemyHandler{
                 }
             }
             this.boss = new CopyOnWriteArrayList<>();
-        }
     }
 
     public void summonEnemy(){
-        synchronized (lock) {
             if (boss.isEmpty()) {
                 boss.add(new Twins(game));
             }
 
-        // if(Math.random() < spawnChance){
-        //     Random rand = new Random();
-        //     int n = rand.nextInt(3);
-        //     if(n == 0)enemies.add(new RockEnemy(game));
-        //     if(n == 1)enemies.add(new PaperEnemy(game));
-        //     if(n == 2)enemies.add(new ScissorEnemy(game));
-        // }
-
-        }
+            if(Math.random() < spawnChance){
+                Random rand = new Random();
+                int n = rand.nextInt(3);
+                if(n == 0)enemies.add(new RockEnemy(game));
+                if(n == 1)enemies.add(new PaperEnemy(game));
+                if(n == 2)enemies.add(new ScissorEnemy(game));
+            }
     }
 
     public void update(){
-        synchronized (lock) {
             summonEnemy();
             for (Enemy e : enemies) {
                 e.update();
@@ -69,12 +63,9 @@ public class EnemyHandler{
                 b.update();
             }
             collisionChecker.checkCollisions(this.enemies, this.boss, player.bullets);
-        }
     }
 
     public void draw(Graphics2D g2){
-        // Synchronize the critical section
-        synchronized (lock) {
             for (Enemy e : enemies) {
                 e.draw(g2);
             }
@@ -82,6 +73,5 @@ public class EnemyHandler{
             for (Boss b : boss) {
                 b.draw(g2);
             }
-        }
     }
 }

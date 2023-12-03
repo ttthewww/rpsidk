@@ -8,16 +8,24 @@ public class Twins implements Boss{
     public Twin twin1;
     public Twin twin2;
 
-    private FrameEnemy twin1Frame;
-    private FrameEnemy twin2Frame;
-    private int health;
+    private TwinFrame twin1Frame;
+    private TwinFrame twin2Frame;
     public boolean isActive = true;
-    public Twins(Game game){
-        twin1Frame = new FrameEnemy(game);
-        twin2Frame = new FrameEnemy(game);
 
-        twin1 = new Twin(game, twin1Frame);
-        twin2 = new Twin(game, twin2Frame);
+    private int health;
+    
+    private int isShootingDuration = 100;
+    private int isShootingTimer = 0;
+    private int maxStrokeWidth = 20;
+    private int minStrokeWidth = 1;
+
+    public Twins(Game game){
+        twin1Frame = new TwinFrame(game, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
+        twin2Frame = new TwinFrame(game, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
+
+        twin1 = new Twin(game, twin1Frame, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
+        twin2 = new Twin(game, twin2Frame, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
+
         this.health = 10;
     }
 
@@ -28,10 +36,9 @@ public class Twins implements Boss{
         twin1.update();
         twin2.update();
 
-        if(health <= 0){
+        if(this.health <= 0){
             this.isActive = false;
-            twin1Frame.window.dispose();
-            twin2Frame.window.dispose();
+            dispose();
         }
     }
 

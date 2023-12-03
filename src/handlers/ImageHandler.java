@@ -51,7 +51,7 @@ public class ImageHandler {
             this.background4 =  ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/background/Background.png")));
             /** BACKGROUND TO DO **/
             this.boss1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/enemies/boss1.png")));
-
+            
         }catch(IOException e){
             e.printStackTrace();
         }
