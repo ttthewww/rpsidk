@@ -37,6 +37,7 @@ public class Twins implements Boss{
         if(this.health <= 0){
             this.isActive = false;
             dispose();
+            return;
         }
     }
 

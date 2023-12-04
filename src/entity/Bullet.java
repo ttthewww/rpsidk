@@ -34,9 +34,6 @@ public class Bullet extends Entity{
         this.dy = Math.sin(angle) * this.speed;
 
         this.isActive = true;
-        this.colRect = mask.getBounds();
-        this.colRect.x = (int) (this.x - this.image.getWidth() / 2.0);
-        this.colRect.y = (int) (this.y - this.image.getHeight() / 2.0);
     }
 
     public void getImage(){
@@ -75,7 +72,6 @@ public class Bullet extends Entity{
         this.mask.reset();
         this.mask.add(newMask);
         this.mask.transform(at);
-        this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2.0), (int) (this.y - this.image.getHeight() / 2.0));
     }
 
 

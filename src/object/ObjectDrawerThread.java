@@ -1,9 +1,11 @@
 package object;
 
+import java.awt.Graphics2D;
+
+import javax.swing.SwingUtilities;
+
 import main.Game;
 
-import javax.swing.*;
-import java.awt.*;
 
 public class ObjectDrawerThread extends Thread {
     private static final int UPDATE_INTERVAL_MS = 10;

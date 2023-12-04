@@ -24,8 +24,6 @@ public class Enemy extends Entity implements Rotate, SpawnPoints{
         this.x = spawn.x;
         this.y = spawn.y;
         getImage();
-
-        this.colRect = this.mask.getBounds();
     }
 
     public void getImage(){
@@ -69,7 +67,6 @@ public class Enemy extends Entity implements Rotate, SpawnPoints{
                 this.mask.add(newMask);
                 this.mask.transform(at);
             }
-            this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2.0), (int) (this.y - this.image.getHeight() / 2.0));
         }
         this.attackCooldown++;
         if(attackCooldown >= attackTimer){
@@ -96,7 +93,6 @@ public class Enemy extends Entity implements Rotate, SpawnPoints{
         g2.drawImage(this.image, at, null);
 
         // g2.draw(this.mask);
-//        g2.draw(this.colRect);
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }

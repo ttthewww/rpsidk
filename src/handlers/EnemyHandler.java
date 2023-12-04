@@ -37,7 +37,7 @@ public class EnemyHandler{
     public void summonEnemy(){
         if (boss.isEmpty()) {
             boss.add(new Twins(game));
-            boss.add(new Snake(game));
+            // boss.add(new Snake(game));
         }
 
         if(Math.random() < spawnChance){

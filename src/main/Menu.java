@@ -1,7 +1,10 @@
 package main;
 
 import handlers.MouseHandler;
-import java.awt.*;
+
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.util.ArrayList;
 
 public abstract class Menu {

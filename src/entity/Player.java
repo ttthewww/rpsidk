@@ -3,18 +3,17 @@ package entity;
 import handlers.ImageHandler;
 import handlers.KeyHandler;
 import handlers.MouseHandler;
-import main.*;
+import main.Game;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
@@ -59,7 +58,7 @@ public class Player extends Entity implements Rotate{
         this.mask = new Area(this.game.maskCreationThread.addMask(this));
         this.x = this.game.window.getWidth() / 2;
         this.y = this.game.window.getHeight() / 2;
-        this.health = 99999;
+        this.health = 999;
         this.score = 0;
     }
 

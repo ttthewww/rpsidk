@@ -1,12 +1,27 @@
 package main;
 
-import entity.*;
-import handlers.*;
 import object.ObjectDrawerThread;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.MouseInfo;
+import java.awt.Toolkit;
 import java.time.LocalDate;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import entity.Bullet;
+import entity.Player;
+import handlers.EnemyHandler;
+import handlers.ImageHandler;
+import handlers.KeyHandler;
+import handlers.MaskHandler;
+import handlers.MouseHandler;
+import handlers.MouseMotionHandler;
+import handlers.Sound;
 
 public class Game extends JPanel implements Runnable, Sound{
     public JFrame window;
@@ -41,7 +56,6 @@ public class Game extends JPanel implements Runnable, Sound{
     public Graphics2D g2;
     public Game(){
         setWindowDefaults();
-        this.setBackground(Color.black); /** BACKGROUND TO DO **/
         this.setDoubleBuffered(true);
         this.setFocusable(true);
         this.setSize(this.window.getWidth(), this.window.getHeight());
