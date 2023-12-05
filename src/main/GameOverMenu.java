@@ -66,7 +66,7 @@ public class GameOverMenu extends Menu{
         int[] menuItemsOffest = {100, 135, 200, 275, 350, 425};
 
         for(int i = 0; i < menuItems.length; i++){
-            Point point = getCenteredTextPoint(g2, menuItems[i], menuItemsOffest[i]);
+            Point point = getCenteredTextPoint(this.game, g2, menuItems[i], menuItemsOffest[i]);
             g2.drawString(menuItems[i], point.x, point.y);
             points.add(point);
         }

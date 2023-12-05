@@ -19,11 +19,11 @@ public class Test extends JFrame {
 
         setUndecorated(true);
         setBackground(new Color(0, 0, 0, 0));
-        panel.setOpaque(false);
+        // panel.setOpaque(false);
         panel.setPreferredSize(new Dimension(500, 500));
 
         add(panel);
-        pack();
+        // pack();
         setVisible(true);
     }
 
@@ -58,13 +58,12 @@ public class Test extends JFrame {
 
     public static void main(String[] args) {
         Test window = new Test();
-        window.setLocation(0, 0); // Set the frame location to (0, 0)
+        window.setLocation(100, 0); // Set the frame location to (0, 0)
         boolean start = true;
 
         int x =0;
         int y = 0;
         while(start){
-            x++;
             window.setLocation(x, y);
         }
     }

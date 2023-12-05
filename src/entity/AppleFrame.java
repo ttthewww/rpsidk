@@ -9,11 +9,11 @@ import javax.swing.ImageIcon;
 
 import handlers.ImageHandler;
 
-public class AppleFrame extends EnemyFrame{
+public class AppleFrame extends EntityWindow{
     BufferedImage image;
 
     public AppleFrame (Game game, int frameWidth, int frameHeight) {
-        super(game, frameWidth, frameHeight);
+        super(game, frameWidth, frameHeight, 0);
         this.image = ImageHandler.apple;
     }
 
@@ -28,21 +28,6 @@ public class AppleFrame extends EnemyFrame{
         this.window.setVisible(false);
         ImageIcon img = new ImageIcon("src/resource/snek.png");
         window.setIconImage(img.getImage());
-    }
-
-    @Override
-    public void getNewDestination() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void rotate(BufferedImage image, AffineTransform at) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void move() {
-        // TODO Auto-generated method stub
     }
 
     @Override

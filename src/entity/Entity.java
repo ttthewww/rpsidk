@@ -16,4 +16,5 @@ public abstract class Entity {
     public Area mask;
     public abstract void getImage();
     public abstract void draw(Graphics2D g2);
+    public abstract void update();
 }

@@ -56,19 +56,19 @@ public class  PauseMenu extends Menu{
     public void draw(Graphics2D g2){
         ArrayList<Point> points = new ArrayList<>();
         g2.setColor(new Color(0, 0, 0, 0.7F));
-        g2.fillRect(0, 0, game.getWidth(), game.getHeight());
+        g2.fillRect(0, 0, game.window.getWidth(), game.window.getHeight());
 
         g2.setFont(g2.getFont().deriveFont(Font.BOLD, 28F));
         g2.setColor(Color.GREEN);
 
-        Point titlePoint = getCenteredTextPoint(g2, "Paused", 100);
+        Point titlePoint = getCenteredTextPoint(this.game, g2, "Paused", 100);
         g2.drawString("PAUSED", titlePoint.x, titlePoint.y);
 
         String[] menuItems = {"Main Menu", "Resume", "Quit"};
         int[] menuItemsOffset = {200, 250, 300};
 
         for(int i = 0; i < menuItems.length; i++){
-            Point point = getCenteredTextPoint(g2, menuItems[i], menuItemsOffset[i]);
+            Point point = getCenteredTextPoint(this.game, g2, menuItems[i], menuItemsOffset[i]);
             g2.drawString(menuItems[i], point.x, point.y);
             points.add(point);
         }

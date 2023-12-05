@@ -1,11 +1,14 @@
 package entity;
 
 import handlers.ImageHandler;
-import main.*;
+import main.Game;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
 public class Enemy extends Entity implements Rotate, SpawnPoints{
@@ -15,12 +18,11 @@ public class Enemy extends Entity implements Rotate, SpawnPoints{
     public int attackTimer = 150;
     public int attackCooldown = 0;
     private BufferedImage aura;
-    private final Object lock = new Object();
     public Enemy(Game game, int enemyType){
         this.speed = 1;
         this.enemyType = enemyType;
         this.game = game;
-        Point spawn = validSpawnPoint(game);
+        Point2D.Double spawn = validSpawnPoint(game);
         this.x = spawn.x;
         this.y = spawn.y;
         getImage();
@@ -37,7 +39,7 @@ public class Enemy extends Entity implements Rotate, SpawnPoints{
             this.image = ImageHandler.enemyScissorImage;
             this.aura = ImageHandler.enemyScissorsAura;
         }
-        this.mask = new Area(this.game.maskCreationThread.addMask(this));
+        this.mask = new Area(this.game.maskHandler.addMask(this));
     }
     public void update() {
         double directionX = this.game.player.x - ((this.x));
@@ -54,19 +56,17 @@ public class Enemy extends Entity implements Rotate, SpawnPoints{
         this.x -= this.game.player.speed_x_left * 0.5;
         this.y -= this.game.player.speed_y_up * 0.5;
         this.y -= this.game.player.speed_y_down * 0.5;
-        synchronized (lock) {
-            if (this.game.maskCreationThread.getMask(this) != null) {
-                Area newMask = this.game.maskCreationThread.getMask(this);
-                AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
-                directionX = this.game.player.x - (this.x + (double) this.image.getWidth() / 2);
-                directionY = this.game.player.y - (this.y + (double) this.image.getHeight() / 2);
-                double rotationAngleInRadians = Math.atan2(directionY, directionX);
+        if (this.game.maskHandler.getMask(this) != null) {
+            Area newMask = this.game.maskHandler.getMask(this);
+            AffineTransform at = AffineTransform.getTranslateInstance(this.x, this.y);
+            directionX = this.game.player.x - (this.x + (double) this.image.getWidth() / 2);
+            directionY = this.game.player.y - (this.y + (double) this.image.getHeight() / 2);
+            double rotationAngleInRadians = Math.atan2(directionY, directionX);
 
-                at.rotate(rotationAngleInRadians);
-                this.mask.reset();
-                this.mask.add(newMask);
-                this.mask.transform(at);
-            }
+            at.rotate(rotationAngleInRadians);
+            this.mask.reset();
+            this.mask.add(newMask);
+            this.mask.transform(at);
         }
         this.attackCooldown++;
         if(attackCooldown >= attackTimer){

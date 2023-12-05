@@ -4,13 +4,12 @@ import javax.swing.*;
 
 import main.Game;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.Frame;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 
-public abstract class EnemyFrame extends JPanel {
+public abstract class EntityWindow extends JPanel {
     public Game game;
     public JFrame window;
 
@@ -31,27 +30,36 @@ public abstract class EnemyFrame extends JPanel {
 
     public int speed = 2;
 
-    public EnemyFrame(Game game, int windowWidth, int windowHeight) {
+    public EntityWindow(Game game, int windowWidth, int windowHeight, int state) {
         getImage();
         this.game = game;
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
 
         setWindowDefaults();
+
+        if(state == 1){
+            this.window.setUndecorated(true);
+            this.window.setBackground(new Color(0, 0, 0, 0));
+            this.setPreferredSize(new Dimension(windowWidth, windowHeight));
+            this.window.pack();
+            this.setOpaque(false);
+        }
+
         this.setDoubleBuffered(true);
         this.setSize(window.getWidth(), window.getHeight());
         this.setFocusTraversalKeysEnabled(false);
         this.window.setVisible(true);
     }
 
-
-    public EnemyFrame(Game game, int windowWidth, int windowHeight, boolean isVisible){
+    public EntityWindow(Game game, int windowWidth, int windowHeight, boolean isVisible){
         this.game = game;
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
 
         setWindowDefaults();
         this.setDoubleBuffered(true);
+
         this.setSize(window.getWidth(), window.getHeight());
         this.setFocusTraversalKeysEnabled(false);
         if(isVisible){
@@ -59,20 +67,17 @@ public abstract class EnemyFrame extends JPanel {
         }
     }
 
-    public abstract void getImage();
-
     public void setWindowDefaults(){
         this.window = new JFrame();
-        this.window.setSize(windowWidth, windowHeight);
 
+        this.window.setSize(windowWidth, windowHeight);
         this.window.setFocusTraversalKeysEnabled(false);
         this.window.setFocusableWindowState(false);
+
         this.window.setResizable(false);
         this.window.setDefaultCloseOperation(0);
         this.window.add(this);
-
-        this.setSize(this.window.getWidth(), this.window.getHeight());
-
+        
         this.window.addWindowStateListener(new WindowStateListener() {
             @Override
             public void windowStateChanged(WindowEvent e) {
@@ -81,11 +86,7 @@ public abstract class EnemyFrame extends JPanel {
         }); 
     }
 
-    public abstract void getNewDestination();
-
-    public abstract void rotate(BufferedImage image, AffineTransform at);
-
-    public abstract void move();
+    public abstract void getImage();
 
     public abstract void update();
 

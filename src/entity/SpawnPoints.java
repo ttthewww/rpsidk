@@ -2,28 +2,26 @@ package entity;
 
 import main.Game;
 
-import java.awt.*;
+import java.awt.geom.Point2D;
 
 public interface SpawnPoints {
-    public default Point validSpawnPoint(Game gp) {
-        int maxAttempts = 100;
-        int x;
-        int y;
-        for (int attempt = 0; attempt < maxAttempts; attempt++) {
-            if (Math.random() < 0.5) {
-                x = (int) (Math.random() * -200);
-            } else {
-                x = (int) (Math.random() * gp.getWidth() + 200) + gp.getWidth();
-            }
 
-            if (Math.random() < 0.5) {
-                y = (int) (Math.random() * gp.getHeight() - 200);
-            } else {
-                y = (int) (Math.random() * gp.getHeight() + 200) + gp.getHeight();
-            }
+    public default Point2D.Double validSpawnPoint(Game gp) {
+        double x;
+        double y;
 
-            return new Point(x, y);
+        if (Math.random() < 0.5) {
+            x = (Math.random() * 201) - 200;
+        } else {
+            x = (Math.random() * 201) + gp.getWidth();
         }
-        return null;
+
+        if (Math.random() < 0.5) {
+            y = (Math.random() * 201) - 200;
+        } else {
+            y = (Math.random() * 201) + gp.getHeight();
+        }
+        Point2D.Double spawn = new Point2D.Double(x, y);
+        return spawn;
     }
 }

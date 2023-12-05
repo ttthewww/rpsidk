@@ -18,18 +18,18 @@ public class Twins implements Boss{
     private int minStrokeWidth = 1;
 
     public Twins(Game game){
-        twin1Frame = new TwinFrame(game, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
-        twin2Frame = new TwinFrame(game, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
+        // twin1Frame = new TwinFrame(game, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
+        // twin2Frame = new TwinFrame(game, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
 
-        twin1 = new Twin(game, twin1Frame, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
-        twin2 = new Twin(game, twin2Frame, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
+        twin1 = new Twin(game, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
+        twin2 = new Twin(game, isShootingDuration, isShootingTimer, maxStrokeWidth, minStrokeWidth);
 
         this.health = 10;
     }
 
     public void update(){
-        twin1Frame.update();
-        twin2Frame.update();
+        // twin1Frame.update();
+        // twin2Frame.update();
 
         twin1.update();
         twin2.update();
@@ -47,8 +47,8 @@ public class Twins implements Boss{
     }
 
     public void draw(Graphics2D g2){
-        twin1Frame.repaint();
-        twin2Frame.repaint();
+        // twin1Frame.repaint();
+        // twin2Frame.repaint();
     
         twin1.draw(g2);
         twin2.draw(g2);

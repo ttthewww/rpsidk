@@ -7,11 +7,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 
-public class SnakeHeadFrame extends EnemyFrame{
+public class SnakeHeadFrame extends EntityWindow{
     private int xHeadPoly[] = {};
     private int yHeadPoly[] = {};
 
@@ -20,7 +18,7 @@ public class SnakeHeadFrame extends EnemyFrame{
     char direction = 'R';
 
     public SnakeHeadFrame(Game game, int UNIT_SIZE) {
-        super(game, UNIT_SIZE, UNIT_SIZE);
+        super(game, UNIT_SIZE, UNIT_SIZE, 0);
         this.polygon = new Polygon(xHeadPoly, yHeadPoly, xHeadPoly.length);
     }
 
@@ -37,25 +35,9 @@ public class SnakeHeadFrame extends EnemyFrame{
     }
 
     @Override
-    public void getNewDestination() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void rotate(BufferedImage image, AffineTransform at) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void move() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     public void update() {
         // TODO Auto-generated method stub
     }
-
 
     public void updateDirection(char direction) {
         switch (direction) {

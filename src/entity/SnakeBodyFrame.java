@@ -11,7 +11,7 @@ import javax.swing.ImageIcon;
 
 import main.Game;
 
-public class SnakeBodyFrame extends EnemyFrame{
+public class SnakeBodyFrame extends EntityWindow{
     private int xHeadPoly[] = {};
     private int yHeadPoly[] = {};
     private int number;
@@ -33,21 +33,6 @@ public class SnakeBodyFrame extends EnemyFrame{
         super.setWindowDefaults();
         ImageIcon img = new ImageIcon("src/resource/snek.png");
         window.setIconImage(img.getImage());
-    }
-
-    @Override
-    public void getNewDestination() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void rotate(BufferedImage image, AffineTransform at) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void move() {
-        // TODO Auto-generated method stub
     }
 
     @Override

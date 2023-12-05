@@ -17,8 +17,7 @@ import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-
-public class TwinFrame extends EnemyFrame implements Rotate{
+public class TwinFrame extends EntityWindow implements Rotate{
     public boolean isShooting;
     private int isShootingDuration;
     private int isShootingTimer;
@@ -34,7 +33,7 @@ public class TwinFrame extends EnemyFrame implements Rotate{
     Point mainWindowPos;
 
     public TwinFrame(Game game, int isShootingDuration, int isShootingTimer, int maxStrokeWidth, int minStrokeWidth){
-        super(game, 200, 200);
+        super(game, 200, 200, 0);
 
         /** BACKGROUND TO DO **/
         this.setBackground(Color.black);

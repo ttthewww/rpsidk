@@ -3,8 +3,7 @@ package entity;
 import main.Game;
 
 public class PlayerBullet extends Bullet{
-    public PlayerBullet(Game game, double angle, int bulletType){
-        super(game, angle);
-        this.bulletType = bulletType;
+    public PlayerBullet(Game game, double x, double y, double angle){
+        super(game, x, y, angle);
     }
 }

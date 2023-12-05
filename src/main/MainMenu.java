@@ -1,12 +1,10 @@
 package main;
 
-import handlers.ImageHandler;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class MainMenu extends Menu{
@@ -77,24 +75,22 @@ public class MainMenu extends Menu{
 
     public void draw(Graphics2D g2) {
         ArrayList<Point> points = new ArrayList<>();
-        BufferedImage backgroundImage = ImageHandler.mainMenuBackgroundImage;
-        g2.drawImage(backgroundImage, 0, 0, backgroundImage.getWidth(), backgroundImage.getHeight(), null);
+
         Font font = g2.getFont().deriveFont(Font.BOLD, 28F);
         g2.setFont(font);
         g2.setColor(Color.GREEN);
 
-        String[] menuState0= {"WOW", "PLAY", "High Scores", "Quit"};
+        String[] menuState0= {"RPSIDK", "PLAY", "High Scores", "Quit"};
         int[] menuState0VerticalOffsets = {100, 200, 300, 400};
 
-
-        ArrayList<String> topScores = scores.getTopScores();
+        ArrayList<String> topScores = this.scores.getTopScores();
         String[] menuState1 = {"High Scores","Back"};
         int[] menuState1VerticalOffsets = {50, 450};
         int[] highScoresOffset = {150, 200, 250, 300, 350};
 
         if(this.state == 0){
             for (int i = 0; i < menuState0.length; i++) {
-                Point point = getCenteredTextPoint(g2, menuState0[i], menuState0VerticalOffsets[i]);
+                Point point = getCenteredTextPoint(this.game, g2, menuState0[i], menuState0VerticalOffsets[i]);
                 g2.drawString(menuState0[i], point.x, point.y);
                 points.add(point);
             }
@@ -102,17 +98,16 @@ public class MainMenu extends Menu{
 
         if(this.state == 1){
             for (int i = 0; i < menuState1.length; i++) {
-                Point point = getCenteredTextPoint(g2, menuState1[i], menuState1VerticalOffsets[i]);
+                Point point = getCenteredTextPoint(this.game, g2, menuState1[i], menuState1VerticalOffsets[i]);
                 g2.drawString(menuState1[i], point.x, point.y);
                 points.add(point);
             }
 
             for (int i = 0; i < topScores.size(); i++) {
-                Point scorePoint = getCenteredTextPoint(g2, topScores.get(i), highScoresOffset[i]);
+                Point scorePoint = getCenteredTextPoint(this.game, g2, topScores.get(i), highScoresOffset[i]);
                 g2.drawString(topScores.get(i), scorePoint.x, scorePoint.y);
             }
         }
-
         update(points, g2);
     }
 }

@@ -14,7 +14,7 @@ public abstract class SuperObject implements CloneableImageObject{
     public BufferedImage[] images; // Modified to use an array of images
     public String name;
     public boolean collision = false;
-    public int worldX, worldY;
+    public int x, y;
     public Rectangle solidArea = new Rectangle(0,0,DEFAULT_SOLID_AREA_WIDTH,DEFAULT_SOLID_AREA_HEIGHT);
     public int solidAreaDefaultX = 0;
     public int solidAreaDefaultY = 0;
@@ -39,12 +39,7 @@ public abstract class SuperObject implements CloneableImageObject{
         try {
             if (game == null) {
             } else {
-//                double screenX = worldX - game.player.x + gp.player.xLocationOnScreen;
-//                double screenY = worldY - game.player.y + gp.player.yLocationOnScreen;
-                // Use synchronized block to ensure atomic access to the images array
-                g2.setColor(Color.RED);
-
-                g2.drawImage(getImages()[currentFrame],worldX,worldY, null);
+                // g2.drawImage(getImages()[currentFrame], x, y, null);
             }
         } catch (Exception e) {
             e.printStackTrace();

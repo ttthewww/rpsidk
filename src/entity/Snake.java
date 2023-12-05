@@ -11,9 +11,9 @@ import main.Game;
 
 public class Snake implements Boss {
     Game game;
-    EnemyFrame snakeHeadFrame;
+    EntityWindow snakeHeadFrame;
 
-    public CopyOnWriteArrayList<EnemyFrame> snakeFrames = new CopyOnWriteArrayList<>();
+    public CopyOnWriteArrayList<EntityWindow> snakeFrames = new CopyOnWriteArrayList<>();
     int count = 0;
     
     public int frameWidth = 150;
@@ -190,7 +190,7 @@ public class Snake implements Boss {
 
     @Override
     public void draw(Graphics2D g2) {
-        for(EnemyFrame f : snakeFrames){
+        for(EntityWindow f : snakeFrames){
             f.repaint();
         }
     }

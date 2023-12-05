@@ -16,7 +16,6 @@ public class FPS {
         timer += (this.currentTime - this.lastTime);
         this.lastTime = this.currentTime;
 
-
         if(timer >= 1000000000){
             currentFPS = drawCount;
             drawCount = 0;

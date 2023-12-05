@@ -12,10 +12,14 @@ public class AssetSetter implements SpawnPoints {
     }
 
     public void setObject() {
-        drawerThread.obj[0] = new OBJ_Background(game);
+        // drawerThread.obj[0] = new OBJ_Background(game);
 
-        // drawerThread.obj[1] = new OBJ_Orb();
+        // drawerThread.obj[1] = new OBJ_Orb(game);
         // drawerThread.obj[1].worldX = 0;
         // drawerThread.obj[1].worldY = 0;
+         
+        drawerThread.obj[1] = new OBJ_Player(game);
+        drawerThread.obj[1].x =  100;
+        drawerThread.obj[1].y = 100;
     }
 }
