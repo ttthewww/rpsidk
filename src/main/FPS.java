@@ -1,7 +1,5 @@
 package main;
 
-import java.awt.*;
-
 public class FPS {
     public int targetFPS= 60;
     public int currentFPS = 0;
@@ -9,14 +7,20 @@ public class FPS {
     public double delta = 0;
     public long lastTime = System.nanoTime();
     public long currentTime;
-    public long timer = 0;
+    public static long timer = 0;
     public int drawCount = 0;
 
     public void update(){
         this.currentTime = System.nanoTime();
         this.delta += (this.currentTime - this.lastTime) / this.drawInterval;
-        this.timer += (this.currentTime - this.lastTime);
+        timer += (this.currentTime - this.lastTime);
         this.lastTime = this.currentTime;
+
+        if(timer >= 1000000000){
+            currentFPS = drawCount;
+            drawCount = 0;
+            timer = 0;
+        }
     }
 }
 

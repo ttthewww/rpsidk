@@ -1,33 +1,47 @@
 package main;
 
-import entity.*;
-import handlers.*;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.MouseInfo;
+import java.awt.Toolkit;
 import java.time.LocalDate;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import entity.Player;
+import handlers.EntityHandler;
+import handlers.ImageHandler;
+import handlers.KeyHandler;
+import handlers.MaskHandler;
+import handlers.MouseHandler;
+import handlers.MouseMotionHandler;
+import handlers.Sound;
+import object.ObjectDrawerThread;
+
 public class Game extends JPanel implements Runnable, Sound{
-    public WindowContainer window;
-    public int windowPosX = 500;
-    public int windowPosY = 250;
-    public int screenWidth = 576;
-    public int screenHeight = 576;
+    public JFrame window;
+    public int windowPosX;
+    public int windowPosY;
+
+    public int windowWidth = 576;
+    public int windowHeight = 576;
     public int mouseX;
     public int mouseY;
     public int absoluteMouseX;
     public int absoluteMouseY;
-    public MaskHandler maskCreationThread;
-    public EnemyHandler enemyHandler;
-    public CollisionChecker cChecker;
+    public MaskHandler maskHandler;
+    public EntityHandler entityHandler;
     public Player player;
     public KeyHandler keyH;
     public MouseHandler mouseH;
     public MouseMotionHandler mouseMotionH;
-    public BackgroundHandler backgroundHandler;
+
     // GameState variables
     public int mainMenuState = 0, mainGameState = 1, gameOverState = 2;
-    public int gameState = mainMenuState;
+    public int gameState = mainGameState;
     public boolean paused;
     public MainMenu mainMenu;
     public PauseMenu pauseMenu;
@@ -35,32 +49,31 @@ public class Game extends JPanel implements Runnable, Sound{
     public FPS fps = new FPS();
     public ScoreBoard scoreBoard;
     Thread gameThread;
+    Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+    ObjectDrawerThread objectDrawerThread;
+    AssetSetter  assetSetter;
+    Graphics2D g2;
+
+
     public Game(){
         setWindowDefaults();
-        this.setBackground(Color.black);
-        this.setDoubleBuffered(true);
-        this.setFocusable(true);
-        this.setSize((int) window.windowWidth, (int)window.windowHeight);
-        this.setFocusTraversalKeysEnabled(false);
-
-        this.maskCreationThread = new MaskHandler();
-
         new ImageHandler();
+        this.objectDrawerThread = new ObjectDrawerThread(this);
+        assetSetter = new AssetSetter(this, objectDrawerThread);
+        assetSetter.setObject();
+
+        this.maskHandler = new MaskHandler();
         this.player = new Player(this);
         this.mouseMotionH = new MouseMotionHandler();
         this.addMouseMotionListener(mouseMotionH);
-        this.keyH = new KeyHandler();
-
+        this.keyH = new KeyHandler(this);
+        this.mouseH = new MouseHandler(this);
         this.mainMenu = new MainMenu(this);
         this.pauseMenu = new PauseMenu(this);
         this.gameOverMenu = new GameOverMenu(this);
 
-        this.mouseH = new MouseHandler(this);
-
-        this.cChecker = new CollisionChecker(this.player);
-        this.backgroundHandler = new BackgroundHandler(this);
-
-        this.enemyHandler = new EnemyHandler(this);
+        this.entityHandler = new EntityHandler(this, g2);
 
         this.addKeyListener(keyH);
         this.addMouseListener(mouseH);
@@ -70,29 +83,32 @@ public class Game extends JPanel implements Runnable, Sound{
     }
 
     public void setWindowDefaults(){
-        this.window =  new WindowContainer(screenWidth, screenHeight,0, 0);
-        window.setFocusTraversalKeysEnabled(false);
-        window.setResizable(false);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setTitle("Game");
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        window.setLocation(dim.width / 2 - windowPosX / 2, dim.height / 2 - windowPosY - 50);
-        window.setLayout(null);
-        window.add(this);
+        this.window =  new JFrame();
+        this.window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        this.window.setUndecorated(true);
+        this.window.setBackground(new Color(0, 0, 0, 0));
+        // this.setPreferredSize(new Dimension(dim.height, dim.width));
+        this.setOpaque(false);
+        this.window.setAlwaysOnTop(true);
+        this.window.add(this);
+
+        this.window.setVisible(true);
+        this.setFocusTraversalKeysEnabled(false);
     }
 
     public void startGameThread(){
         gameThread = new Thread(this);
         gameThread.start();
-//        playMusic(0);
+        playMusic(0);
     }
 
     public void reset(){
         this.player.reset();
-        this.enemyHandler.reset();
+        this.entityHandler.reset();
         this.gameState = mainGameState;
     }
-
 
     public void run(){
         while(gameThread != null){
@@ -104,80 +120,71 @@ public class Game extends JPanel implements Runnable, Sound{
             }
 
             fps.update();
-            fps.currentTime = System.nanoTime();
-            fps.delta += (fps.currentTime - fps.lastTime) / fps.drawInterval;
-            fps.timer += (fps.currentTime - fps.lastTime);
-            fps.lastTime = fps.currentTime;
 
             if(fps.delta >= 1){
                 update();
                 repaint();
+
                 fps.delta--;
                 fps.drawCount++;
             }
-            if(fps.timer>= 1000000000){
-                fps.currentFPS = fps.drawCount;
-                fps.drawCount = 0;
-                fps.timer = 0;
-            }
         }
     }
+
     public void update(){
+        if(this.gameState == this.mainMenuState){
+            this.entityHandler.reset();
+        }
+
         if(this.gameState == this.mainGameState){
-            if(this.keyH.escToggled){
+            if(KeyHandler.escToggled){
                 this.paused = true;
             }
 
-            if(!this.keyH.escToggled){
+            if(!KeyHandler.escToggled){
                 this.paused = false;
             }
 
             if(!this.paused){
-                this.backgroundHandler.update();
-
-                if(this.player.health <= 0){
+                if(this.player.getHealth() <= 0){
                     scoreBoard.addScore(String.valueOf(LocalDate.now()), player.score);
                     this.gameState = gameOverState;
                 }
 
-                player.update(this, this.window);
-                enemyHandler.update();
+                entityHandler.update();
             }
         }
     }
 
-    public void paintComponent(Graphics g){
-         super.paintComponent(g);
-         Graphics2D g2 = (Graphics2D)g;
+    protected void paintComponent(Graphics g){
+        if(this.gameThread != null){
+            super.paintComponent(g);
+            g2 = (Graphics2D)g;
 
-         if(this.gameState == 0){
-             mainMenu.draw(g2);
-         }
+            if(this.gameState == mainMenuState){
+                this.mainMenu.draw(g2);
+            }
 
-         if(this.gameState ==  1){
+            if(this.gameState ==  mainGameState){
+                objectDrawerThread.drawObjects(g2);
 
-             this.backgroundHandler.draw(g2);
+                if(!this.paused){
+                    this.entityHandler.draw(g2);
+                }
 
-             this.enemyHandler.draw(g2);
-             for (Bullet bullet : player.bullets) {
-                 bullet.draw(g2);
-             }
+                if(this.paused){
+                    this.pauseMenu.draw(g2);
+                }
 
-             g2.setColor(Color.GREEN);
-             g2.drawString("Score: " + player.score, 5, 10);
-             g2.drawString("Health: " + player.health,400, 10);
+                g2.setColor(Color.GREEN);
+                g2.drawString("Score: " + player.score, 5, 10);
+                g2.drawString("Health: " + player.getHealth() ,400, 10);
+            }
 
-             player.draw(g2);
-
-             if(this.paused){
-                 this.pauseMenu.draw(g2);
-             }
-         }
-
-         if(this.gameState == 2){
-             this.gameOverMenu.draw(g2);
-         }
-
-         g2.dispose();
+            if(this.gameState == gameOverState){
+                this.gameOverMenu.draw(g2);
+            }
+            g2.dispose();
+        }
     }
 }

@@ -1,10 +1,15 @@
 package main;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class ScoreBoard {
-    private static final String SCORE_FILE = "src/resource/Scores.txt";
+    private static final String SCORE_FILE = "./src/resource/Scores.txt";
     void addScore(String date, int score) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SCORE_FILE, true))) {
             writer.write(score + " | " + date);

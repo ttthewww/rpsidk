@@ -1,8 +1,9 @@
 package main;
 
+import javax.swing.JFrame;
+
 import entity.Enemy;
 
-import javax.swing.*;
 
 public class EnemyWindowContainer extends JFrame implements Runnable {
     int windowPosX;

@@ -15,12 +15,12 @@ public class MaskHandler {
     }
 
     public Area addMask(Entity entity){
-        Area mask = createMaskFromTransparency(entity.image, entity.x - entity.image.getWidth() / 2, entity.y - entity.image.getHeight() / 2);
+        Area mask = createMaskFromTransparency(entity.image, entity.x - (double) entity.image.getWidth() / 2, entity.y - (double) entity.image.getHeight() / 2);
         masks.put(entity, mask);
         return mask;
     }
 
-    public Area getMask(Entity entity) {
+    public Area getMask(Entity entity){
         try {
             for (Map.Entry<Entity, Area> entry : masks.entrySet()) {
                 if(entry.getKey() == entity){

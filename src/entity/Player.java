@@ -3,24 +3,27 @@ package entity;
 import handlers.ImageHandler;
 import handlers.KeyHandler;
 import handlers.MouseHandler;
-import main.*;
+import main.Game;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+
 public class Player extends Entity implements Rotate{
-    public int health;
+    private int health;
     public int score;
     public int fireCooldown = 0;
     public int reloadTime = 30;
     public int bulletType = 1;
+
+    private int invunerableTime = 0;
+    private int maxInvulnerableTime = 100;
 
     public double absoluteX;
     public double absoluteY;
@@ -39,20 +42,25 @@ public class Player extends Entity implements Rotate{
     public BufferedImage[] playerFrames;
     public CopyOnWriteArrayList<Bullet> bullets = new CopyOnWriteArrayList<>();
     private BufferedImage bulletTypeImage = ImageHandler.rockBulletImage;
+    PlayerBullet playerBullet;
 
     public Player(Game game) {
         this.game = game;
+        playerBullet = new PlayerBullet(this.game, 0F, 0, 0);
         getImage();
         reset();
-        this.colRect = this.mask.getBounds();
     }
 
+
     public void reset() {
-        x = this.game.window.getWidth() / 2;
-        y = this.game.window.getHeight() / 2;
-        this.mask = new Area(this.game.maskCreationThread.addMask(this));
+        this.x = 0;
+        this.y = 0;
+        this.mask = new Area(this.game.maskHandler.addMask(this));
+        this.x = this.game.window.getWidth() / 2;
+        this.y = this.game.window.getHeight() / 2;
         this.health = 999;
         this.score = 0;
+
     }
 
     public void setHandlers(KeyHandler keyH, MouseHandler mouseH){
@@ -61,22 +69,20 @@ public class Player extends Entity implements Rotate{
     }
 
     public void getImage() {
-        try {
-            playerFrames = new BufferedImage[5];
+        this.image = ImageHandler.playerFrames[0];
+    }
 
-            for (int i = 0; i < 5; i++) {
-                BufferedImage frame = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("../resource/player/idle" + (i + 1) + ".png")));
-                if (frame != null) {
-                    playerFrames[i] = frame;
-                } else {
-                    System.err.println("Error loading image for frame " + i);
-                }
-            }
-            this.image = playerFrames[0];
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void takeDamage(){
+        if(invunerableTime <= 0){
+            this.health--;
+            invunerableTime = maxInvulnerableTime;
         }
     }
+
+    public int getHealth() {
+        return this.health;
+    }
+
     public void toggleBulletType() {
         bulletType++;
         if (bulletType > 3) {
@@ -89,16 +95,26 @@ public class Player extends Entity implements Rotate{
 
     public void shoot() {
         if (fireCooldown >= reloadTime) {
-            double directionX = this.game.absoluteMouseX - ((game.getLocationOnScreen().x + this.x));
-            double directionY = this.game.absoluteMouseY - ((game.getLocationOnScreen().y + this.y));
-            double rotationAngleInRadians = Math.atan2(directionY, directionX);
-            bullets.add(new PlayerBullet(this.game, rotationAngleInRadians, this.bulletType));
+            double targetX = this.game.absoluteMouseX - ((game.getLocationOnScreen().x + this.x));
+            double targetY = this.game.absoluteMouseY - ((game.getLocationOnScreen().y + this.y));
+            double rotationAngleInRadians = Math.atan2(targetY, targetX);
+
+            CloneableEntity newBullet = playerBullet.clone();
+            PlayerBullet newPlayerBullet = (PlayerBullet)newBullet;
+            newPlayerBullet.game = this.game;
+            newPlayerBullet.angle = rotationAngleInRadians;
+            newPlayerBullet.bulletType = this.bulletType;
+            newPlayerBullet.getImage();
+            newPlayerBullet.x = this.x;
+            newPlayerBullet.y = this.y;
+            bullets.add(newPlayerBullet);
+            // bullets.add(new PlayerBullet(game, this.x, this.y, rotationAngleInRadians));
             fireCooldown = 3;
         }
     }
 
     public void move() {
-        if (keyH.rightPressed) {
+        if (KeyHandler.rightPressed) {
             this.speed_x_right += this.acceleration;
             if (this.speed_x_right > this.top_speed) {
                 this.speed_x_right = this.top_speed;
@@ -107,7 +123,7 @@ public class Player extends Entity implements Rotate{
             this.speed_x_right -= this.deceleration;
         }
 
-        if (keyH.leftPressed) {
+        if (KeyHandler.leftPressed) {
             this.speed_x_left -= this.acceleration;
             if (this.speed_x_left < -this.top_speed) {
                 this.speed_x_left = -this.top_speed;
@@ -116,7 +132,7 @@ public class Player extends Entity implements Rotate{
             this.speed_x_left += this.deceleration;
         }
 
-        if (keyH.downPressed) {
+        if (KeyHandler.downPressed) {
             this.speed_y_down += this.acceleration;
             if (this.speed_y_down > this.top_speed) {
                 this.speed_y_down = this.top_speed;
@@ -125,7 +141,7 @@ public class Player extends Entity implements Rotate{
             this.speed_y_down -= this.deceleration;
         }
 
-        if (keyH.upPressed) {
+        if (KeyHandler.upPressed) {
             this.speed_y_up -= this.acceleration;
             if (this.speed_y_up < -this.top_speed) {
                 this.speed_y_up = -this.top_speed;
@@ -148,35 +164,37 @@ public class Player extends Entity implements Rotate{
             this.speed_y_up = 0;
         }
 
-        this.x += this.speed_x_right;
-        this.x += this.speed_x_left;
-        this.y += this.speed_y_up;
-        this.y += this.speed_y_down;
+        if(!KeyHandler.shiftPressed){
+            this.x += (int) this.speed_x_right;
+            this.x += (int) this.speed_x_left;
+            this.y += (int) this.speed_y_up;
+            this.y += (int) this.speed_y_down;
+        }
 
         this.absoluteX += this.speed_x_right;
         this.absoluteX += this.speed_x_left;
         this.absoluteY += this.speed_y_up;
         this.absoluteY += this.speed_y_down;
 
+
+        if (this.x - 15 <= 0) {
+            this.x = 15;
+        }
+
+        if (this.x + 15 >= game.getWidth()) {
+            this.x = game.getWidth() - 15;
+        }
+
+        if (this.y - 15 <= 0) {
+            this.y = 15;
+        }
+
+        if (this.y + 15 >= game.getHeight()) {
+            this.y = game.getHeight() - 15;
+        }
+
         this.xLocationOnScreen = this.game.getLocationOnScreen().x + this.x;
         this.yLocationOnScreen = this.game.getLocationOnScreen().y + this.y;
-
-
-        if (this.x - 30 <= 0) {
-            this.x = 30;
-        }
-
-        if (this.x + 30 >= game.getWidth()) {
-            this.x = game.getWidth() - 30;
-        }
-
-        if (this.y - 30 <= 0) {
-            this.y = 30;
-        }
-
-        if (this.y + 30 >= game.getHeight()) {
-            this.y = game.getHeight() - 30;
-        }
     }
 
     public void updatePlayerBullets(){
@@ -187,33 +205,14 @@ public class Player extends Entity implements Rotate{
         }
     }
 
-    public void update(Game game, WindowContainer window){
-        move();
-        //Shooting
-        fireCooldown++;
-        if (fireCooldown >= reloadTime) fireCooldown = reloadTime;
-        if (keyH.spacePressed || mouseH.shoot) {
-            shoot();
-        }
-        updatePlayerBullets();
-
-        //Updating collision box
-        this.colRect.setLocation((int) (this.x - this.image.getWidth() / 2), (int) (this.y - this.image.getHeight() / 2));
-    }
-
-
-    @Override
     public void rotate(BufferedImage image, AffineTransform at) {
-        rotate(image, null, at);
-    }
-    public void rotate(BufferedImage image, Game gamePanel, AffineTransform at) {
-        double directionX = gamePanel.absoluteMouseX - ((game.getLocationOnScreen().x + this.x));
-        double directionY = gamePanel.absoluteMouseY - ((game.getLocationOnScreen().y + this.y));
+        double directionX = this.game.absoluteMouseX - ((game.getLocationOnScreen().x + this.x));
+        double directionY = this.game.absoluteMouseY - ((game.getLocationOnScreen().y + this.y));
         double rotationAngleInRadians = Math.atan2(directionY, directionX);
         at.rotate(rotationAngleInRadians, image.getWidth() / 2.0, image.getHeight() / 2.0);
 
-        if (this.game.maskCreationThread.getMask(this) != null) {
-            Area newMask = this.game.maskCreationThread.getMask(this);
+        if (this.game.maskHandler.getMask(this) != null) {
+            Area newMask = this.game.maskHandler.getMask(this);
             at = AffineTransform.getTranslateInstance(this.x, this.y);
 
             directionX = this.game.absoluteMouseX - ((game.getLocationOnScreen().x + this.x));
@@ -227,24 +226,34 @@ public class Player extends Entity implements Rotate{
         }
     }
 
+    public void update(){
+        move();
+        invunerableTime--;
+        //Shooting
+        fireCooldown++;
+        if (fireCooldown >= reloadTime) fireCooldown = reloadTime;
+        if (KeyHandler.spacePressed || mouseH.shoot) {
+            shoot();
+        }
+        updatePlayerBullets();
+    }
+
     public void draw(Graphics2D g2) {
-        BufferedImage image = playerFrames[0];
-        if (playerFrames != null && playerFrames.length > 0) {
-            int frameIndex = (int) ((System.currentTimeMillis() / 100) % playerFrames.length);
-            image = playerFrames[frameIndex];
+        if (ImageHandler.playerFrames != null && ImageHandler.playerFrames.length > 0) {
+            int frameIndex = (int) ((System.currentTimeMillis() / 100) % ImageHandler.playerFrames.length);
+            image = ImageHandler.playerFrames[frameIndex];
         }
 
         AffineTransform at = AffineTransform.getTranslateInstance(this.x - image.getWidth() / 2.0, this.y - image.getHeight() / 2.0);
-        rotate(image, this.game, at);
-        g2.drawImage(this.bulletTypeImage, AffineTransform.getTranslateInstance(this.game.getWidth() / 2.0 - this.bulletTypeImage.getWidth() / 2,  10), null);
-
-//        g2.draw(this.colRect);
-//        g2.draw(this.mask);
-
-
+        rotate(image, at);
         g2.drawImage(image, at, null);
-//        g2.setColor(Color.RED);
-//        g2.drawOval((int) this.x, (int) this.y, 2, 2);
+        g2.drawImage(this.bulletTypeImage, AffineTransform.getTranslateInstance(this.game.getWidth() / 2.0 - this.bulletTypeImage.getWidth() / 2.0,  10), null);
+
+        g2.setColor(Color.RED);
+
+        // g2.draw(this.mask);
+
+        g2.setColor(Color.BLUE);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
 }

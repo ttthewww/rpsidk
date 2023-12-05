@@ -2,7 +2,6 @@ package handlers;
 
 import main.*;
 
-import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -36,11 +35,11 @@ public class MouseHandler implements MouseListener {
 
             if(this.game.paused){
                 if(this.game.pauseMenu.resumeHovered){
-                    this.game.keyH.escToggled = false;
+                    KeyHandler.escToggled = false;
                     this.game.paused = false;
                 }
                 if(this.game.pauseMenu.mainMenuHovered){
-                    this.game.keyH.escToggled = false;
+                    KeyHandler.escToggled = false;
                     this.game.paused = false;
                     this.game.gameState = game.mainMenuState;
                 }
